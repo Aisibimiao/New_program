@@ -97,7 +97,7 @@ function parseImages(images: any): string[] {
 }
 
 function getImageUrl(url?: string): string {
-  if (!url) return 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=product%20image%20placeholder&image_size=square'
+  if (!url) return 'https://api.dicebear.com/9.x/initials/svg?seed=Goods&backgroundColor=b6e3f4'
   if (url.startsWith('http')) return url
   return `http://localhost:3000${url}`
 }
@@ -133,7 +133,7 @@ function goToChat() {
   }
 
   uni.navigateTo({
-    url: `/pages/chat/index?goodsId=${goods.value?.id}&goodsName=${encodeURIComponent(goods.value?.name || '')}&otherId=${goods.value?.userId}&otherAvatar=${encodeURIComponent(goods.value?.seller?.avatar || '')}`
+    url: `/pages/chat/index?goodsId=${goods.value?.id}&goodsName=${encodeURIComponent(goods.value?.name || '')}&otherId=${goods.value?.userId}&otherAvatar=${encodeURIComponent(goods.value?.seller?.avatar || 'https://api.dicebear.com/9.x/initials/svg?seed=Seller&backgroundColor=b6e3f4')}`
   })
 }
 

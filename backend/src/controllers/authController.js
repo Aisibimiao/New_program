@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { generateToken } = require('../utils/jwt');
 const { sendVerificationCode } = require('../utils/email');
 const { saveCode, verifyCode } = require('../utils/codeStore');
@@ -47,11 +47,13 @@ exports.register = async (req, res) => {
     if (existing) return res.status(400).json({ msg: '用户已存在' });
 
     const hashed = await bcrypt.hash(password, 10);
+    const defaultAvatar = `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(nickname || email.split('@')[0])}&backgroundColor=b6e3f4`;
     const user = await prisma.user.create({
         data: {
             email,
             password: hashed,
             nickname: nickname || email.split('@')[0],
+            avatar: defaultAvatar,
             role: 'USER',
         },
         select: { id: true, email: true, nickname: true, avatar: true, role: true },

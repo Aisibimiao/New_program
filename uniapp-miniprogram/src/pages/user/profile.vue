@@ -109,7 +109,7 @@ const stats = ref({
 })
 
 function getImageUrl(url?: string) {
-  if (!url) return ''
+  if (!url) return 'https://api.dicebear.com/9.x/initials/svg?seed=User&backgroundColor=b6e3f4'
   if (url.startsWith('http')) return url
   return `http://localhost:3000${url}`
 }

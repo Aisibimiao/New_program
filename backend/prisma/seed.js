@@ -18,7 +18,8 @@ async function main() {
                 password: hashedPassword,
                 role: 'ADMIN',
                 name: 'System Admin',
-                nickname: 'Admin'
+                nickname: 'Admin',
+                avatar: 'https://api.dicebear.com/9.x/initials/svg?seed=Admin&backgroundColor=667eea'
             }
         })
         console.log('管理员账号已创建')
@@ -37,7 +38,8 @@ async function main() {
                 password: hashedPassword,
                 role: 'USER',
                 name: 'Test User',
-                nickname: '测试用户'
+                nickname: '测试用户',
+                avatar: 'https://api.dicebear.com/9.x/initials/svg?seed=TestUser&backgroundColor=4facfe'
             }
         })
         console.log('测试用户账号已创建')

@@ -39,8 +39,8 @@ const messages = ref<{ content: string; time: string; isSelf: boolean }[]>([])
 const goodsId = ref('')
 const goodsName = ref('')
 const otherId = ref('')
-const otherAvatar = ref('')
-const selfAvatar = ref('')
+const otherAvatar = ref('https://api.dicebear.com/9.x/initials/png?seed=Seller&backgroundColor=b6e3f4')
+const selfAvatar = ref('https://api.dicebear.com/9.x/initials/png?seed=Me&backgroundColor=b6e3f4')
 const messageList = ref<uni.NodeInfo | null>(null)
 const scrollToId = ref('')
 
@@ -56,7 +56,7 @@ function updateCurrentTime() {
 }
 
 function getImageUrl(url?: string) {
-  if (!url) return 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=user%20avatar%20icon%20simple%20circle&image_size=square'
+  if (!url) return 'https://api.dicebear.com/9.x/initials/png?seed=User&backgroundColor=b6e3f4'
   if (url.startsWith('http')) return url
   return `http://localhost:3000${url}`
 }
@@ -174,19 +174,28 @@ onLoad((options) => {
   if (options?.goodsId) goodsId.value = options.goodsId
   if (options?.goodsName) goodsName.value = decodeURIComponent(options.goodsName)
   if (options?.otherId) otherId.value = options.otherId
-  if (options?.otherAvatar) otherAvatar.value = decodeURIComponent(options.otherAvatar)
-  
-  if (userStore.user) {
-    selfAvatar.value = userStore.user.avatar || ''
-  }
-  
-  loadMessages()
+  if (options?.otherAvatar) otherAvatar.value = decodeURIComponent(options.otherAvatar) || 'https://api.dicebear.com/9.x/initials/png?seed=Seller&backgroundColor=b6e3f4'
 })
 
 onMounted(() => {
   userStore.initFromStorage()
+  
+  // 无论用户是否登录，都设置头像
+  if (userStore.user && userStore.user.avatar) {
+    selfAvatar.value = userStore.user.avatar
+  } else if (userStore.user) {
+    selfAvatar.value = 'https://api.dicebear.com/9.x/initials/png?seed=' + encodeURIComponent(userStore.user.nickname || userStore.user.name || 'Me') + '&backgroundColor=b6e3f4'
+  } else {
+    selfAvatar.value = 'https://api.dicebear.com/9.x/initials/png?seed=Me&backgroundColor=b6e3f4'
+  }
+  
+  if (!otherAvatar.value) {
+    otherAvatar.value = 'https://api.dicebear.com/9.x/initials/png?seed=Seller&backgroundColor=b6e3f4'
+  }
+  
   updateCurrentTime()
   uni.setNavigationBarTitle({ title: goodsName.value || '联系卖家' })
+  loadMessages()
 })
 </script>
 

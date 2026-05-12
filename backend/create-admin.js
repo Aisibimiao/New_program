@@ -17,7 +17,10 @@ async function createAdmin() {
             // 存在则更新为管理员
             await prisma.user.update({
                 where: { phone },
-                data: { role: 'ADMIN' }
+                data: {
+                    role: 'ADMIN',
+                    avatar: existingUser.avatar || 'https://api.dicebear.com/9.x/initials/svg?seed=Admin&backgroundColor=667eea'
+                }
             });
             console.log(`用户 ${phone} 已设置为管理员`);
         } else {
@@ -29,7 +32,8 @@ async function createAdmin() {
                     password: hashedPassword,
                     email,
                     role: 'ADMIN',
-                    name: '管理员'
+                    name: '管理员',
+                    avatar: 'https://api.dicebear.com/9.x/initials/svg?seed=Admin&backgroundColor=667eea'
                 }
             });
             console.log(`管理员账号创建成功: ${phone} / ${password}`);
