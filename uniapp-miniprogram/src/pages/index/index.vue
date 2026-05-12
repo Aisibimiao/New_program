@@ -1,7 +1,7 @@
 <template>
   <view class="container">
     <view class="header">
-      <text class="title">校园二手平台</text>
+      <text class="title">重庆电子科技职业大学校园交易平台</text>
       <view class="search-bar">
         <text class="search-icon">🔍</text>
         <input 
