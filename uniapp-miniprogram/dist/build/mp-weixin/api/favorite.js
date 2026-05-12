@@ -1,0 +1,1 @@
+"use strict";const e=require("../utils/request.js");exports.addFavorite=function(t){return e.request({url:"/favorites",method:"POST",data:{goodsId:t}})},exports.getFavorites=function(){return e.request({url:"/favorites",method:"GET"})},exports.removeFavorite=function(t){return e.request({url:`/favorites/${t}`,method:"DELETE"})};

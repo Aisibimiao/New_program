@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `goods` MODIFY `category` ENUM('LIFE', 'ELECTRONICS', 'BOOK', 'CLOTHING', 'SPORTS', 'OTHER') NOT NULL;

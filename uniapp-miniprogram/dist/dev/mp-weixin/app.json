@@ -1,0 +1,25 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/goods/list",
+    "pages/goods/detail",
+    "pages/user/login",
+    "pages/user/register",
+    "pages/user/profile",
+    "pages/user/edit",
+    "pages/user/settings",
+    "pages/goods/my-list",
+    "pages/order/list",
+    "pages/order/detail",
+    "pages/favorite/index",
+    "pages/publish/index",
+    "pages/chat/index"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "校园二手平台",
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#f5f5f5"
+  },
+  "usingComponents": {}
+}

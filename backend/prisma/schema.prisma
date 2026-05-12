@@ -1,0 +1,129 @@
+// 数据源配置
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 生成客户端
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id         String        @id @default(uuid())
+  phone      String?       @unique
+  email      String?       @unique
+  password   String
+  name       String?       // 真实姓名
+  nickname   String?       // 昵称（新增）
+  studentId  String?       @unique
+  role       Role          @default(USER)
+  avatar     String?       // 头像 URL
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  goods      Goods[]
+  orders     Order[]
+  reviews    Review[]
+  favorites  Favorite[]
+  sentMessages    ChatMessage[]  @relation("Sender")
+  receivedMessages ChatMessage[] @relation("Receiver")
+}
+
+model Goods {
+  id          String        @id @default(uuid())
+  title       String
+  description String?       @db.Text
+  price       Decimal       @db.Decimal(10,2)
+  originalPrice Decimal?    @db.Decimal(10,2)
+  category    Category
+  condition   Int      @default(2) @map("goods_condition")
+  images      Json
+  status      Status        @default(ACTIVE)
+  location    String?
+  contact     String?
+  sellerId    String
+  seller      User          @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  viewCount   Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  orders      Order[]
+  reviews     Review[]
+  favorites   Favorite[]
+  chatMessages ChatMessage[]
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  buyerId     String
+  buyer       User        @relation(fields: [buyerId], references: [id])
+  goodsId     String
+  goods       Goods       @relation(fields: [goodsId], references: [id])
+  status      OrderStatus @default(PENDING)
+  contactInfo String?     @db.Text
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  rating      Int
+  comment     String?  @db.Text
+  reviewerId  String
+  reviewer    User     @relation(fields: [reviewerId], references: [id])
+  goodsId     String
+  goods       Goods    @relation(fields: [goodsId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Category {
+  LIFE
+  ELECTRONICS
+  BOOK
+  CLOTHING
+  SPORTS
+  OTHER
+}
+
+enum Status {
+  ACTIVE
+  SOLD
+  INACTIVE
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+model Favorite {
+  id        String  @id @default(uuid())
+  userId    String
+  goodsId   String
+  createdAt DateTime @default(now())
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goods Goods  @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, goodsId])
+}
+
+model ChatMessage {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  goodsId    String
+  content    String
+  createdAt  DateTime @default(now())
+
+  sender   User   @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User   @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  goods    Goods  @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+}
