@@ -1,24 +1,11 @@
 <template>
   <view class="container">
-    <view class="header">
-      <text class="title">重庆电子科技职业大学校园交易平台</text>
-      <view class="search-bar">
-        <text class="search-icon">🔍</text>
-        <input 
-          class="search-input" 
-          v-model="searchKeyword" 
-          placeholder="搜索商品"
-          confirm-type="search"
-          @confirm="handleSearch"
-        />
-        <view class="search-btn" @click="handleSearch">
-          <text>搜索</text>
-        </view>
+    <view class="header-area">
+      <view class="title-section">
+        <text class="title">重庆电子科技职业大学校园交易软件</text>
       </view>
-    </view>
-
-    <scroll-view class="main-scroll" scroll-y>
-      <view class="banner">
+      
+      <view class="banner-section">
         <swiper class="banner-swiper" indicator-dots autoplay circular interval="3000">
           <swiper-item>
             <view class="banner-item">
@@ -40,77 +27,64 @@
           </swiper-item>
         </swiper>
       </view>
+    </view>
 
-      <view class="category-section">
-        <text class="section-title">分类浏览</text>
-        <view class="category-grid">
-          <view 
-            class="category-item" 
-            v-for="cat in categories" 
-            :key="cat.name"
-            @click="goToCategory(cat.name)"
-          >
-            <text class="category-icon">{{ cat.icon }}</text>
-            <text class="category-name">{{ cat.name }}</text>
-          </view>
+    <view class="search-wrapper" :class="{ 'fixed': isSticky }">
+      <view class="search-bar">
+        <text class="search-icon">🔍</text>
+        <input 
+          class="search-input" 
+          v-model="searchKeyword" 
+          placeholder="搜索商品"
+          confirm-type="search"
+          @confirm="handleSearch"
+        />
+        <view class="search-btn" @click="handleSearch">
+          <text>搜索</text>
         </view>
       </view>
+    </view>
 
-      <view class="hot-section">
-        <view class="section-header">
-          <text class="section-title">热门商品</text>
-          <text class="section-more" @click="goToGoods()">更多 ›</text>
-        </view>
-        <scroll-view class="hot-scroll" scroll-x>
-          <view class="hot-list">
+    <scroll-view 
+      class="main-scroll" 
+      scroll-y 
+      @scroll="onScroll"
+      :scroll-top="scrollTop"
+    >
+      <view class="scroll-content">
+        <view class="header-placeholder" v-if="isSticky"></view>
+        
+        <view class="goods-section">
+          <view class="goods-list">
             <view 
-              class="hot-item" 
-              v-for="goods in hotGoods" 
+              class="goods-card" 
+              v-for="goods in goodsList" 
               :key="goods.id"
               @click="goToDetail(goods.id)"
             >
-              <image class="hot-image" :src="getImageUrl(goods.images?.[0])" mode="aspectFill" />
-              <view class="hot-info">
-                <text class="hot-name">{{ goods.name }}</text>
-                <text class="hot-price">¥{{ goods.price }}</text>
+              <image class="goods-image" :src="getImageUrl(goods.images?.[0])" mode="aspectFill" />
+              <view class="goods-info">
+                <text class="goods-name">{{ goods.name }}</text>
+                <text class="goods-desc">{{ goods.description }}</text>
+                <view class="goods-price-row">
+                  <text class="goods-price">¥{{ goods.price }}</text>
+                  <text v-if="goods.originalPrice" class="goods-original-price">¥{{ goods.originalPrice }}</text>
+                </view>
+                <text class="goods-time">{{ formatTime(goods.createdAt) }}</text>
               </view>
             </view>
           </view>
-        </scroll-view>
-      </view>
 
-      <view class="features">
-        <view class="feature-item" @click="goToGoods()">
-          <text class="feature-icon">📦</text>
-          <text class="feature-text">浏览商品</text>
-        </view>
-        <view class="feature-item" @click="goToPublish()">
-          <text class="feature-icon">📤</text>
-          <text class="feature-text">发布商品</text>
-        </view>
-        <view class="feature-item" @click="goToProfile()">
-          <text class="feature-icon">👤</text>
-          <text class="feature-text">个人中心</text>
-        </view>
-        <view class="feature-item" @click="goToFavorites()">
-          <text class="feature-icon">❤️</text>
-          <text class="feature-text">我的收藏</text>
-        </view>
-      </view>
-
-      <view class="data-info">
-        <text class="info-title">数据互联效果</text>
-        <view class="info-item">
-          <text class="info-label">Web端地址:</text>
-          <text class="info-value">http://localhost:5173</text>
-        </view>
-        <view class="info-item">
-          <text class="info-label">后端API:</text>
-          <text class="info-value">http://localhost:3000/api</text>
-        </view>
-        <view class="info-item">
-          <text class="info-label">数据存储:</text>
-          <text class="info-value">MySQL数据库</text>
+          <view class="load-more" v-if="loading">
+            <text class="loading-text">加载中...</text>
+          </view>
+          <view class="no-more" v-else-if="!hasMore && goodsList.length > 0">
+            <text class="no-more-text">暂无更多物品</text>
+          </view>
+          <view class="empty-state" v-else-if="goodsList.length === 0 && !loading">
+            <text class="empty-icon">📦</text>
+            <text class="empty-text">暂无商品</text>
+          </view>
         </view>
       </view>
     </scroll-view>
@@ -120,9 +94,9 @@
         <text class="tab-icon">🏠</text>
         <text class="tab-text">首页</text>
       </view>
-      <view class="tab-item" @click="goToGoods()">
-        <text class="tab-icon">📦</text>
-        <text class="tab-text">商品</text>
+      <view class="tab-item" @click="goToPublish()">
+        <text class="tab-icon">📤</text>
+        <text class="tab-text">发布</text>
       </view>
       <view class="tab-item" @click="goToProfile()">
         <text class="tab-icon">👤</text>
@@ -139,23 +113,18 @@ import { useUserStore } from '@/stores/user'
 
 const userStore = useUserStore()
 const searchKeyword = ref('')
-
-const categories = [
-  { name: '数码产品', icon: '📱' },
-  { name: '服饰鞋包', icon: '👔' },
-  { name: '图书教材', icon: '📚' },
-  { name: '运动户外', icon: '⚽' },
-  { name: '生活用品', icon: '🏠' },
-  { name: '其他', icon: '🎯' }
-]
-
-const hotGoods = ref<Goods[]>([])
+const goodsList = ref<Goods[]>([])
+const page = ref(1)
+const hasMore = ref(true)
+const loading = ref(false)
+const scrollTop = ref(0)
+const isSticky = ref(false)
 
 const mockGoods: Goods[] = [
   {
     id: '1',
     name: 'iPhone 14 Pro 256GB',
-    description: '95成新，使用半年，无磕碰',
+    description: '95成新，使用半年，无磕碰，电池健康度92%',
     price: 5999,
     originalPrice: 8999,
     images: [],
@@ -169,7 +138,7 @@ const mockGoods: Goods[] = [
   {
     id: '2',
     name: '高等数学教材（第七版）',
-    description: '全新未拆封，考研必备',
+    description: '全新未拆封，考研必备教材',
     price: 35,
     originalPrice: 59,
     images: [],
@@ -235,37 +204,58 @@ const mockGoods: Goods[] = [
     userId: '6',
     createdAt: '2024-01-10',
     updatedAt: '2024-01-10'
+  },
+  {
+    id: '7',
+    name: 'iPad Air 5 256GB',
+    description: '几乎全新，带原装笔',
+    price: 3599,
+    originalPrice: 5499,
+    images: [],
+    category: '数码产品',
+    condition: 5,
+    status: 1,
+    userId: '7',
+    createdAt: '2024-01-09',
+    updatedAt: '2024-01-09'
+  },
+  {
+    id: '8',
+    name: '四六级真题试卷',
+    description: '含答案解析，适合备考',
+    price: 20,
+    originalPrice: 35,
+    images: [],
+    category: '图书教材',
+    condition: 4,
+    status: 1,
+    userId: '8',
+    createdAt: '2024-01-08',
+    updatedAt: '2024-01-08'
   }
 ]
 
 function getImageUrl(url?: string) {
-  if (!url) return ''
+  if (!url || url === '[]') return 'https://via.placeholder.com/400x300/f5f5f5/999999?text=No+Image'
   if (url.startsWith('http')) return url
-  return `http://localhost:3000${url}`
+  if (url.startsWith('/')) return `http://localhost:3000${url}`
+  return url
+}
+
+function formatTime(dateStr?: string) {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  if (days === 0) return '今天'
+  if (days === 1) return '昨天'
+  if (days < 7) return `${days}天前`
+  return `${date.getMonth() + 1}月${date.getDate()}日`
 }
 
 function goToHome() {
   uni.navigateTo({ url: '/pages/index/index' })
-}
-
-function goToGoods() {
-  uni.navigateTo({ url: '/pages/goods/list' })
-}
-
-function goToSearch() {
-  uni.navigateTo({ url: '/pages/goods/list' })
-}
-
-function handleSearch() {
-  if (!searchKeyword.value.trim()) {
-    uni.showToast({ title: '请输入搜索关键词', icon: 'none' })
-    return
-  }
-  uni.navigateTo({ url: `/pages/goods/list?keyword=${encodeURIComponent(searchKeyword.value)}` })
-}
-
-function goToCategory(category: string) {
-  uni.navigateTo({ url: `/pages/goods/list?category=${category}` })
 }
 
 function goToPublish() {
@@ -288,32 +278,51 @@ function goToProfile() {
   uni.navigateTo({ url: '/pages/user/profile' })
 }
 
-function goToFavorites() {
-  if (!userStore.token) {
-    uni.showToast({ title: '请先登录', icon: 'none' })
+function handleSearch() {
+  if (!searchKeyword.value.trim()) {
+    uni.showToast({ title: '请输入搜索关键词', icon: 'none' })
     return
   }
-  uni.navigateTo({ url: '/pages/favorite/index' })
+  uni.navigateTo({ url: `/pages/goods/list?keyword=${encodeURIComponent(searchKeyword.value)}` })
 }
 
 function goToDetail(id: string) {
   uni.navigateTo({ url: `/pages/goods/detail?id=${id}` })
 }
 
-function loadHotGoods() {
-  hotGoods.value = mockGoods
-  getGoods({ page: 1, limit: 6 }).then((result) => {
+function onScroll(e: any) {
+  const scrollY = e.detail.scrollTop
+  isSticky.value = scrollY >= 300
+}
+
+function loadGoods() {
+  if (loading.value || !hasMore.value) return
+  
+  loading.value = true
+  getGoods({ page: page.value, limit: 6 }).then((result) => {
     if (result.list && result.list.length > 0) {
-      hotGoods.value = result.list
+      goodsList.value = [...goodsList.value, ...result.list]
+      page.value++
+      if (result.list.length < 6) {
+        hasMore.value = false
+      }
+    } else {
+      hasMore.value = false
     }
+    loading.value = false
   }).catch((err) => {
-    console.error('后台API加载失败，使用mock数据', err)
+    console.error('加载商品失败，使用mock数据', err)
+    if (goodsList.value.length === 0) {
+      goodsList.value = mockGoods
+    }
+    hasMore.value = false
+    loading.value = false
   })
 }
 
 onMounted(() => {
   userStore.initFromStorage()
-  loadHotGoods()
+  loadGoods()
 })
 </script>
 
@@ -322,57 +331,27 @@ onMounted(() => {
   min-height: 100vh;
   background-color: #f5f5f5;
   padding-bottom: 120rpx;
-  display: flex;
-  flex-direction: column;
 }
 
-.header {
+.header-area {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 80rpx 40rpx 40rpx;
+  padding: 60rpx 30rpx 30rpx;
+}
+
+.title-section {
+  padding: 20rpx 0;
 }
 
 .title {
-  display: block;
-  font-size: 48rpx;
+  font-size: 34rpx;
   font-weight: bold;
   color: #fff;
-  margin-bottom: 30rpx;
+  text-align: center;
+  line-height: 1.4;
 }
 
-.search-bar {
-  display: flex;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 40rpx;
-  padding: 0 30rpx;
-  height: 80rpx;
-}
-
-.search-icon {
-  font-size: 32rpx;
-  margin-right: 20rpx;
-}
-
-.search-input {
-  flex: 1;
-  font-size: 28rpx;
-}
-
-.search-btn {
-  padding: 15rpx 30rpx;
-  background-color: #667eea;
-  color: #fff;
-  border-radius: 30rpx;
-  font-size: 26rpx;
-  margin-left: 20rpx;
-}
-
-.main-scroll {
-  flex: 1;
-}
-
-.banner {
-  padding: 20rpx;
+.banner-section {
+  margin-top: 10rpx;
 }
 
 .banner-swiper {
@@ -384,14 +363,16 @@ onMounted(() => {
 .banner-item {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #83a4d4 0%, #b6fbff 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  
   &.banner-2 {
     background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   }
+  
   &.banner-3 {
     background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   }
@@ -409,89 +390,96 @@ onMounted(() => {
   color: rgba(255, 255, 255, 0.9);
 }
 
-.category-section {
-  padding: 20rpx;
+.search-wrapper {
+  padding: 20rpx 30rpx;
+  background-color: #f5f5f5;
+  position: relative;
+  z-index: 50;
+  
+  &.fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+    z-index: 100;
+  }
 }
 
-.section-title {
+.search-bar {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 40rpx;
+  padding: 0 30rpx;
+  height: 76rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.search-icon {
   font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20rpx;
+  margin-right: 20rpx;
 }
 
-.category-grid {
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+}
+
+.search-btn {
+  padding: 15rpx 30rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  margin-left: 20rpx;
+}
+
+.main-scroll {
+  height: calc(100vh - 520rpx);
+}
+
+.scroll-content {
+  padding-bottom: 20rpx;
+}
+
+.header-placeholder {
+  height: 100rpx;
+}
+
+.goods-section {
+  padding: 0 20rpx;
+}
+
+.goods-list {
   display: flex;
   flex-wrap: wrap;
-  background-color: #fff;
-  border-radius: 20rpx;
-  padding: 20rpx;
-}
-
-.category-item {
-  width: calc(33.33% - 10rpx);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20rpx 0;
-}
-
-.category-icon {
-  font-size: 56rpx;
-  margin-bottom: 10rpx;
-}
-
-.category-name {
-  font-size: 26rpx;
-  color: #333;
-}
-
-.hot-section {
-  padding: 20rpx;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20rpx;
-}
-
-.section-more {
-  font-size: 26rpx;
-  color: #667eea;
-}
-
-.hot-scroll {
-  white-space: nowrap;
-}
-
-.hot-list {
-  display: inline-flex;
   gap: 20rpx;
 }
 
-.hot-item {
-  width: 240rpx;
+.goods-card {
+  width: calc(50% - 10rpx);
   background-color: #fff;
   border-radius: 16rpx;
   overflow: hidden;
-  display: inline-block;
-  vertical-align: top;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
 }
 
-.hot-image {
+.goods-image {
   width: 100%;
-  height: 200rpx;
+  height: 240rpx;
+  background-color: #f8f8f8;
 }
 
-.hot-info {
-  padding: 15rpx;
+.goods-info {
+  padding: 20rpx;
 }
 
-.hot-name {
+.goods-name {
   display: block;
-  font-size: 26rpx;
+  font-size: 30rpx;
+  font-weight: bold;
   color: #333;
   margin-bottom: 10rpx;
   overflow: hidden;
@@ -499,73 +487,65 @@ onMounted(() => {
   white-space: nowrap;
 }
 
-.hot-price {
-  font-size: 32rpx;
+.goods-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 15rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goods-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10rpx;
+  margin-bottom: 10rpx;
+}
+
+.goods-price {
+  font-size: 36rpx;
   font-weight: bold;
   color: #e74c3c;
 }
 
-.features {
-  display: flex;
-  justify-content: space-around;
-  background-color: #fff;
-  border-radius: 20rpx;
-  padding: 40rpx 20rpx;
-  margin: 0 20rpx 20rpx;
+.goods-original-price {
+  font-size: 24rpx;
+  color: #ccc;
+  text-decoration: line-through;
 }
 
-.feature-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20rpx;
+.goods-time {
+  font-size: 22rpx;
+  color: #999;
 }
 
-.feature-icon {
-  font-size: 60rpx;
-  margin-bottom: 15rpx;
-}
-
-.feature-text {
-  font-size: 28rpx;
-  color: #333;
-}
-
-.data-info {
-  background-color: rgba(255, 255, 255, 0.95);
-  border-radius: 20rpx;
+.load-more, .no-more {
   padding: 30rpx;
-  margin: 0 20rpx;
-}
-
-.info-title {
-  display: block;
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20rpx;
   text-align: center;
 }
 
-.info-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 15rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.info-label {
+.loading-text, .no-more-text {
   font-size: 28rpx;
   color: #999;
 }
 
-.info-value {
-  font-size: 28rpx;
-  color: #333;
-  font-family: monospace;
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100rpx 0;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: #999;
 }
 
 .tab-bar {
@@ -579,6 +559,7 @@ onMounted(() => {
   align-items: center;
   justify-content: space-around;
   box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
 
 .tab-item {

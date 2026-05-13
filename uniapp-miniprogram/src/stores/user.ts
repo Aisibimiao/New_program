@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { User } from '@/api/auth'
-import { login as apiLogin, register as apiRegister, getProfile, logout as apiLogout } from '@/api/auth'
+import { login as apiLogin, register as apiRegister, getProfile, logout as apiLogout, wechatLogin as apiWechatLogin } from '@/api/auth'
 
 export const useUserStore = defineStore('user', () => {
   const user = ref<User | null>(null)
@@ -33,6 +33,14 @@ export const useUserStore = defineStore('user', () => {
 
   async function register(email: string, password: string, nickname: string, code: string) {
     const result = await apiRegister({ email, password, nickname, code })
+    setToken(result.token)
+    setUser(result.user)
+    uni.setStorageSync('user', JSON.stringify(result.user))
+    return result
+  }
+
+  async function wechatLogin(code: string, nickName?: string, avatarUrl?: string) {
+    const result = await apiWechatLogin({ code, nickName, avatarUrl })
     setToken(result.token)
     setUser(result.user)
     uni.setStorageSync('user', JSON.stringify(result.user))
@@ -74,6 +82,7 @@ export const useUserStore = defineStore('user', () => {
     token,
     login,
     register,
+    wechatLogin,
     fetchProfile,
     logout,
     initFromStorage,

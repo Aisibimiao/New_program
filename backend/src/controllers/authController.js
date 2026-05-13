@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const { generateToken } = require('../utils/jwt');
 const { sendVerificationCode } = require('../utils/email');
 const { saveCode, verifyCode } = require('../utils/codeStore');
+const axios = require('axios');
 
 const prisma = new PrismaClient();
 
@@ -201,5 +202,66 @@ exports.uploadAvatar = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ msg: '上传失败' });
+    }
+};
+
+// 微信小程序登录
+exports.wechatLogin = async (req, res) => {
+    try {
+        const { code, encryptedData, iv, nickName, avatarUrl } = req.body;
+
+        if (!code) {
+            return res.status(400).json({ msg: '缺少code参数' });
+        }
+
+        const appId = 'wx1234567890123456';
+        const appSecret = 'your_app_secret';
+
+        const response = await axios.get(`https://api.weixin.qq.com/sns/jscode2session`, {
+            params: {
+                appid: appId,
+                secret: appSecret,
+                js_code: code,
+                grant_type: 'authorization_code'
+            }
+        });
+
+        const { openid, session_key } = response.data;
+
+        if (!openid) {
+            return res.status(400).json({ msg: '获取openid失败' });
+        }
+
+        let user = await prisma.user.findUnique({
+            where: { openid }
+        });
+
+        if (!user) {
+            user = await prisma.user.create({
+                data: {
+                    openid,
+                    nickname: nickName || '微信用户',
+                    avatar: avatarUrl || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(nickName || 'user')}&backgroundColor=b6e3f4`,
+                    role: 'USER'
+                }
+            });
+        }
+
+        const token = generateToken(user.id, user.role);
+
+        res.json({
+            msg: '登录成功',
+            token,
+            user: {
+                id: user.id,
+                openid: user.openid,
+                nickname: user.nickname,
+                avatar: user.avatar,
+                role: user.role
+            }
+        });
+    } catch (err) {
+        console.error('微信登录失败:', err);
+        res.status(500).json({ msg: '微信登录失败' });
     }
 };

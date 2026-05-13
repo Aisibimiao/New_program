@@ -4,7 +4,6 @@
     "pages/goods/list",
     "pages/goods/detail",
     "pages/user/login",
-    "pages/user/register",
     "pages/user/profile",
     "pages/user/edit",
     "pages/user/settings",

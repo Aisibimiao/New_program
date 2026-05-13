@@ -3,9 +3,9 @@ import { request } from '@/utils/request'
 export interface User {
   id: number
   nickname: string
-  email: string
   avatar: string
   role: string
+  openid?: string
 }
 
 export function login(data: { email: string; password: string }) {
@@ -59,5 +59,17 @@ export function logout() {
   return request({
     url: '/auth/logout',
     method: 'POST'
+  })
+}
+
+export function wechatLogin(data: { 
+  code: string 
+  nickName?: string 
+  avatarUrl?: string 
+}) {
+  return request<{ token: string; user: User }>({
+    url: '/auth/wechat-login',
+    method: 'POST',
+    data
   })
 }

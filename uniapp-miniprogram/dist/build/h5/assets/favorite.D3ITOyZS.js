@@ -1,0 +1,1 @@
+import{r}from"./request.B_Pb2LRK.js";function t(t){return r({url:"/favorites",method:"POST",data:{goodsId:t}})}function o(t){return r({url:`/favorites/${t}`,method:"DELETE"})}function e(){return r({url:"/favorites",method:"GET"})}export{t as a,e as g,o as r};

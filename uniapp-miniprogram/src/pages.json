@@ -26,12 +26,6 @@
       }
     },
     {
-      "path": "pages/user/register",
-      "style": {
-        "navigationBarTitleText": "注册"
-      }
-    },
-    {
       "path": "pages/user/profile",
       "style": {
         "navigationBarTitleText": "个人中心"

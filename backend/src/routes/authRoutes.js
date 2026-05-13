@@ -10,6 +10,7 @@ router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.post('/send-reset-code', authController.sendResetCode);
 router.post('/reset-password', authController.resetPassword);
+router.post('/wechat-login', authController.wechatLogin);
 
 // 需要登录的路由
 router.get('/profile', authMiddleware, authController.getProfile);
