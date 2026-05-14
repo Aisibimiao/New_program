@@ -79,15 +79,15 @@
     </view>
 
     <view class="tab-bar">
-      <view class="tab-item" @click="goToHome()">
+      <view class="tab-item" @click="switchToHome">
         <text class="tab-icon">🏠</text>
         <text class="tab-text">首页</text>
       </view>
-      <view class="tab-item" @click="goToGoods()">
+      <view class="tab-item" @click="switchToGoods">
         <text class="tab-icon">📦</text>
         <text class="tab-text">商品</text>
       </view>
-      <view class="tab-item active" @click="goToProfile()">
+      <view class="tab-item active">
         <text class="tab-icon">👤</text>
         <text class="tab-text">我的</text>
       </view>
@@ -204,15 +204,13 @@ function goToAbout() {
   })
 }
 
-function goToHome() {
-  uni.navigateTo({ url: '/pages/index/index' })
+function switchToHome() {
+  uni.reLaunch({ url: '/pages/index/index' })
 }
 
-function goToGoods() {
+function switchToGoods() {
   uni.navigateTo({ url: '/pages/goods/list' })
 }
-
-function goToProfile() {}
 
 function handleLogout() {
   uni.showModal({

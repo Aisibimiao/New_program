@@ -1,15 +1,15 @@
 <template>
   <view class="container">
     <view class="tab-bar">
-      <view 
-        class="tab-item" 
+      <view
+        class="tab-item"
         :class="{ active: activeTab === 'selling' }"
         @click="activeTab = 'selling'"
       >
         <text>在售中</text>
       </view>
-      <view 
-        class="tab-item" 
+      <view
+        class="tab-item"
         :class="{ active: activeTab === 'sold' }"
         @click="activeTab = 'sold'"
       >
@@ -17,27 +17,46 @@
       </view>
     </view>
 
-    <scroll-view 
-      class="goods-scroll" 
-      scroll-y 
+    <scroll-view
+      class="goods-scroll"
+      scroll-y
       :refresher-enabled="true"
       :refresher-triggered="refreshing"
       @refresherrefresh="onRefresh"
     >
       <view class="goods-list">
-        <view 
-          class="goods-item" 
-          v-for="goods in goodsList" 
+        <view
+          class="goods-item"
+          v-for="goods in goodsList"
           :key="goods.id"
-          @click="goToDetail(goods.id)"
         >
-          <image class="goods-image" :src="getImageUrl(goods.images[0])" mode="aspectFill" />
-          <view class="goods-info">
-            <text class="goods-name">{{ goods.name }}</text>
-            <text class="goods-desc">{{ goods.description }}</text>
-            <view class="goods-footer">
-              <text class="goods-price">¥{{ goods.price }}</text>
-              <text class="goods-status">{{ goods.status === 1 ? '在售' : '已售出' }}</text>
+          <view class="goods-content" @click="goToDetail(goods.id)">
+            <image class="goods-image" :src="getImageUrl(goods.images[0])" mode="aspectFill" />
+            <view class="goods-info">
+              <text class="goods-name">{{ goods.name }}</text>
+              <text class="goods-desc">{{ goods.description }}</text>
+              <view class="goods-footer">
+                <text class="goods-price">¥{{ goods.price }}</text>
+                <text class="goods-status">{{ goods.status === 1 ? '在售' : '已售出' }}</text>
+              </view>
+            </view>
+          </view>
+
+          <view class="goods-actions" v-if="goods.status === 1">
+            <view class="action-btn off-btn" @click="handleOffShelf(goods.id)">
+              <text>下架</text>
+            </view>
+            <view class="action-btn edit-btn" @click="goToEdit(goods.id)">
+              <text>编辑</text>
+            </view>
+            <view class="action-btn delete-btn" @click="handleDelete(goods.id)">
+              <text>删除</text>
+            </view>
+          </view>
+
+          <view class="goods-actions" v-else>
+            <view class="action-btn delete-btn" @click="handleDelete(goods.id)">
+              <text>删除</text>
             </view>
           </view>
         </view>
@@ -53,7 +72,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { getMyGoods, type Goods } from '@/api/goods'
+import { getMyGoods, deleteGoods, offShelfGoods, type Goods } from '@/api/goods'
 
 const activeTab = ref('selling')
 const goodsList = ref<Goods[]>([])
@@ -67,6 +86,48 @@ function getImageUrl(url?: string) {
 
 function goToDetail(id: string) {
   uni.navigateTo({ url: `/pages/goods/detail?id=${id}` })
+}
+
+function goToEdit(id: string) {
+  uni.navigateTo({ url: `/pages/publish/edit?id=${id}` })
+}
+
+async function handleOffShelf(id: string) {
+  uni.showModal({
+    title: '确认下架',
+    content: '确定要下架这个商品吗？下架后会移至已售出',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          await offShelfGoods(id)
+          uni.showToast({ title: '下架成功', icon: 'success' })
+          loadGoods()
+        } catch (err) {
+          console.error('下架失败', err)
+          uni.showToast({ title: '下架失败', icon: 'none' })
+        }
+      }
+    }
+  })
+}
+
+async function handleDelete(id: string) {
+  uni.showModal({
+    title: '确认删除',
+    content: '确定要删除这个商品吗？删除后不可恢复',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          await deleteGoods(id)
+          uni.showToast({ title: '删除成功', icon: 'success' })
+          loadGoods()
+        } catch (err) {
+          console.error('删除失败', err)
+          uni.showToast({ title: '删除失败', icon: 'none' })
+        }
+      }
+    }
+  })
 }
 
 async function loadGoods() {
@@ -133,17 +194,52 @@ onMounted(() => {
 }
 
 .goods-item {
-  display: flex;
   background-color: #fff;
   border-radius: 16rpx;
-  padding: 20rpx;
   margin-bottom: 20rpx;
+}
+
+.goods-content {
+  display: flex;
+  padding: 20rpx;
 }
 
 .goods-image {
   width: 200rpx;
   height: 200rpx;
   border-radius: 12rpx;
+}
+
+.goods-actions {
+  display: flex;
+  gap: 15rpx;
+  padding: 15rpx 20rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.action-btn {
+  flex: 1;
+  height: 70rpx;
+  line-height: 70rpx;
+  text-align: center;
+  border-radius: 35rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+.off-btn {
+  background-color: #fff5e6;
+  color: #ff9800;
+}
+
+.edit-btn {
+  background-color: #f0f4ff;
+  color: #667eea;
+}
+
+.delete-btn {
+  background-color: #fff5f5;
+  color: #e74c3c;
 }
 
 .goods-info {

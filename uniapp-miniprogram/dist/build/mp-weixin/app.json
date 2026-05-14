@@ -12,6 +12,7 @@
     "pages/order/detail",
     "pages/favorite/index",
     "pages/publish/index",
+    "pages/publish/edit",
     "pages/chat/index"
   ],
   "window": {

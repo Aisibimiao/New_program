@@ -74,6 +74,12 @@
       }
     },
     {
+      "path": "pages/publish/edit",
+      "style": {
+        "navigationBarTitleText": "编辑商品"
+      }
+    },
+    {
       "path": "pages/chat/index",
       "style": {
         "navigationBarTitleText": "联系卖家"

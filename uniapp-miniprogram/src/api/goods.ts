@@ -21,6 +21,10 @@ export interface Goods {
     email?: string
     role?: string
   }
+  college?: string
+  major?: string
+  bookName?: string
+  grade?: string
 }
 
 export function getGoods(params?: {
@@ -54,11 +58,14 @@ export function getGoodsDetail(id: string) {
 export function createGoods(data: {
   name: string
   description: string
-  price: number
-  originalPrice: number
+  price: number | string
+  originalPrice?: number | string
   images: string[]
   category: string
-  condition: number
+  college?: string
+  major?: string
+  bookName?: string
+  grade?: string
 }) {
   return request<Goods>({
     url: '/goods',
@@ -67,7 +74,43 @@ export function createGoods(data: {
   })
 }
 
+export function updateGoods(id: string, data: {
+  name?: string
+  description?: string
+  price?: number | string
+  originalPrice?: number | string
+  images?: string[]
+  category?: string
+  status?: number
+  college?: string
+  major?: string
+  bookName?: string
+  grade?: string
+}) {
+  return request<Goods>({
+    url: `/goods/${id}`,
+    method: 'PUT',
+    data
+  })
+}
+
+export function deleteGoods(id: string) {
+  return request({
+    url: `/goods/${id}`,
+    method: 'DELETE'
+  })
+}
+
+export function offShelfGoods(id: string) {
+  return updateGoods(id, { status: 0 })
+}
+
 export async function uploadImage(filePath: string): Promise<string> {
-  const result = await uploadFile('/goods/upload', filePath, 'file')
-  return result.url
+  try {
+    const result = await uploadFile('/goods/upload', filePath, 'file')
+    return result.url || result.data?.url || ''
+  } catch (err) {
+    console.error('上传失败', err)
+    return ''
+  }
 }

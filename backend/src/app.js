@@ -66,7 +66,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use('/uploads', (req, res, next) => {
     // 设置跨域资源策略，允许跨域加载图片
     res.header('Cross-Origin-Resource-Policy', 'cross-origin');
-    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     // 预检请求处理

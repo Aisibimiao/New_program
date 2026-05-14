@@ -214,8 +214,8 @@ exports.wechatLogin = async (req, res) => {
             return res.status(400).json({ msg: '缺少code参数' });
         }
 
-        const appId = 'wx1234567890123456';
-        const appSecret = 'your_app_secret';
+        const appId = 'wx3d1487d7bde93a4f';
+        const appSecret = 'b4b816761f803d41403db669a52c1b14';
 
         const response = await axios.get(`https://api.weixin.qq.com/sns/jscode2session`, {
             params: {
@@ -250,6 +250,7 @@ exports.wechatLogin = async (req, res) => {
         const token = generateToken(user.id, user.role);
 
         res.json({
+            code: 200,
             msg: '登录成功',
             token,
             user: {

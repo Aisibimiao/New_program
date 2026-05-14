@@ -1,18 +1,20 @@
 <template>
   <view class="container">
     <scroll-view class="content-scroll" scroll-y>
+      <!-- 商品分类 -->
       <view class="form-section">
         <view class="section-title">
           <text>商品分类</text>
         </view>
-        <picker mode="selector" :range="categoryLabels" @change="onCategoryChange">
+        <picker mode="selector" :range="categoryOptions" range-key="label" @change="onCategoryChange">
           <view class="picker-input">
-            {{ selectedCategory || '请选择分类' }}
+            {{ selectedCategoryLabel || '请选择分类' }}
             <text class="picker-arrow">›</text>
           </view>
         </picker>
       </view>
 
+      <!-- 书籍特殊筛选（仅在选择书籍时显示） -->
       <view class="form-section" v-if="form.category === 'BOOK'">
         <view class="section-title">
           <text>书籍信息</text>
@@ -39,49 +41,52 @@
           </view>
         </picker>
 
-        <input
-          class="form-input"
-          v-model="form.bookName"
-          placeholder="请输入书名"
+        <input 
+          class="form-input" 
+          v-model="form.bookName" 
+          placeholder="请输入书名" 
           style="margin-top: 20rpx;"
         />
       </view>
 
+      <!-- 商品名称 -->
       <view class="form-section">
         <view class="section-title">
           <text>商品名称</text>
         </view>
-        <input
-          class="form-input"
-          v-model="form.name"
+        <input 
+          class="form-input" 
+          v-model="form.name" 
           placeholder="请输入商品名称"
         />
       </view>
 
+      <!-- 商品描述 -->
       <view class="form-section">
         <view class="section-title">
           <text>商品描述</text>
         </view>
-        <textarea
-          class="form-textarea"
-          v-model="form.description"
+        <textarea 
+          class="form-textarea" 
+          v-model="form.description" 
           placeholder="请输入商品描述"
           :maxlength="500"
         />
         <text class="textarea-count">{{ form.description.length }}/500</text>
       </view>
 
+      <!-- 商品图片 -->
       <view class="form-section">
         <view class="section-title">
           <text>商品图片 (最多6张)</text>
         </view>
         <view class="upload-area">
-          <view
-            class="upload-item"
-            v-for="(img, index) in images"
+          <view 
+            class="upload-item" 
+            v-for="(img, index) in images" 
             :key="index"
           >
-            <image class="upload-image" :src="img" mode="aspectFill" />
+            <image class="upload-image" :src="getImageUrl(img)" mode="aspectFill" />
             <view class="remove-btn" @click="removeImage(index)">
               <text>✕</text>
             </view>
@@ -93,15 +98,28 @@
         </view>
       </view>
 
+      <!-- 价格 -->
       <view class="form-section">
         <view class="price-row">
+          <view class="price-item" v-if="form.category === 'BOOK'">
+            <text class="price-label">原价</text>
+            <view class="price-input-wrap">
+              <text class="price-symbol">¥</text>
+              <input 
+                class="price-input" 
+                v-model="form.originalPrice" 
+                placeholder="0"
+                type="digit"
+              />
+            </view>
+          </view>
           <view class="price-item">
             <text class="price-label">售价</text>
             <view class="price-input-wrap">
               <text class="price-symbol">¥</text>
-              <input
-                class="price-input"
-                v-model="form.price"
+              <input 
+                class="price-input" 
+                v-model="form.price" 
                 placeholder="0"
                 type="digit"
               />
@@ -112,17 +130,25 @@
     </scroll-view>
 
     <view class="bottom-bar">
-      <view class="submit-btn" :class="{ disabled: !canSubmit || submitting }" @click="handleSubmit">
-        <text>{{ submitting ? '发布中...' : '发布商品' }}</text>
+      <view class="cancel-btn" @click="goBack">
+        <text>取消</text>
+      </view>
+      <view class="submit-btn" :class="{ disabled: !canSubmit }" @click="handleSubmit">
+        <text>保存修改</text>
       </view>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { createGoods, uploadImage } from '@/api/goods'
+import { ref, computed, onMounted } from 'vue'
+import { getGoodsDetail, updateGoods, uploadImage } from '@/api/goods'
+import { useUserStore } from '@/stores/user'
 
+const userStore = useUserStore()
+const goodsId = ref('')
+
+// 分类选项
 const categories = [
   { value: 'ELECTRONICS', label: '数码产品' },
   { value: 'CLOTHING', label: '服饰鞋包' },
@@ -131,26 +157,29 @@ const categories = [
   { value: 'LIFE', label: '生活用品' },
   { value: 'OTHER', label: '其他' }
 ]
-const categoryLabels = categories.map(c => c.label)
+const categoryOptions = categories.map(c => c.label)
 
+// 学院选项
 const collegeOptions = [
-  '信息工程学院', '计算机学院', '电子学院', '软件学院',
+  '信息工程学院', '计算机学院', '电子学院', '软件学院', 
   '机械学院', '电气学院', '经管学院', '外语学院', '其他学院'
 ]
 
+// 专业选项
 const majorOptions = [
-  '计算机科学与技术', '软件工程', '电子信息工程', '通信工程',
+  '计算机科学与技术', '软件工程', '电子信息工程', '通信工程', 
   '机械工程', '电气工程', '会计学', '市场营销', '其他专业'
 ]
 
+// 年级选项
 const gradeOptions = ['大一', '大二', '大三', '大四', '研究生', '其他']
 
 const images = ref<string[]>([])
-const submitting = ref(false)
 const form = ref({
   name: '',
   description: '',
   category: '',
+  originalPrice: '',
   price: '',
   college: '',
   major: '',
@@ -158,7 +187,7 @@ const form = ref({
   grade: ''
 })
 
-const selectedCategory = computed(() => {
+const selectedCategoryLabel = computed(() => {
   const cat = categories.find(c => c.value === form.value.category)
   return cat ? cat.label : ''
 })
@@ -171,14 +200,44 @@ const canSubmit = computed(() => {
          form.value.category
 })
 
+function getImageUrl(url?: string) {
+  if (!url || url === '[]') return ''
+  if (url.startsWith('http')) return url
+  if (url.startsWith('/')) return `http://localhost:3000${url}`
+  return url
+}
+
+async function loadGoodsDetail() {
+  try {
+    const result = await getGoodsDetail(goodsId.value)
+    form.value = {
+      name: result.name,
+      description: result.description,
+      category: result.category,
+      originalPrice: result.originalPrice ? String(result.originalPrice) : '',
+      price: String(result.price),
+      college: result.college || '',
+      major: result.major || '',
+      bookName: result.bookName || '',
+      grade: result.grade || ''
+    }
+    images.value = result.images || []
+  } catch (err) {
+    console.error('加载商品详情失败', err)
+    uni.showToast({ title: '加载失败', icon: 'none' })
+  }
+}
+
 function onCategoryChange(e: any) {
   const index = e.detail.value
   form.value.category = categories[index].value
+  // 重置书籍相关字段
   if (form.value.category !== 'BOOK') {
     form.value.college = ''
     form.value.major = ''
     form.value.bookName = ''
     form.value.grade = ''
+    form.value.originalPrice = ''
   }
 }
 
@@ -194,13 +253,24 @@ function onGradeChange(e: any) {
   form.value.grade = gradeOptions[e.detail.value]
 }
 
-function chooseImage() {
+async function chooseImage() {
   uni.chooseImage({
     count: 6 - images.value.length,
     sizeType: ['compressed'],
     sourceType: ['album', 'camera'],
-    success: (res) => {
-      images.value = [...images.value, ...res.tempFilePaths]
+    success: async (res) => {
+      uni.showLoading({ title: '上传中...' })
+      try {
+        for (const filePath of res.tempFilePaths) {
+          const url = await uploadImage(filePath)
+          images.value.push(url)
+        }
+      } catch (err) {
+        uni.showToast({ title: '上传失败', icon: 'none' })
+        console.error('上传失败', err)
+      } finally {
+        uni.hideLoading()
+      }
     }
   })
 }
@@ -210,56 +280,60 @@ function removeImage(index: number) {
 }
 
 async function handleSubmit() {
-  if (!canSubmit.value || submitting.value) {
+  if (!canSubmit.value) {
     uni.showToast({ title: '请填写完整信息', icon: 'none' })
     return
   }
 
-  submitting.value = true
+  uni.showLoading({ title: '保存中...' })
 
   try {
-    uni.showLoading({ title: '发布中...' })
-
-    const uploadedImages: string[] = []
-    for (const img of images.value) {
-      if (img.startsWith('http')) {
-        uploadedImages.push(img)
-      } else {
-        const url = await uploadImage(img)
-        if (url) {
-          uploadedImages.push(url)
-        }
-      }
-    }
-
-    await createGoods({
+    await updateGoods(goodsId.value, {
       name: form.value.name,
       description: form.value.description,
-      price: form.value.price,
-      images: uploadedImages,
       category: form.value.category,
-      college: form.value.college || undefined,
-      major: form.value.major || undefined,
-      bookName: form.value.bookName || undefined,
-      grade: form.value.grade || undefined
+      originalPrice: form.value.originalPrice,
+      price: form.value.price,
+      images: images.value,
+      college: form.value.college,
+      major: form.value.major,
+      bookName: form.value.bookName,
+      grade: form.value.grade
     })
 
-    uni.hideLoading()
-    uni.showToast({ title: '发布成功', icon: 'success' })
-
+    uni.showToast({ title: '修改成功', icon: 'success' })
     setTimeout(() => {
-      uni.navigateTo({ url: '/pages/user/profile' })
-      setTimeout(() => {
-        uni.navigateTo({ url: '/pages/goods/my-list' })
-      }, 100)
+      uni.navigateBack()
     }, 1500)
   } catch (err: any) {
-    uni.hideLoading()
-    uni.showToast({ title: err?.message || '发布失败', icon: 'none' })
+    uni.showToast({ title: err.message || '修改失败', icon: 'none' })
+    console.error('修改失败', err)
   } finally {
-    submitting.value = false
+    uni.hideLoading()
   }
 }
+
+function goBack() {
+  uni.navigateBack()
+}
+
+onMounted(() => {
+  userStore.initFromStorage()
+  const pages = getCurrentPages()
+  const currentPage = pages[pages.length - 1]
+  const options = currentPage.options
+  goodsId.value = options.id || ''
+  
+  if (!goodsId.value) {
+    uni.showToast({ title: '参数错误', icon: 'none' })
+    setTimeout(() => {
+      uni.navigateBack()
+    }, 1500)
+    return
+  }
+  
+  loadGoodsDetail()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -390,6 +464,7 @@ async function handleSubmit() {
 
 .price-row {
   display: flex;
+  gap: 40rpx;
 }
 
 .price-item {
@@ -427,22 +502,38 @@ async function handleSubmit() {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 20rpx;
+  padding: 20rpx 30rpx;
   background-color: #fff;
   box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+  display: flex;
+  gap: 20rpx;
+}
+
+.cancel-btn {
+  flex: 1;
+  height: 100rpx;
+  line-height: 100rpx;
+  text-align: center;
+  background-color: #f5f5f5;
+  color: #666;
+  border-radius: 50rpx;
+  font-size: 32rpx;
+  font-weight: bold;
 }
 
 .submit-btn {
+  flex: 2;
   height: 100rpx;
   line-height: 100rpx;
   text-align: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
   border-radius: 50rpx;
-  font-size: 36rpx;
+  font-size: 32rpx;
   font-weight: bold;
-  &.disabled {
-    opacity: 0.5;
-  }
+}
+
+.submit-btn.disabled {
+  opacity: 0.5;
 }
 </style>

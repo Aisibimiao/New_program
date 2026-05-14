@@ -14,7 +14,7 @@ model User {
   phone      String?       @unique
   email      String?       @unique
   openid     String?       @unique
-  password   String
+  password   String?
   name       String?       // 真实姓名
   nickname   String?       // 昵称（新增）
   studentId  String?       @unique
@@ -48,6 +48,12 @@ model Goods {
   viewCount   Int           @default(0)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+  
+  // 书籍专属字段
+  college    String?      // 学院
+  major      String?      // 专业
+  bookName   String?      // 书名
+  grade      String?      // 年级
 
   orders      Order[]
   reviews     Review[]

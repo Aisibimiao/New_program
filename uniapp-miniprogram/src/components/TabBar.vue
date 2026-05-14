@@ -27,7 +27,11 @@ const currentIndex = ref(0)
 function switchTab(index: number) {
   if (currentIndex.value === index) return
   currentIndex.value = index
-  uni.switchTab({ url: tabs[index].url })
+  if (index === 0) {
+    uni.reLaunch({ url: tabs[index].url })
+  } else {
+    uni.navigateTo({ url: tabs[index].url })
+  }
 }
 
 function setCurrentIndex(index: number) {

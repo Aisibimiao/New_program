@@ -3,9 +3,9 @@
     <view class="search-bar">
       <view class="search-input-wrap">
         <text class="search-icon">🔍</text>
-        <input 
-          class="search-input" 
-          v-model="keyword" 
+        <input
+          class="search-input"
+          v-model="keyword"
           placeholder="搜索商品"
           confirm-type="search"
           @confirm="search"
@@ -19,16 +19,16 @@
     <view class="filter-bar">
       <scroll-view class="filter-scroll" scroll-x>
         <view class="filter-list">
-          <view 
-            class="filter-item" 
+          <view
+            class="filter-item"
             :class="{ active: !category }"
             @click="setCategory('')"
           >
             <text>全部</text>
           </view>
-          <view 
-            class="filter-item" 
-            v-for="cat in categories" 
+          <view
+            class="filter-item"
+            v-for="cat in categories"
             :key="cat"
             :class="{ active: category === cat }"
             @click="setCategory(cat)"
@@ -50,22 +50,22 @@
       </view>
     </view>
 
-    <scroll-view 
-      class="goods-scroll" 
-      scroll-y 
+    <scroll-view
+      class="goods-scroll"
+      scroll-y
       :refresher-enabled="true"
       :refresher-triggered="refreshing"
       @refresherrefresh="onRefresh"
       @scrolltolower="loadMore"
     >
       <view class="goods-grid">
-        <view 
-          class="goods-item" 
-          v-for="goods in goodsList" 
+        <view
+          class="goods-item"
+          v-for="goods in goodsList"
           :key="goods.id"
           @click="goToDetail(goods.id)"
         >
-          <image class="goods-image" :src="getImageUrl(goods.images[0])" mode="aspectFill" />
+          <image class="goods-image" :src="getImageUrl(goods.images?.[0])" mode="aspectFill" @error="handleImageError($event)" />
           <view class="goods-info">
             <text class="goods-name">{{ goods.name }}</text>
             <text class="goods-desc">{{ goods.description }}</text>
@@ -87,15 +87,15 @@
     </scroll-view>
 
     <view class="tab-bar">
-      <view class="tab-item" @click="goToHome()">
+      <view class="tab-item" @click="switchToHome()">
         <text class="tab-icon">🏠</text>
         <text class="tab-text">首页</text>
       </view>
-      <view class="tab-item active" @click="goToGoods()">
+      <view class="tab-item active">
         <text class="tab-icon">📦</text>
         <text class="tab-text">商品</text>
       </view>
-      <view class="tab-item" @click="goToProfile()">
+      <view class="tab-item" @click="switchToProfile()">
         <text class="tab-icon">👤</text>
         <text class="tab-text">我的</text>
       </view>
@@ -122,49 +122,37 @@ const category = ref('')
 
 const categories = ['数码产品', '服饰鞋包', '图书教材', '运动户外', '生活用品', '其他']
 
-function getImageUrl(url: string | undefined): string {
-  if (!url) return 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=product%20image%20placeholder&image_size=square'
-  
-  // 如果是JSON字符串，解析它
-  let parsedUrl = url
-  if (url.startsWith('[')) {
-    try {
-      const arr = JSON.parse(url)
-      if (Array.isArray(arr) && arr.length > 0) {
-        parsedUrl = arr[0]
-      } else {
-        return 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=product%20image%20placeholder&image_size=square'
-      }
-    } catch {
-      return 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=product%20image%20placeholder&image_size=square'
-    }
-  }
-  
-  if (parsedUrl.startsWith('http')) return parsedUrl
-  return `http://localhost:3000${parsedUrl}`
+function getImageUrl(url?: string): string {
+  if (!url || url === '[]') return 'https://via.placeholder.com/400x280/667EEA/FFFFFF?text=No+Image'
+  if (url.startsWith('http')) return url
+  if (url.startsWith('/')) return `http://localhost:3000${url}`
+  return url
 }
 
-function getConditionText(condition: number) {
-  const map: Record<number, string> = {
-    1: '全新',
-    2: '几乎全新',
-    3: '轻微使用',
-    4: '明显使用'
-  }
-  return map[condition] || '其他'
+function handleImageError(e: any) {
+  const image = e.target
+  image.src = 'https://via.placeholder.com/400x280/667EEA/FFFFFF?text=No+Image'
 }
+
+// function getConditionText(condition: number) {
+//   const map: Record<number, string> = {
+//     1: '全新',
+//     2: '几乎全新',
+//     3: '轻微使用',
+//     4: '明显使用'
+//   }
+//   return map[condition] || '其他'
+// }
 
 function goToDetail(id: string) {
   uni.navigateTo({ url: `/pages/goods/detail?id=${id}` })
 }
 
-function goToHome() {
-  uni.navigateTo({ url: '/pages/index/index' })
+function switchToHome() {
+  uni.reLaunch({ url: '/pages/index/index' })
 }
 
-function goToGoods() {}
-
-function goToProfile() {
+function switchToProfile() {
   uni.navigateTo({ url: '/pages/user/profile' })
 }
 
@@ -191,9 +179,9 @@ function clearCategory() {
 
 async function loadGoods(isRefresh = false) {
   if (loading.value) return
-  
+
   loading.value = true
-  
+
   try {
     const params: Record<string, any> = {
       page: isRefresh ? 1 : page.value,
@@ -203,14 +191,14 @@ async function loadGoods(isRefresh = false) {
     if (category.value) params.category = category.value
 
     const result = await getGoods(params)
-    
+
     if (isRefresh) {
       goodsList.value = result.list
       page.value = 1
     } else {
       goodsList.value = [...goodsList.value, ...result.list]
     }
-    
+
     hasMore.value = result.list.length >= limit.value
     if (hasMore.value) page.value++
   } catch (err) {

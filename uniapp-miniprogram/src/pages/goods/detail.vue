@@ -1,15 +1,10 @@
 <template>
   <view class="container">
     <scroll-view class="content-scroll" scroll-y>
-      <swiper class="image-swiper" indicator-dots autoplay circular>
-        <swiper-item v-for="(img, index) in imagesArray" :key="index">
-          <image class="goods-image" :src="getImageUrl(img)" mode="aspectFill" />
-        </swiper-item>
-      </swiper>
+      <image class="goods-image" :src="getImageUrl(goods?.images?.[0])" mode="aspectFill" @error="handleImageError($event)" />
 
       <view class="goods-header">
         <text class="goods-price">¥{{ goods?.price }}</text>
-        <text class="goods-original-price">原价 ¥{{ goods?.originalPrice }}</text>
       </view>
 
       <view class="goods-info">
@@ -20,11 +15,7 @@
       <view class="goods-meta">
         <view class="meta-item">
           <text class="meta-label">分类</text>
-          <text class="meta-value">{{ goods?.category }}</text>
-        </view>
-        <view class="meta-item">
-          <text class="meta-label">成色</text>
-          <text class="meta-value">{{ getConditionText(goods?.condition) }}</text>
+          <text class="meta-value">{{ getCategoryText(goods?.category) }}</text>
         </view>
         <view class="meta-item">
           <text class="meta-label">发布时间</text>
@@ -96,20 +87,27 @@ function parseImages(images: any): string[] {
   return []
 }
 
+function getCategoryText(category?: string): string {
+  const map: Record<string, string> = {
+    'ELECTRONICS': '数码产品',
+    'CLOTHING': '服饰鞋包',
+    'BOOKS': '图书教材',
+    'SPORTS': '运动户外',
+    'LIFE': '生活用品',
+    'OTHER': '其他'
+  }
+  return map[category || ''] || category || '未分类'
+}
+
 function getImageUrl(url?: string): string {
-  if (!url) return 'https://api.dicebear.com/9.x/initials/svg?seed=Goods&backgroundColor=b6e3f4'
+  if (!url || url === '[]') return 'https://via.placeholder.com/400x600/667EEA/FFFFFF?text=No+Image'
   if (url.startsWith('http')) return url
   return `http://localhost:3000${url}`
 }
 
-function getConditionText(condition?: number) {
-  const map: Record<number, string> = {
-    1: '全新',
-    2: '几乎全新',
-    3: '轻微使用',
-    4: '明显使用'
-  }
-  return map[condition || 0] || '其他'
+function handleImageError(e: any) {
+  const image = e.target
+  image.src = 'https://via.placeholder.com/400x600/667EEA/FFFFFF?text=No+Image'
 }
 
 function formatDate(dateStr?: string) {
@@ -317,33 +315,20 @@ onMounted(() => {
   padding-bottom: 160rpx;
 }
 
-.image-swiper {
-  height: 600rpx;
-}
-
 .goods-image {
   width: 100%;
-  height: 100%;
+  height: 600rpx;
 }
 
 .goods-header {
   background-color: #fff;
   padding: 30rpx;
-  display: flex;
-  align-items: baseline;
-  gap: 20rpx;
 }
 
 .goods-price {
   font-size: 56rpx;
   font-weight: bold;
   color: #e74c3c;
-}
-
-.goods-original-price {
-  font-size: 28rpx;
-  color: #999;
-  text-decoration: line-through;
 }
 
 .goods-info {
