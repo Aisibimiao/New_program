@@ -59,7 +59,7 @@ exports.register = async (req, res) => {
         },
         select: { id: true, email: true, nickname: true, avatar: true, role: true },
     });
-    const token = generateToken(user.id, user.role);
+    const token = generateToken(user.id, user.role, user.openid);
     res.status(201).json({ msg: '注册成功', token, user });
 };
 
@@ -77,7 +77,7 @@ exports.login = async (req, res) => {
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) return res.status(401).json({ msg: '账号或密码错误' });
 
-    const token = generateToken(user.id, user.role);
+    const token = generateToken(user.id, user.role, user.openid);
     res.json({
         msg: '登录成功',
         token,
@@ -214,25 +214,33 @@ exports.wechatLogin = async (req, res) => {
             return res.status(400).json({ msg: '缺少code参数' });
         }
 
-        const appId = 'wx3d1487d7bde93a4f';
-        const appSecret = 'b4b816761f803d41403db669a52c1b14';
+        let openid;
+        
+        // 开发测试模式：使用测试code绕过微信验证
+        if (code === 'test-code' || process.env.NODE_ENV === 'development') {
+            // 使用nickName或code作为openid（确保唯一性）
+            openid = nickName ? `test_${nickName}_${Date.now()}` : `test_openid_${code}_${Date.now()}`;
+        } else {
+            const appId = 'wx3d1487d7bde93a4f';
+            const appSecret = 'b4b816761f803d41403db669a52c1b14';
 
-        const response = await axios.get(`https://api.weixin.qq.com/sns/jscode2session`, {
-            params: {
-                appid: appId,
-                secret: appSecret,
-                js_code: code,
-                grant_type: 'authorization_code'
+            const response = await axios.get(`https://api.weixin.qq.com/sns/jscode2session`, {
+                params: {
+                    appid: appId,
+                    secret: appSecret,
+                    js_code: code,
+                    grant_type: 'authorization_code'
+                }
+            });
+
+            openid = response.data.openid;
+
+            if (!openid) {
+                return res.status(400).json({ msg: '获取openid失败' });
             }
-        });
-
-        const { openid, session_key } = response.data;
-
-        if (!openid) {
-            return res.status(400).json({ msg: '获取openid失败' });
         }
 
-        let user = await prisma.user.findUnique({
+        let user = await prisma.user.findFirst({
             where: { openid }
         });
 
@@ -247,7 +255,7 @@ exports.wechatLogin = async (req, res) => {
             });
         }
 
-        const token = generateToken(user.id, user.role);
+        const token = generateToken(user.id, user.role, user.openid);
 
         res.json({
             code: 200,

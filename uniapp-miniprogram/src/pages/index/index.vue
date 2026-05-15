@@ -91,8 +91,13 @@
                   class="goods-image"
                   :src="getImageUrl(goods.images?.[0])"
                   mode="aspectFill"
-                  @error="handleImageError($event)"
+                  @load="onImageLoad(goods.id)"
+                  @error="handleImageError($event, goods.id)"
+                  :class="{ 'image-loaded': imageLoadedMap[goods.id] }"
                 />
+                <view class="image-placeholder" v-if="!imageLoadedMap[goods.id]">
+                  <text class="placeholder-text">加载中...</text>
+                </view>
               </view>
               <view class="goods-info">
                 <text class="goods-name" @click="goToDetail(goods.id)">{{ goods.name }}</text>
@@ -128,8 +133,10 @@
         <text class="tab-icon">🏠</text>
         <text class="tab-text">首页</text>
       </view>
-      <view class="tab-item" @click="goToPublish()">
-        <text class="tab-icon">📤</text>
+      <view class="tab-item publish-item" @click="goToPublish()">
+        <view class="publish-btn">
+          <text class="publish-icon">+</text>
+        </view>
         <text class="tab-text">发布</text>
       </view>
       <view class="tab-item" @click="goToProfile()">
@@ -157,6 +164,9 @@ const scrollTop = ref(0)
 const isSticky = ref(false)
 const showCategoryPopup = ref(false)
 const selectedCategory = ref('')
+const imageLoadedMap = ref<Record<string, boolean>>({})
+
+let lastClickTime = 0
 
 const categories = [
   { value: 'ELECTRONICS', label: '数码产品' },
@@ -253,9 +263,14 @@ function getImageUrl(url?: string) {
   return url
 }
 
-function handleImageError(e: any) {
+function onImageLoad(goodsId: string) {
+  imageLoadedMap.value[goodsId] = true
+}
+
+function handleImageError(e: any, goodsId: string) {
   const image = e.target
   image.src = 'https://via.placeholder.com/400x300/667EEA/FFFFFF?text=No+Image'
+  imageLoadedMap.value[goodsId] = true
 }
 
 function formatTime(dateStr?: string) {
@@ -315,7 +330,20 @@ async function loadFavorites() {
 }
 
 function goToHome() {
-  uni.reLaunch({ url: '/pages/index/index' })
+  const currentTime = Date.now()
+  if (currentTime - lastClickTime < 300) {
+    refreshPage()
+  }
+  lastClickTime = currentTime
+}
+
+function refreshPage() {
+  page.value = 1
+  hasMore.value = true
+  goodsList.value = []
+  scrollTop.value = 0
+  loadGoods()
+  uni.showToast({ title: '已刷新', icon: 'none' })
 }
 
 function goToPublish() {
@@ -619,11 +647,35 @@ onMounted(() => {
   width: 100%;
   height: 300rpx;
   overflow: hidden;
+  background-color: #f5f5f5;
 }
 
 .goods-image {
   width: 100%;
   height: 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.goods-image.image-loaded {
+  opacity: 1;
+}
+
+.image-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+}
+
+.placeholder-text {
+  font-size: 24rpx;
+  color: #ccc;
 }
 
 .goods-info {
@@ -756,5 +808,32 @@ onMounted(() => {
 .tab-item.active .tab-text {
   color: #667eea;
   font-weight: 500;
+}
+
+.publish-item {
+  position: relative;
+}
+
+.publish-btn {
+  width: 100rpx;
+  height: 100rpx;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -30rpx;
+  box-shadow: 0 8rpx 24rpx rgba(255, 107, 107, 0.4);
+  border: 6rpx solid #fff;
+}
+
+.publish-icon {
+  font-size: 56rpx;
+  color: #fff;
+  font-weight: 300;
+}
+
+.publish-item .tab-text {
+  margin-top: 10rpx;
 }
 </style>

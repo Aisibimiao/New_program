@@ -29,6 +29,15 @@
       </view>
 
       <view class="form-item">
+        <text class="form-label">宿舍楼栋</text>
+        <picker mode="selector" :range="dormBuildings" @change="onDormChange">
+          <view class="picker-value">
+            {{ form.dormBuilding || '请选择宿舍楼栋' }}
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-item">
         <text class="form-label">邮箱</text>
         <input class="form-input" v-model="form.email" type="email" placeholder="请输入邮箱" />
       </view>
@@ -52,8 +61,23 @@ const form = ref({
   studentId: '',
   phone: '',
   email: '',
-  avatar: ''
+  avatar: '',
+  dormBuilding: ''
 })
+
+const dormBuildings = [
+  '1号楼', '2号楼', '3号楼', '4号楼', '5号楼',
+  '6号楼', '7号楼', '8号楼', '9号楼', '10号楼',
+  '11号楼', '12号楼', '13号楼', '14号楼', '15号楼',
+  '16号楼', '17号楼', '18号楼', '19号楼', '20号楼',
+  '南苑1号楼', '南苑2号楼', '南苑3号楼', '南苑4号楼',
+  '北苑1号楼', '北苑2号楼', '北苑3号楼', '北苑4号楼'
+]
+
+function onDormChange(e: any) {
+  const index = e.detail.value
+  form.value.dormBuilding = dormBuildings[index]
+}
 
 function getImageUrl(url?: string) {
   if (!url) return 'http://localhost:3000/uploads/default-avatar.png'
@@ -157,7 +181,8 @@ async function handleSave() {
         studentId: form.value.studentId.trim(),
         phone: form.value.phone.trim(),
         email: form.value.email.trim(),
-        avatar: form.value.avatar
+        avatar: form.value.avatar,
+        dormBuilding: form.value.dormBuilding
       }
     })
     uni.hideLoading()
@@ -186,7 +211,8 @@ onMounted(() => {
       studentId: userStore.user.studentId || '',
       phone: userStore.user.phone || '',
       email: userStore.user.email || '',
-      avatar: userStore.user.avatar || ''
+      avatar: userStore.user.avatar || '',
+      dormBuilding: userStore.user.dormBuilding || ''
     }
   }
 })

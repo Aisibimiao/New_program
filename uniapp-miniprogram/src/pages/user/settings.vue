@@ -1,32 +1,27 @@
 <template>
   <view class="settings-container">
     <view class="menu-group">
-      <view class="menu-item" @click="toggleNotification">
+      <view class="menu-item">
         <text class="menu-icon">🔔</text>
-        <text class="menu-label">消息通知</text>
-        <switch class="menu-switch" :checked="settings.notification" @change="onNotificationChange" />
+        <text class="menu-label">交易提醒</text>
+        <switch class="menu-switch" :checked="settings.tradeReminder" @change="onTradeReminderChange" />
       </view>
-      <view class="menu-item" @click="toggleSound">
-        <text class="menu-icon">🔊</text>
-        <text class="menu-label">声音</text>
-        <switch class="menu-switch" :checked="settings.sound" @change="onSoundChange" />
-      </view>
-      <view class="menu-item" @click="toggleVibration">
-        <text class="menu-icon">📳</text>
-        <text class="menu-label">震动</text>
-        <switch class="menu-switch" :checked="settings.vibration" @change="onVibrationChange" />
+      <view class="menu-item" @click="showPrivacySettings">
+        <text class="menu-icon">👥</text>
+        <text class="menu-label">允许谁联系我</text>
+        <text class="menu-arrow">›</text>
       </view>
     </view>
 
     <view class="menu-group">
       <view class="menu-item" @click="clearCache">
         <text class="menu-icon">🗑️</text>
-        <text class="menu-label">清除缓存</text>
+        <text class="menu-label">清理缓存</text>
         <text class="menu-value">{{ cacheSize }}</text>
       </view>
       <view class="menu-item" @click="checkUpdate">
         <text class="menu-icon">🔄</text>
-        <text class="menu-label">检查更新</text>
+        <text class="menu-label">版本更新</text>
         <text class="menu-value">v1.0.0</text>
       </view>
     </view>
@@ -50,13 +45,12 @@
     </view>
 
     <view class="menu-group">
-      <view class="menu-item" @click="logout">
+      <view class="menu-item" @click="handleLogout">
         <text class="menu-icon">🚪</text>
         <text class="menu-label logout-text">退出登录</text>
       </view>
     </view>
 
-    <!-- 弹窗 -->
     <view class="popup-mask" v-if="showPopup" @click="closePopup">
       <view class="popup-content" @click.stop>
         <view class="popup-header">
@@ -75,22 +69,52 @@
         </view>
       </view>
     </view>
+
+    <view class="popup-mask" v-if="showPrivacyPopup" @click="closePrivacyPopup">
+      <view class="popup-content" @click.stop>
+        <view class="popup-header">
+          <text class="popup-title">允许谁联系我</text>
+        </view>
+        <view class="popup-body">
+          <radio-group @change="onPrivacyChange">
+            <label class="privacy-option">
+              <radio value="all" :checked="privacySetting === 'all'" />
+              <text class="privacy-label">所有人</text>
+            </label>
+            <label class="privacy-option">
+              <radio value="friend" :checked="privacySetting === 'friend'" />
+              <text class="privacy-label">仅好友</text>
+            </label>
+            <label class="privacy-option">
+              <radio value="none" :checked="privacySetting === 'none'" />
+              <text class="privacy-label">不允许</text>
+            </label>
+          </radio-group>
+        </view>
+        <view class="popup-footer">
+          <view class="popup-btn" @click="closePrivacyPopup">确认</view>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useUserStore } from '@/stores/user'
+
+const userStore = useUserStore()
 
 const settings = ref({
-  notification: true,
-  sound: true,
-  vibration: true
+  tradeReminder: true
 })
 
 const cacheSize = ref('0KB')
 const showPopup = ref(false)
 const popupTitle = ref('')
 const popupText = ref<string[]>([])
+const showPrivacyPopup = ref(false)
+const privacySetting = ref('all')
 
 const privacyContent = [
   '校园二手平台隐私政策',
@@ -186,36 +210,15 @@ onMounted(() => {
   if (saved) {
     settings.value = saved
   }
+  const privacy = uni.getStorageSync('privacySetting')
+  if (privacy) {
+    privacySetting.value = privacy
+  }
   cacheSize.value = '12.5MB'
 })
 
-function toggleNotification() {
-  settings.value.notification = !settings.value.notification
-  saveSettings()
-}
-
-function toggleSound() {
-  settings.value.sound = !settings.value.sound
-  saveSettings()
-}
-
-function toggleVibration() {
-  settings.value.vibration = !settings.value.vibration
-  saveSettings()
-}
-
-function onNotificationChange(e: any) {
-  settings.value.notification = e.detail.value
-  saveSettings()
-}
-
-function onSoundChange(e: any) {
-  settings.value.sound = e.detail.value
-  saveSettings()
-}
-
-function onVibrationChange(e: any) {
-  settings.value.vibration = e.detail.value
+function onTradeReminderChange(e: any) {
+  settings.value.tradeReminder = e.detail.value
   saveSettings()
 }
 
@@ -223,14 +226,30 @@ function saveSettings() {
   uni.setStorageSync('settings', settings.value)
 }
 
+function showPrivacySettings() {
+  showPrivacyPopup.value = true
+}
+
+function closePrivacyPopup() {
+  showPrivacyPopup.value = false
+}
+
+function onPrivacyChange(e: any) {
+  privacySetting.value = e.detail.value
+  uni.setStorageSync('privacySetting', privacySetting.value)
+}
+
 function clearCache() {
   uni.showModal({
-    title: '清除缓存',
-    content: '确定要清除所有缓存吗？',
+    title: '清理缓存',
+    content: '确定要清理所有缓存吗？',
     success: (res) => {
       if (res.confirm) {
+        uni.clearStorageSync()
+        settings.value = { tradeReminder: true }
+        privacySetting.value = 'all'
         cacheSize.value = '0KB'
-        uni.showToast({ title: '清除成功', icon: 'success' })
+        uni.showToast({ title: '清理成功', icon: 'success' })
       }
     }
   })
@@ -253,25 +272,21 @@ function showAgreement() {
 }
 
 function showAbout() {
-  uni.showModal({
-    title: '关于我们',
-    content: '校园二手平台 v1.0.0\n致力于为在校学生提供便捷的闲置物品交易服务',
-    showCancel: false
-  })
+  uni.navigateTo({ url: '/pages/user/about' })
 }
 
 function closePopup() {
   showPopup.value = false
 }
 
-function logout() {
+function handleLogout() {
   uni.showModal({
     title: '退出登录',
-    content: '确定要退出当前账号吗？',
+    content: '退出后将无法同步收藏和发布记录，是否继续？',
     success: (res) => {
       if (res.confirm) {
-        uni.removeStorageSync('userInfo')
-        uni.removeStorageSync('token')
+        uni.clearStorageSync()
+        userStore.logout()
         uni.reLaunch({ url: '/pages/user/login' })
       }
     }

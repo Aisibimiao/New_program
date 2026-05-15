@@ -41,6 +41,20 @@ export function confirmOrder(orderId: string) {
   })
 }
 
+export function shipOrder(orderId: string) {
+  return request({
+    url: `/orders/${orderId}/ship`,
+    method: 'PUT'
+  })
+}
+
+export function receiveOrder(orderId: string) {
+  return request({
+    url: `/orders/${orderId}/receive`,
+    method: 'PUT'
+  })
+}
+
 export function cancelOrder(orderId: string) {
   return request({
     url: `/orders/${orderId}/cancel`,

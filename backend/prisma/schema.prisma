@@ -15,11 +15,11 @@ model User {
   email      String?       @unique
   openid     String?       @unique
   password   String?
-  name       String?       // 真实姓名
-  nickname   String?       // 昵称（新增）
+  name       String?
+  nickname   String?
   studentId  String?       @unique
   role       Role          @default(USER)
-  avatar     String?       // 头像 URL
+  avatar     String?
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
 
@@ -29,6 +29,7 @@ model User {
   favorites  Favorite[]
   sentMessages    ChatMessage[]  @relation("Sender")
   receivedMessages ChatMessage[] @relation("Receiver")
+  admin      Admin?
 }
 
 model Goods {
@@ -55,7 +56,7 @@ model Goods {
   bookName   String?      // 书名
   grade      String?      // 年级
 
-  orders      Order[]
+  orders       Order[]
   reviews     Review[]
   favorites   Favorite[]
   chatMessages ChatMessage[]
@@ -106,8 +107,11 @@ enum Status {
 
 enum OrderStatus {
   PENDING
+  PAID
+  SHIPPED
   COMPLETED
   CANCELLED
+  REFUNDED
 }
 
 model Favorite {
@@ -133,4 +137,14 @@ model ChatMessage {
   sender   User   @relation("Sender", fields: [senderId], references: [id], onDelete: Cascade)
   receiver User   @relation("Receiver", fields: [receiverId], references: [id], onDelete: Cascade)
   goods    Goods  @relation(fields: [goodsId], references: [id], onDelete: Cascade)
+}
+
+model Admin {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        String   @default("ADMIN")
+  permissions Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

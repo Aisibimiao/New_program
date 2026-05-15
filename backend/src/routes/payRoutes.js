@@ -5,5 +5,6 @@ const authMiddleware = require('../middlewares/auth');
 
 router.post('/wechat', authMiddleware, payController.createWechatPay);
 router.post('/wechat/notify', payController.wechatNotify);
+router.get('/order/:orderId', authMiddleware, payController.getOrderStatus);
 
 module.exports = router;

@@ -15,6 +15,9 @@ const favoriteRoutes = require('./routes/favoriteRoutes');
 const payRoutes = require('./routes/payRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const bookCategoryRoutes = require('./routes/bookCategoryRoutes');
+const reportRoutes = require('./routes/reportRoutes');
+const userManageRoutes = require('./routes/userManageRoutes');
 
 // 导入全局错误处理中间件
 const { errorHandler } = require('./middlewares/errorHandler');
@@ -115,6 +118,15 @@ app.use('/api/admin', adminRoutes);
 // 聊天相关
 app.use('/api/chat', chatRoutes);
 
+// 书籍分类
+app.use('/api/book-category', bookCategoryRoutes);
+
+// 举报相关
+app.use('/api/report', reportRoutes);
+
+// 用户管理
+app.use('/api/user-manage', userManageRoutes);
+
 // ========================
 // 健康检查
 // ========================
@@ -140,5 +152,11 @@ app.use('*', (req, res) => {
 // 全局错误处理（必须放在所有路由之后）
 // ========================
 app.use(errorHandler);
+
+// 添加 res.xml 方法支持微信支付回调
+app.response.xml = function(data) {
+    this.set('Content-Type', 'text/xml');
+    this.send(data);
+};
 
 module.exports = app;

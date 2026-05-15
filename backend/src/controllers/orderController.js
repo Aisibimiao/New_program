@@ -41,7 +41,7 @@ exports.createOrder = async (req, res) => {
     }
 };
 
-// 卖家确认订单
+// 卖家确认订单（待支付状态）
 exports.confirmOrder = async (req, res) => {
     try {
         const { orderId } = req.params;
@@ -72,6 +72,74 @@ exports.confirmOrder = async (req, res) => {
             })
         ]);
         res.json({ msg: '交易已完成' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ msg: '操作失败' });
+    }
+};
+
+// 卖家确认发货
+exports.shipOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const sellerId = req.user.id;
+
+        const order = await prisma.order.findUnique({
+            where: { id: orderId },
+            include: { goods: true }
+        });
+        if (!order) {
+            return res.status(404).json({ msg: '订单不存在' });
+        }
+        if (order.goods.sellerId !== sellerId) {
+            return res.status(403).json({ msg: '无权操作此订单' });
+        }
+        if (order.status !== 'PAID') {
+            return res.status(400).json({ msg: '订单状态不支持发货' });
+        }
+
+        await prisma.order.update({
+            where: { id: orderId },
+            data: { status: 'SHIPPED' }
+        });
+        res.json({ msg: '已确认发货，请等待买家确认收货' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ msg: '操作失败' });
+    }
+};
+
+// 买家确认收货
+exports.receiveOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const buyerId = req.user.id;
+
+        const order = await prisma.order.findUnique({
+            where: { id: orderId },
+            include: { goods: true }
+        });
+        if (!order) {
+            return res.status(404).json({ msg: '订单不存在' });
+        }
+        if (order.buyerId !== buyerId) {
+            return res.status(403).json({ msg: '无权操作此订单' });
+        }
+        if (order.status !== 'SHIPPED') {
+            return res.status(400).json({ msg: '订单状态不支持确认收货' });
+        }
+
+        await prisma.$transaction([
+            prisma.order.update({
+                where: { id: orderId },
+                data: { status: 'COMPLETED' }
+            }),
+            prisma.goods.update({
+                where: { id: order.goodsId },
+                data: { status: 'SOLD' }
+            })
+        ]);
+        res.json({ msg: '交易完成，感谢使用' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ msg: '操作失败' });

@@ -1,0 +1,14 @@
+-- 创建管理员表
+CREATE TABLE IF NOT EXISTS `Admin` (
+    `id` VARCHAR(191) NOT NULL DEFAULT uuid(),
+    `userId` VARCHAR(191) NOT NULL,
+    `role` VARCHAR(50) NOT NULL DEFAULT 'ADMIN',
+    `permissions` JSON,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `Admin_userId_key`(`userId`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- 添加外键
+ALTER TABLE `Admin` ADD CONSTRAINT `Admin_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

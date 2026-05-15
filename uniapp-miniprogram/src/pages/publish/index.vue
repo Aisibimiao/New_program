@@ -73,7 +73,7 @@
 
       <view class="form-section">
         <view class="section-title">
-          <text>商品图片 (最多6张)</text>
+          <text>商品图片 (最多3张)</text>
         </view>
         <view class="upload-area">
           <view
@@ -86,7 +86,7 @@
               <text>✕</text>
             </view>
           </view>
-          <view class="upload-btn" @click="chooseImage" v-if="images.length < 6">
+          <view class="upload-btn" @click="chooseImage" v-if="images.length < 3">
             <text class="upload-icon">+</text>
             <text class="upload-text">添加图片</text>
           </view>
@@ -96,7 +96,7 @@
       <view class="form-section">
         <view class="price-row">
           <view class="price-item">
-            <text class="price-label">售价</text>
+            <text class="price-label">发布金额</text>
             <view class="price-input-wrap">
               <text class="price-symbol">¥</text>
               <input
@@ -107,6 +107,15 @@
               />
             </view>
           </view>
+        </view>
+      </view>
+
+      <view class="form-section">
+        <view class="section-title">
+          <text>交易地点</text>
+        </view>
+        <view class="form-placeholder">
+          <text class="placeholder-text">交易地点功能开发中...</text>
         </view>
       </view>
     </scroll-view>
@@ -124,11 +133,11 @@ import { ref, computed } from 'vue'
 import { createGoods, uploadImage } from '@/api/goods'
 
 const categories = [
-  { value: 'ELECTRONICS', label: '数码产品' },
-  { value: 'CLOTHING', label: '服饰鞋包' },
-  { value: 'BOOK', label: '图书教材' },
+  { value: 'ELECTRONICS', label: '电子产品' },
+  { value: 'BEAUTY', label: '生活美妆' },
+  { value: 'BOOK', label: '书籍' },
+  { value: 'VIRTUAL', label: '虚拟物品' },
   { value: 'SPORTS', label: '运动户外' },
-  { value: 'LIFE', label: '生活用品' },
   { value: 'OTHER', label: '其他' }
 ]
 const categoryLabels = categories.map(c => c.label)
@@ -196,7 +205,7 @@ function onGradeChange(e: any) {
 
 function chooseImage() {
   uni.chooseImage({
-    count: 6 - images.value.length,
+    count: 3 - images.value.length,
     sizeType: ['compressed'],
     sourceType: ['album', 'camera'],
     success: (res) => {
@@ -248,10 +257,7 @@ async function handleSubmit() {
     uni.showToast({ title: '发布成功', icon: 'success' })
 
     setTimeout(() => {
-      uni.navigateTo({ url: '/pages/user/profile' })
-      setTimeout(() => {
-        uni.navigateTo({ url: '/pages/goods/my-list' })
-      }, 100)
+      uni.navigateTo({ url: '/pages/goods/my-list' })
     }, 1500)
   } catch (err: any) {
     uni.hideLoading()
@@ -444,5 +450,18 @@ async function handleSubmit() {
   &.disabled {
     opacity: 0.5;
   }
+}
+
+.form-placeholder {
+  padding: 40rpx;
+  background-color: #fafafa;
+  border-radius: 12rpx;
+  border: 2rpx dashed #e0e0e0;
+}
+
+.placeholder-text {
+  font-size: 28rpx;
+  color: #999;
+  text-align: center;
 }
 </style>

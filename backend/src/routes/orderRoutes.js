@@ -6,6 +6,8 @@ const authMiddleware = require('../middlewares/auth');
 // 所有订单接口都需要登录
 router.post('/', authMiddleware, orderController.createOrder);
 router.put('/:orderId/confirm', authMiddleware, orderController.confirmOrder);
+router.put('/:orderId/ship', authMiddleware, orderController.shipOrder);
+router.put('/:orderId/receive', authMiddleware, orderController.receiveOrder);
 router.put('/:orderId/cancel', authMiddleware, orderController.cancelOrder);
 router.delete('/:orderId', authMiddleware, orderController.deleteOrder);
 router.get('/buy', authMiddleware, orderController.getBuyOrders);

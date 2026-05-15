@@ -1,23 +1,34 @@
 import { request } from '@/utils/request'
 
-export interface PayResult {
-  msg: string
-  payData: {
-    appid: string
-    partnerid: string
-    prepayid: string
-    noncestr: string
-    timestamp: string
-    package: string
-    sign: string
-  }
-  order: any
+export interface PayData {
+  appId: string
+  timeStamp: string
+  nonceStr: string
+  package: string
+  signType: string
+  paySign: string
 }
 
-export function createWechatPay(orderId: string) {
-  return request<PayResult>({
+export function createWechatPay(data: { orderId: string }) {
+  return request<{ msg: string; payData: PayData; orderId: string }>({
     url: '/pay/wechat',
     method: 'POST',
-    data: { orderId }
+    data
+  })
+}
+
+export function getOrderStatus(orderId: string) {
+  return request<{
+    msg: string
+    order: {
+      id: string
+      status: string
+      goods: any
+      buyer: any
+      seller: any
+    }
+  }>({
+    url: `/pay/order/${orderId}`,
+    method: 'GET'
   })
 }

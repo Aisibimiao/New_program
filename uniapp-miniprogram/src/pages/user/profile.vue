@@ -119,6 +119,7 @@ async function loadUserData() {
   try {
     const myGoods = await getMyGoods()
     stats.value.goodsCount = Array.isArray(myGoods) ? myGoods.length : 0
+    stats.value.orderCount = Array.isArray(myGoods) ? myGoods.filter(g => g.status === 'SOLD' || g.status === 1).length : 0
   } catch (err) {
     console.error('加载用户数据失败', err)
   }
@@ -197,11 +198,7 @@ function goToSettings() {
 }
 
 function goToAbout() {
-  uni.showModal({
-    title: '关于我们',
-    content: '校园二手平台 v1.0\n\n让闲置物品找到新主人\n\n联系我们：support@campus-trade.com',
-    showCancel: false
-  })
+  uni.navigateTo({ url: '/pages/user/about' })
 }
 
 function switchToHome() {
@@ -214,14 +211,15 @@ function switchToGoods() {
 
 function handleLogout() {
   uni.showModal({
-    title: '确认退出',
-    content: '确定要退出登录吗？',
+    title: '退出登录',
+    content: '退出后将无法同步收藏和发布记录，是否继续？',
     success: (res) => {
       if (res.confirm) {
+        uni.clearStorageSync()
         userStore.logout()
         user.value = null
         stats.value = { goodsCount: 0, orderCount: 0 }
-        uni.showToast({ title: '退出成功', icon: 'success' })
+        uni.reLaunch({ url: '/pages/user/login' })
       }
     }
   })
@@ -272,18 +270,18 @@ onMounted(() => {
 }
 
 .role {
-  font-size: 24rpx;
+  font-size: 26rpx;
   color: rgba(255, 255, 255, 0.8);
 }
 
 .edit-btn {
-  width: 160rpx;
-  height: 70rpx;
-  line-height: 70rpx;
-  text-align: center;
-  background-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.2);
+  padding: 16rpx 32rpx;
+  border-radius: 30rpx;
+}
+
+.edit-btn text {
   color: #fff;
-  border-radius: 35rpx;
   font-size: 26rpx;
 }
 
@@ -291,7 +289,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40rpx;
+  padding: 40rpx 0;
 }
 
 .login-icon {
@@ -300,56 +298,64 @@ onMounted(() => {
 }
 
 .login-text {
-  font-size: 32rpx;
   color: #fff;
+  font-size: 32rpx;
 }
 
 .stats-section {
   display: flex;
-  background-color: #fff;
+  justify-content: space-around;
+  padding: 40rpx 0;
+  background: #fff;
   margin: 20rpx;
   border-radius: 20rpx;
-  padding: 30rpx 0;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
 }
 
 .stat-item {
-  flex: 1;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .stat-num {
-  display: block;
   font-size: 48rpx;
   font-weight: bold;
-  color: #333;
-  margin-bottom: 10rpx;
+  color: #667eea;
 }
 
 .stat-label {
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: #999;
+  margin-top: 10rpx;
 }
 
 .menu-list {
-  background-color: #fff;
+  background: #fff;
   margin: 20rpx;
   border-radius: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
   overflow: hidden;
 }
 
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 30rpx;
+  padding: 32rpx 30rpx;
   border-bottom: 1rpx solid #f0f0f0;
+
   &:last-child {
     border-bottom: none;
+  }
+
+  &:active {
+    background: #f8f8f8;
   }
 }
 
 .menu-icon {
   font-size: 40rpx;
-  margin-right: 20rpx;
+  margin-right: 24rpx;
 }
 
 .menu-text {
@@ -359,14 +365,13 @@ onMounted(() => {
 }
 
 .menu-arrow {
-  font-size: 40rpx;
+  font-size: 36rpx;
   color: #ccc;
 }
 
 .logout-item {
-  background-color: #fff5f5;
   .menu-text {
-    color: #e74c3c;
+    color: #ff6b6b;
   }
 }
 
@@ -375,38 +380,33 @@ onMounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 120rpx;
-  background-color: #fff;
   display: flex;
-  align-items: center;
-  justify-content: space-around;
-  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
+  background: #fff;
+  padding: 20rpx 0;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
 }
 
 .tab-item {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10rpx 40rpx;
+
+  &.active {
+    .tab-icon,
+    .tab-text {
+      color: #667eea;
+    }
+  }
 }
 
 .tab-icon {
-  font-size: 48rpx;
-  margin-bottom: 5rpx;
+  font-size: 44rpx;
+  margin-bottom: 8rpx;
 }
 
 .tab-text {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #999;
-}
-
-.tab-item.active {
-  .tab-icon {
-    transform: scale(1.1);
-  }
-  .tab-text {
-    color: #667eea;
-    font-weight: bold;
-  }
 }
 </style>

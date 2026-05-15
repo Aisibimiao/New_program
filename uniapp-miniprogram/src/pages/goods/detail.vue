@@ -1,6 +1,10 @@
 <template>
   <view class="container">
     <scroll-view class="content-scroll" scroll-y>
+      <view class="sold-badge" v-if="isSold">
+        <text class="sold-text">已售出</text>
+      </view>
+
       <image class="goods-image" :src="getImageUrl(goods?.images?.[0])" mode="aspectFill" @error="handleImageError($event)" />
 
       <view class="goods-header">
@@ -35,7 +39,7 @@
       </view>
     </scroll-view>
 
-    <view class="bottom-bar">
+    <view class="bottom-bar" :class="{ 'disabled': isSold && !isFromFavorite }">
       <view class="bottom-left">
         <view class="action-item" @click="goToChat">
           <text class="action-icon">💬</text>
@@ -52,14 +56,14 @@
       </view>
       <view class="bottom-right">
         <view class="btn-secondary" @click="goToContactSeller">联系卖家</view>
-        <view class="btn-primary" @click="buyNow">立即购买</view>
+        <view class="btn-primary" :class="{ 'btn-disabled': isSold }" @click="buyNow">{{ isSold ? '已售出' : '立即购买' }}</view>
       </view>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { getGoodsDetail, type Goods } from '@/api/goods'
 import { createOrder } from '@/api/order'
@@ -71,6 +75,11 @@ const goods = ref<Goods | null>(null)
 const collected = ref(false)
 const goodsId = ref('')
 const userStore = useUserStore()
+const isFromFavorite = ref(false)
+
+const isSold = computed(() => {
+  return goods.value?.status === 'SOLD' || goods.value?.status === 1
+})
 
 const imagesArray = ref<string[]>([])
 
@@ -216,6 +225,15 @@ async function checkFavoriteStatus() {
 }
 
 async function buyNow() {
+  if (isSold.value && !isFromFavorite.value) {
+    uni.showModal({
+      title: '提示',
+      content: '该商品已售出，仅可查看详情',
+      showCancel: false
+    })
+    return
+  }
+
   if (!userStore.token) {
     uni.showModal({
       title: '请先登录',
@@ -291,6 +309,9 @@ async function loadData() {
 onLoad((options) => {
   if (options?.id) {
     goodsId.value = options.id
+  }
+  if (options?.from === 'favorite') {
+    isFromFavorite.value = true
   }
 })
 
@@ -483,5 +504,29 @@ onMounted(() => {
   color: #fff;
   border-radius: 40rpx;
   font-size: 28rpx;
+}
+
+.btn-disabled {
+  background: #ccc !important;
+}
+
+.sold-badge {
+  position: absolute;
+  top: 40rpx;
+  left: 40rpx;
+  z-index: 10;
+  background-color: #e74c3c;
+  padding: 12rpx 24rpx;
+  border-radius: 8rpx;
+}
+
+.sold-text {
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+.disabled {
+  opacity: 0.6;
 }
 </style>

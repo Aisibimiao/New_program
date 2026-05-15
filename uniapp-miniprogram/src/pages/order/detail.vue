@@ -62,20 +62,23 @@
       </view>
     </scroll-view>
 
-    <view class="bottom-bar" v-if="order?.status === 'PENDING'">
-      <view 
-        v-if="isSeller" 
-        class="btn-primary" 
-        @click="handleConfirm"
-      >
-        <text>确认交易</text>
-      </view>
-      <view 
-        v-if="!isSeller" 
-        class="btn-secondary" 
-        @click="handleCancel"
-      >
+    <view class="bottom-bar">
+      <view v-if="order?.status === 'PENDING' && !isSeller" class="btn-secondary" @click="handleCancel">
         <text>取消订单</text>
+      </view>
+
+      <view v-if="order?.status === 'PAID' && isSeller" class="btn-primary" @click="handleShip">
+        <text>确认发货</text>
+      </view>
+      <view v-if="order?.status === 'PAID' && !isSeller" class="btn-hint">
+        <text>等待卖家发货...</text>
+      </view>
+
+      <view v-if="order?.status === 'SHIPPED' && !isSeller" class="btn-primary" @click="handleReceive">
+        <text>确认收货</text>
+      </view>
+      <view v-if="order?.status === 'SHIPPED' && isSeller" class="btn-hint">
+        <text>等待买家确认收货...</text>
       </view>
     </view>
   </view>
@@ -84,7 +87,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { getOrderDetail, cancelOrder, confirmOrder } from '@/api/order'
+import { getOrderDetail, cancelOrder, confirmOrder, shipOrder, receiveOrder } from '@/api/order'
 import type { Order } from '@/api/order'
 import { useUserStore } from '@/stores/user'
 
@@ -110,9 +113,12 @@ function formatDate(dateStr?: string) {
 
 function getStatusText(status?: string) {
   const map: Record<string, string> = {
-    PENDING: '待确认',
+    PENDING: '待支付',
+    PAID: '待卖家发货',
+    SHIPPED: '待确认收货',
     COMPLETED: '已完成',
-    CANCELLED: '已取消'
+    CANCELLED: '已取消',
+    REFUNDED: '已退款'
   }
   return map[status || ''] || '未知'
 }
@@ -120,8 +126,11 @@ function getStatusText(status?: string) {
 function getStatusClass(status?: string) {
   const map: Record<string, string> = {
     PENDING: 'pending',
+    PAID: 'paid',
+    SHIPPED: 'shipped',
     COMPLETED: 'completed',
-    CANCELLED: 'cancelled'
+    CANCELLED: 'cancelled',
+    REFUNDED: 'refunded'
   }
   return map[status || ''] || ''
 }
@@ -163,22 +172,42 @@ async function handleCancel() {
   })
 }
 
-async function handleConfirm() {
+async function handleReceive() {
   if (!orderId.value) return
-  
+
   uni.showModal({
-    title: '确认交易',
-    content: '确认已收到货款并交付商品？',
+    title: '确认收货',
+    content: '确认已收到商品？',
     success: async (res) => {
       if (res.confirm) {
         try {
-          await confirmOrder(orderId.value)
-          uni.showToast({ title: '确认成功', icon: 'success' })
+          await receiveOrder(orderId.value)
+          uni.showToast({ title: '确认成功，交易完成', icon: 'success' })
           setTimeout(() => {
             uni.navigateBack()
           }, 1500)
         } catch (err: any) {
           uni.showToast({ title: err.message || '确认失败', icon: 'none' })
+        }
+      }
+    }
+  })
+}
+
+async function handleShip() {
+  if (!orderId.value) return
+
+  uni.showModal({
+    title: '确认发货',
+    content: '确认已交付商品给买家？',
+    success: async (res) => {
+      if (res.confirm) {
+        try {
+          await shipOrder(orderId.value)
+          uni.showToast({ title: '发货成功', icon: 'success' })
+          loadData()
+        } catch (err: any) {
+          uni.showToast({ title: err.message || '操作失败', icon: 'none' })
         }
       }
     }
@@ -426,6 +455,17 @@ onMounted(() => {
   text-align: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+}
+
+.btn-hint {
+  width: 300rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  text-align: center;
+  background-color: #e8e8e8;
+  color: #999;
   border-radius: 40rpx;
   font-size: 28rpx;
 }
