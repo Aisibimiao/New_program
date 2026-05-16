@@ -231,147 +231,235 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/variables.scss';
+
 .container {
   min-height: 100vh;
-  background-color: #f5f5f5;
-  padding-bottom: 120rpx;
+  background-color: $bg-color;
+  padding-bottom: $tabbar-height;
 }
 
 .header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 60rpx 40rpx 40rpx;
+  @include gradient-primary;
+  padding: 80rpx $spacing-xl $spacing-xl;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-radius: 0 0 $radius-xl $radius-xl;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -60%;
+    right: -30%;
+    width: 80%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -20%;
+    width: 50%;
+    height: 80%;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+  }
 }
 
 .user-info {
   display: flex;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
 .avatar {
-  width: 140rpx;
-  height: 140rpx;
+  width: 160rpx;
+  height: 160rpx;
   border-radius: 50%;
-  border: 4rpx solid rgba(255, 255, 255, 0.5);
+  border: 6rpx solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.15);
+  transition: all $transition-normal;
+  
+  &:active {
+    transform: scale(0.95);
+  }
 }
 
 .user-detail {
-  margin-left: 30rpx;
+  margin-left: $spacing-lg;
 }
 
 .nickname {
   display: block;
-  font-size: 36rpx;
-  font-weight: bold;
+  font-size: $font-xl;
+  font-weight: 700;
   color: #fff;
-  margin-bottom: 10rpx;
+  margin-bottom: $spacing-xs;
+  text-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.15);
 }
 
 .role {
-  font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: $font-sm;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 2rpx;
 }
 
 .edit-btn {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 16rpx 32rpx;
-  border-radius: 30rpx;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(10rpx);
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-full;
+  border: 2rpx solid rgba(255, 255, 255, 0.25);
+  transition: all $transition-fast;
+  position: relative;
+  z-index: 1;
+  
+  &:active {
+    background: rgba(255, 255, 255, 0.28);
+    transform: scale(0.96);
+  }
 }
 
 .edit-btn text {
   color: #fff;
-  font-size: 26rpx;
+  font-size: $font-sm;
+  font-weight: 500;
 }
 
 .login-prompt {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40rpx 0;
+  padding: $spacing-xl 0;
+  position: relative;
+  z-index: 1;
 }
 
 .login-icon {
-  font-size: 80rpx;
-  margin-bottom: 20rpx;
+  font-size: 100rpx;
+  margin-bottom: $spacing-md;
+  opacity: 0.8;
 }
 
 .login-text {
   color: #fff;
-  font-size: 32rpx;
+  font-size: $font-lg;
+  font-weight: 500;
 }
 
 .stats-section {
   display: flex;
   justify-content: space-around;
-  padding: 40rpx 0;
-  background: #fff;
-  margin: 20rpx;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+  padding: $spacing-xl 0;
+  background: $bg-white;
+  margin: $spacing-md $spacing-lg;
+  border-radius: $radius-xl;
+  @include shadow-card;
+  border: 2rpx solid rgba(102, 126, 234, 0.06);
 }
 
 .stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 0 $spacing-lg;
+  
+  &:not(:last-child) {
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 2rpx;
+      height: 60%;
+      background: $border-color;
+    }
+  }
 }
 
 .stat-num {
-  font-size: 48rpx;
-  font-weight: bold;
-  color: #667eea;
+  font-size: 56rpx;
+  font-weight: 700;
+  @include gradient-primary;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .stat-label {
-  font-size: 24rpx;
-  color: #999;
-  margin-top: 10rpx;
+  font-size: $font-sm;
+  color: $text-light;
+  margin-top: $spacing-sm;
+  font-weight: 500;
 }
 
 .menu-list {
-  background: #fff;
-  margin: 20rpx;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+  background: $bg-white;
+  margin: 16rpx $spacing-lg;
+  border-radius: $radius-xl;
+  @include shadow-card;
   overflow: hidden;
+  border: 2rpx solid rgba(102, 126, 234, 0.06);
 }
 
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 32rpx 30rpx;
-  border-bottom: 1rpx solid #f0f0f0;
-
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 2rpx solid $border-color;
+  transition: all $transition-fast;
+  
   &:last-child {
     border-bottom: none;
   }
-
+  
   &:active {
-    background: #f8f8f8;
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+    transform: scale(0.98);
   }
 }
 
 .menu-icon {
-  font-size: 40rpx;
-  margin-right: 24rpx;
+  font-size: 48rpx;
+  margin-right: $spacing-lg;
+  opacity: 0.7;
 }
 
 .menu-text {
   flex: 1;
-  font-size: 30rpx;
-  color: #333;
+  font-size: $font-md;
+  color: $text-primary;
+  font-weight: 500;
 }
 
 .menu-arrow {
-  font-size: 36rpx;
-  color: #ccc;
+  font-size: $font-lg;
+  color: $text-placeholder;
+  transition: all $transition-fast;
+  
+  .menu-item:active & {
+    transform: translateX(8rpx);
+  }
 }
 
 .logout-item {
   .menu-text {
-    color: #ff6b6b;
+    color: $accent-color;
+    font-weight: 600;
+  }
+  
+  .menu-icon {
+    opacity: 0.8;
   }
 }
 
@@ -381,9 +469,13 @@ onMounted(() => {
   left: 0;
   right: 0;
   display: flex;
-  background: #fff;
-  padding: 20rpx 0;
-  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20rpx);
+  padding: 16rpx 0;
+  padding-bottom: calc(16rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -8rpx 32rpx rgba(102, 126, 234, 0.08);
+  border-top: 2rpx solid rgba(102, 126, 234, 0.05);
 }
 
 .tab-item {
@@ -391,22 +483,51 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-
+  transition: all $transition-fast;
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
   &.active {
-    .tab-icon,
+    .tab-icon {
+      transform: scale(1.1);
+      
+      &::after {
+        width: 40rpx;
+      }
+    }
+    
     .tab-text {
-      color: #667eea;
+      color: $primary-color;
+      font-weight: 600;
     }
   }
 }
 
 .tab-icon {
-  font-size: 44rpx;
-  margin-bottom: 8rpx;
+  font-size: 52rpx;
+  margin-bottom: $spacing-xs;
+  transition: all $transition-normal;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -6rpx;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 6rpx;
+    background: $primary-color;
+    border-radius: $radius-full;
+    transition: width $transition-normal;
+  }
 }
 
 .tab-text {
-  font-size: 22rpx;
-  color: #999;
+  font-size: $font-xs;
+  color: $text-light;
+  transition: all $transition-normal;
 }
 </style>

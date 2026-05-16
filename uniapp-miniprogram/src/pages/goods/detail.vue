@@ -324,123 +324,157 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/variables.scss';
+
 .container {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: $bg-color;
   display: flex;
   flex-direction: column;
 }
 
 .content-scroll {
   flex: 1;
-  padding-bottom: 160rpx;
+  padding-bottom: 180rpx;
 }
 
 .goods-image {
   width: 100%;
-  height: 600rpx;
+  height: 750rpx;
+  background: linear-gradient(135deg, #f8f9ff 0%, #e8edff 100%);
 }
 
 .goods-header {
-  background-color: #fff;
-  padding: 30rpx;
+  background-color: $bg-white;
+  padding: $spacing-lg;
+  position: relative;
 }
 
 .goods-price {
-  font-size: 56rpx;
-  font-weight: bold;
-  color: #e74c3c;
+  font-size: 64rpx;
+  font-weight: 700;
+  color: $accent-color;
+  letter-spacing: 2rpx;
+  
+  &::before {
+    content: '¥';
+    font-size: 40rpx;
+    font-weight: 600;
+    margin-right: 4rpx;
+  }
 }
 
 .goods-info {
-  background-color: #fff;
-  margin-top: 20rpx;
-  padding: 30rpx;
+  background-color: $bg-white;
+  margin: $spacing-md $spacing-lg;
+  padding: $spacing-xl;
+  border-radius: $radius-xl;
+  @include shadow-card;
+  border: 2rpx solid rgba(102, 126, 234, 0.06);
 }
 
 .goods-name {
   display: block;
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20rpx;
+  font-size: $font-xl;
+  font-weight: 700;
+  color: $text-primary;
+  margin-bottom: $spacing-md;
+  line-height: 1.4;
 }
 
 .goods-desc {
-  font-size: 28rpx;
-  color: #666;
-  line-height: 1.6;
+  font-size: $font-md;
+  color: $text-secondary;
+  line-height: 1.7;
 }
 
 .goods-meta {
-  background-color: #fff;
-  margin-top: 20rpx;
-  padding: 30rpx;
+  background-color: $bg-white;
+  margin: $spacing-md $spacing-lg;
+  padding: $spacing-xl;
+  border-radius: $radius-xl;
+  @include shadow-card;
+  border: 2rpx solid rgba(102, 126, 234, 0.06);
 }
 
 .meta-item {
   display: flex;
   justify-content: space-between;
-  padding: 20rpx 0;
-  border-bottom: 1rpx solid #f0f0f0;
+  align-items: center;
+  padding: $spacing-md 0;
+  border-bottom: 2rpx solid $border-color;
+  
   &:last-child {
     border-bottom: none;
   }
 }
 
 .meta-label {
-  font-size: 28rpx;
-  color: #999;
+  font-size: $font-md;
+  color: $text-light;
+  font-weight: 500;
 }
 
 .meta-value {
-  font-size: 28rpx;
-  color: #333;
+  font-size: $font-md;
+  color: $text-primary;
+  font-weight: 600;
 }
 
 .seller-info {
-  background-color: #fff;
-  margin-top: 20rpx;
-  padding: 30rpx;
+  background-color: $bg-white;
+  margin: $spacing-md $spacing-lg;
+  padding: $spacing-xl;
+  border-radius: $radius-xl;
+  @include shadow-card;
+  border: 2rpx solid rgba(102, 126, 234, 0.06);
 }
 
 .section-title {
   display: block;
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20rpx;
+  font-size: $font-lg;
+  font-weight: 700;
+  color: $text-primary;
+  margin-bottom: $spacing-md;
 }
 
 .seller-card {
   display: flex;
   align-items: center;
-  padding: 20rpx;
-  background-color: #f9f9f9;
-  border-radius: 16rpx;
+  padding: $spacing-lg;
+  @include gradient-bg;
+  border-radius: $radius-lg;
+  transition: all $transition-normal;
+  
+  &:active {
+    transform: scale(0.98);
+    @include shadow-sm;
+  }
 }
 
 .seller-avatar {
-  width: 120rpx;
-  height: 120rpx;
+  width: 140rpx;
+  height: 140rpx;
   border-radius: 50%;
+  border: 4rpx solid rgba(102, 126, 234, 0.1);
 }
 
 .seller-detail {
-  margin-left: 30rpx;
+  margin-left: $spacing-lg;
+  flex: 1;
 }
 
 .seller-name {
   display: block;
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 10rpx;
+  font-size: $font-lg;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-xs;
 }
 
 .seller-role {
-  font-size: 26rpx;
-  color: #999;
+  font-size: $font-sm;
+  color: $text-light;
 }
 
 .bottom-bar {
@@ -448,85 +482,119 @@ onMounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 120rpx;
-  background-color: #fff;
+  height: 140rpx;
+  background-color: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20rpx);
   display: flex;
   align-items: center;
-  padding: 0 20rpx;
-  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+  padding: 0 $spacing-lg;
+  box-shadow: 0 -8rpx 40rpx rgba(102, 126, 234, 0.1);
+  border-top: 2rpx solid rgba(102, 126, 234, 0.06);
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .bottom-left {
   display: flex;
-  gap: 40rpx;
+  gap: $spacing-xl;
 }
 
 .action-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: $spacing-xs;
+  transition: all $transition-fast;
+  
+  &:active {
+    transform: scale(0.92);
+  }
 }
 
 .action-icon {
-  font-size: 48rpx;
+  font-size: 56rpx;
 }
 
 .action-text {
-  font-size: 22rpx;
-  color: #666;
-  margin-top: 5rpx;
+  font-size: $font-xs;
+  color: $text-secondary;
+  margin-top: $spacing-xs;
+  font-weight: 500;
 }
 
 .bottom-right {
   flex: 1;
   display: flex;
   justify-content: flex-end;
-  gap: 20rpx;
+  gap: $spacing-md;
 }
 
 .btn-secondary {
-  width: 160rpx;
-  height: 80rpx;
-  line-height: 80rpx;
+  width: 180rpx;
+  height: 96rpx;
+  line-height: 96rpx;
   text-align: center;
-  background-color: #f5f5f5;
-  color: #333;
-  border-radius: 40rpx;
-  font-size: 28rpx;
+  @include gradient-bg;
+  color: $primary-color;
+  border-radius: $radius-full;
+  font-size: $font-md;
+  font-weight: 600;
+  box-shadow: 0 4rpx 16rpx rgba(102, 126, 234, 0.12);
+  border: 2rpx solid rgba(102, 126, 234, 0.15);
+  transition: all $transition-fast;
+  
+  &:active {
+    transform: scale(0.94);
+    box-shadow: 0 2rpx 8rpx rgba(102, 126, 234, 0.18);
+  }
 }
 
 .btn-primary {
-  width: 200rpx;
-  height: 80rpx;
-  line-height: 80rpx;
+  width: 220rpx;
+  height: 96rpx;
+  line-height: 96rpx;
   text-align: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  @include gradient-primary;
   color: #fff;
-  border-radius: 40rpx;
-  font-size: 28rpx;
+  border-radius: $radius-full;
+  font-size: $font-md;
+  font-weight: 600;
+  box-shadow: 0 10rpx 32rpx rgba(102, 126, 234, 0.4);
+  transition: all $transition-fast;
+  
+  &:active {
+    transform: scale(0.94);
+    box-shadow: 0 5rpx 16rpx rgba(102, 126, 234, 0.5);
+  }
 }
 
 .btn-disabled {
-  background: #ccc !important;
+  background: $text-placeholder !important;
+  box-shadow: none !important;
+  
+  &:active {
+    transform: none;
+  }
 }
 
 .sold-badge {
   position: absolute;
-  top: 40rpx;
-  left: 40rpx;
+  top: $spacing-xl;
+  left: $spacing-xl;
   z-index: 10;
-  background-color: #e74c3c;
-  padding: 12rpx 24rpx;
-  border-radius: 8rpx;
+  background: linear-gradient(135deg, $accent-color 0%, #dc3545 100%);
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  box-shadow: 0 6rpx 20rpx rgba(231, 76, 60, 0.4);
 }
 
 .sold-text {
   color: #fff;
-  font-size: 28rpx;
-  font-weight: bold;
+  font-size: $font-md;
+  font-weight: 600;
 }
 
 .disabled {
-  opacity: 0.6;
+  opacity: 0.5;
 }
 </style>

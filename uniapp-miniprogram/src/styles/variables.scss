@@ -1,0 +1,105 @@
+$primary-color: #667eea;
+$primary-light: #764ba2;
+$secondary-color: #f093fb;
+$accent-color: #f5576c;
+$success-color: #43e97b;
+$warning-color: #ffd26f;
+$info-color: #4facfe;
+
+$bg-color: #f5f7fa;
+$bg-white: #ffffff;
+$text-primary: #1a1a1a;
+$text-secondary: #666666;
+$text-light: #999999;
+$text-placeholder: #cccccc;
+
+$border-color: #f0f0f0;
+$shadow-color: rgba(102, 126, 234, 0.08);
+$shadow-color-hover: rgba(102, 126, 234, 0.15);
+
+$radius-sm: 12rpx;
+$radius-md: 20rpx;
+$radius-lg: 24rpx;
+$radius-xl: 32rpx;
+$radius-full: 9999rpx;
+
+$spacing-xs: 8rpx;
+$spacing-sm: 16rpx;
+$spacing-md: 24rpx;
+$spacing-lg: 32rpx;
+$spacing-xl: 48rpx;
+
+$font-xs: 22rpx;
+$font-sm: 24rpx;
+$font-md: 28rpx;
+$font-lg: 32rpx;
+$font-xl: 36rpx;
+$font-xxl: 44rpx;
+$font-title: 48rpx;
+
+$transition-fast: 0.15s ease;
+$transition-normal: 0.3s ease;
+$transition-slow: 0.4s ease;
+
+$header-height: 88rpx;
+$tabbar-height: 120rpx;
+$safe-bottom: constant(safe-area-inset-bottom);
+$safe-bottom-env: env(safe-area-inset-bottom);
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin text-clamp($lines: 2) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $lines;
+  overflow: hidden;
+}
+
+@mixin gradient-primary {
+  background: linear-gradient(135deg, $primary-color 0%, $primary-light 100%);
+}
+
+@mixin gradient-bg {
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+}
+
+@mixin shadow-card {
+  box-shadow: 0 8rpx 32rpx $shadow-color;
+}
+
+@mixin shadow-card-hover {
+  box-shadow: 0 16rpx 48rpx $shadow-color-hover;
+}
+
+@mixin shadow-sm {
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.05);
+}
+
+@mixin active-scale {
+  &:active {
+    transform: scale(0.96);
+    transition: transform $transition-fast;
+  }
+}

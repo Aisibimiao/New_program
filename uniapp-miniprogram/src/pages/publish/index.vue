@@ -94,19 +94,17 @@
       </view>
 
       <view class="form-section">
-        <view class="price-row">
-          <view class="price-item">
-            <text class="price-label">发布金额</text>
-            <view class="price-input-wrap">
-              <text class="price-symbol">¥</text>
-              <input
-                class="price-input"
-                v-model="form.price"
-                placeholder="0"
-                type="digit"
-              />
-            </view>
-          </view>
+        <view class="section-title">
+          <text>发布金额</text>
+        </view>
+        <view class="form-input price-input-wrap">
+          <text class="price-symbol">¥</text>
+          <input
+            class="price-input"
+            v-model="form.price"
+            placeholder="0"
+            type="digit"
+          />
         </view>
       </view>
 
@@ -114,8 +112,14 @@
         <view class="section-title">
           <text>交易地点</text>
         </view>
-        <view class="form-placeholder">
-          <text class="placeholder-text">交易地点功能开发中...</text>
+        <view class="form-input location-input">
+          <text class="location-icon">📍</text>
+          <input
+            class="location-text-input"
+            v-model="form.location"
+            placeholder="比如：北区食堂"
+            placeholder-class="location-placeholder"
+          />
         </view>
       </view>
     </scroll-view>
@@ -164,7 +168,8 @@ const form = ref({
   college: '',
   major: '',
   bookName: '',
-  grade: ''
+  grade: '',
+  location: ''
 })
 
 const selectedCategory = computed(() => {
@@ -173,11 +178,21 @@ const selectedCategory = computed(() => {
 })
 
 const canSubmit = computed(() => {
-  return images.value.length > 0 &&
+  const baseValid = images.value.length > 0 &&
          form.value.name &&
          form.value.description &&
          form.value.price &&
          form.value.category
+  
+  if (form.value.category === 'BOOK') {
+    return baseValid &&
+           form.value.college &&
+           form.value.major &&
+           form.value.bookName &&
+           form.value.grade
+  }
+  
+  return baseValid
 })
 
 function onCategoryChange(e: any) {
@@ -250,7 +265,8 @@ async function handleSubmit() {
       college: form.value.college || undefined,
       major: form.value.major || undefined,
       bookName: form.value.bookName || undefined,
-      grade: form.value.grade || undefined
+      grade: form.value.grade || undefined,
+      location: form.value.location || undefined
     })
 
     uni.hideLoading()
@@ -269,163 +285,244 @@ async function handleSubmit() {
 </script>
 
 <style lang="scss" scoped>
+@import '@/styles/variables.scss';
+
 .container {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: $bg-color;
   display: flex;
   flex-direction: column;
 }
 
 .content-scroll {
   flex: 1;
-  padding: 20rpx;
-  padding-bottom: 160rpx;
+  padding: $spacing-md;
+  padding-bottom: 180rpx;
 }
 
 .form-section {
-  background-color: #fff;
-  border-radius: 20rpx;
-  padding: 30rpx;
-  margin-bottom: 20rpx;
+  background-color: $bg-white;
+  border-radius: $radius-xl;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  @include shadow-card;
+  border: 2rpx solid rgba(102, 126, 234, 0.06);
 }
 
 .section-title {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20rpx;
+  font-size: $font-md;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  align-items: center;
+  
+  &::before {
+    content: '';
+    width: 6rpx;
+    height: 32rpx;
+    @include gradient-primary;
+    border-radius: $radius-full;
+    margin-right: $spacing-sm;
+  }
 }
 
 .picker-input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 80rpx;
-  background-color: #f5f5f5;
-  border-radius: 12rpx;
-  padding: 0 20rpx;
-  font-size: 30rpx;
-  color: #333;
+  height: 96rpx;
+  background-color: $bg-color;
+  border-radius: $radius-lg;
+  padding: 0 $spacing-lg;
+  font-size: $font-md;
+  color: $text-primary;
+  transition: all $transition-fast;
+  
+  &:active {
+    background-color: darken($bg-color, 3%);
+    transform: scale(0.99);
+  }
 }
 
 .picker-arrow {
-  font-size: 40rpx;
-  color: #ccc;
+  font-size: $font-lg;
+  color: $text-light;
+  transition: transform $transition-fast;
+}
+
+.picker-input:active .picker-arrow {
+  transform: rotate(90deg);
 }
 
 .upload-area {
   display: flex;
   flex-wrap: wrap;
-  gap: 20rpx;
+  gap: $spacing-md;
 }
 
 .upload-item {
   position: relative;
-  width: 200rpx;
-  height: 200rpx;
+  width: calc(33.33% - 16rpx);
+  aspect-ratio: 1;
+  border-radius: $radius-xl;
+  overflow: hidden;
+  @include shadow-sm;
+  transition: all $transition-normal;
+  
+  &:active {
+    transform: scale(0.95);
+    @include shadow-card;
+  }
 }
 
 .upload-image {
   width: 100%;
   height: 100%;
-  border-radius: 12rpx;
+  border-radius: $radius-xl;
 }
 
 .remove-btn {
   position: absolute;
-  top: -15rpx;
-  right: -15rpx;
-  width: 40rpx;
-  height: 40rpx;
-  background-color: #e74c3c;
+  top: $spacing-xs;
+  right: $spacing-xs;
+  width: 52rpx;
+  height: 52rpx;
+  background: linear-gradient(135deg, rgba(231, 76, 60, 0.95) 0%, rgba(220, 53, 69, 0.95) 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: 24rpx;
+  font-size: $font-sm;
+  font-weight: 600;
+  box-shadow: 0 6rpx 16rpx rgba(231, 76, 60, 0.5);
+  transition: all $transition-fast;
+  animation: fadeIn 0.2s ease-out;
+  
+  &:active {
+    transform: scale(0.85);
+    box-shadow: 0 3rpx 8rpx rgba(231, 76, 60, 0.6);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .upload-btn {
-  width: 200rpx;
-  height: 200rpx;
-  border: 2rpx dashed #ccc;
-  border-radius: 12rpx;
+  width: calc(33.33% - 16rpx);
+  aspect-ratio: 1;
+  border: 4rpx dashed rgba(102, 126, 234, 0.4);
+  border-radius: $radius-xl;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  transition: all $transition-normal;
+  
+  &:active {
+    border-color: $primary-color;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.12) 100%);
+    transform: scale(0.96);
+    border-style: solid;
+  }
+  
+  &:hover {
+    border-color: $primary-color;
+  }
 }
 
 .upload-icon {
-  font-size: 60rpx;
-  color: #ccc;
+  font-size: 64rpx;
+  color: $primary-color;
+  opacity: 0.7;
+  line-height: 1;
+  transition: all $transition-fast;
+  
+  .upload-btn:active & {
+    transform: scale(1.1);
+    opacity: 0.9;
+  }
 }
 
 .upload-text {
-  font-size: 24rpx;
-  color: #ccc;
-  margin-top: 10rpx;
+  font-size: $font-xs;
+  color: $text-light;
+  margin-top: $spacing-xs;
+  transition: all $transition-fast;
+  
+  .upload-btn:active & {
+    color: $primary-color;
+  }
 }
 
 .form-input {
   width: 100%;
-  height: 80rpx;
-  font-size: 30rpx;
-  padding: 0 20rpx;
-  background-color: #f5f5f5;
-  border-radius: 12rpx;
+  height: 96rpx;
+  font-size: $font-md;
+  padding: 0 $spacing-lg;
+  background-color: $bg-color;
+  border-radius: $radius-lg;
+  transition: all $transition-fast;
+  
+  &:focus {
+    background-color: darken($bg-color, 2%);
+    box-shadow: 0 0 0 4rpx rgba(102, 126, 234, 0.15);
+  }
 }
 
 .form-textarea {
   width: 100%;
-  height: 200rpx;
-  font-size: 30rpx;
-  padding: 20rpx;
-  background-color: #f5f5f5;
-  border-radius: 12rpx;
+  height: 240rpx;
+  font-size: $font-md;
+  padding: $spacing-md;
+  background-color: $bg-color;
+  border-radius: $radius-lg;
+  transition: all $transition-fast;
+  
+  &:focus {
+    background-color: darken($bg-color, 2%);
+    box-shadow: 0 0 0 4rpx rgba(102, 126, 234, 0.15);
+  }
 }
 
 .textarea-count {
   display: block;
   text-align: right;
-  font-size: 24rpx;
-  color: #999;
-  margin-top: 10rpx;
-}
-
-.price-row {
-  display: flex;
-}
-
-.price-item {
-  flex: 1;
-}
-
-.price-label {
-  display: block;
-  font-size: 28rpx;
-  color: #999;
-  margin-bottom: 15rpx;
+  font-size: $font-xs;
+  color: $text-light;
+  margin-top: $spacing-sm;
 }
 
 .price-input-wrap {
   display: flex;
   align-items: center;
-  background-color: #f5f5f5;
-  border-radius: 12rpx;
-  padding: 0 20rpx;
+  justify-content: center;
 }
 
 .price-symbol {
   font-size: 32rpx;
-  color: #333;
+  color: $accent-color;
+  font-weight: 700;
+  margin-right: $spacing-xs;
 }
 
 .price-input {
   flex: 1;
-  height: 80rpx;
-  font-size: 32rpx;
+  height: 96rpx;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: $text-primary;
+  text-align: left;
 }
 
 .bottom-bar {
@@ -433,35 +530,79 @@ async function handleSubmit() {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 20rpx;
-  background-color: #fff;
-  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+  padding: $spacing-md $spacing-lg;
+  padding-bottom: calc($spacing-md + constant(safe-area-inset-bottom));
+  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
+  background-color: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20rpx);
+  box-shadow: 0 -8rpx 40rpx rgba(102, 126, 234, 0.1);
+  border-top: 2rpx solid rgba(102, 126, 234, 0.06);
 }
 
 .submit-btn {
-  height: 100rpx;
-  line-height: 100rpx;
+  height: 104rpx;
+  line-height: 104rpx;
   text-align: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  @include gradient-primary;
   color: #fff;
-  border-radius: 50rpx;
-  font-size: 36rpx;
-  font-weight: bold;
+  border-radius: $radius-full;
+  font-size: $font-lg;
+  font-weight: 600;
+  box-shadow: 0 12rpx 36rpx rgba(102, 126, 234, 0.4);
+  transition: all $transition-fast;
+  letter-spacing: 4rpx;
+  
+  &:active {
+    transform: scale(0.97);
+    box-shadow: 0 6rpx 18rpx rgba(102, 126, 234, 0.5);
+  }
+  
   &.disabled {
     opacity: 0.5;
+    box-shadow: none;
+    
+    &:active {
+      transform: none;
+    }
   }
 }
 
 .form-placeholder {
-  padding: 40rpx;
-  background-color: #fafafa;
-  border-radius: 12rpx;
-  border: 2rpx dashed #e0e0e0;
+  padding: $spacing-xl;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-radius: $radius-lg;
+  border: 2rpx dashed rgba(102, 126, 234, 0.2);
+  text-align: center;
 }
 
 .placeholder-text {
-  font-size: 28rpx;
-  color: #999;
-  text-align: center;
+  font-size: $font-sm;
+  color: $text-light;
 }
+
+.location-input {
+  display: flex;
+  align-items: center;
+  background-color: $bg-color;
+  border-radius: $radius-lg;
+  padding: $spacing-md $spacing-lg;
+  transition: all $transition-fast;
+  
+  &:focus-within {
+    box-shadow: 0 0 0 4rpx rgba(102, 126, 234, 0.15);
+    background-color: darken($bg-color, 2%);
+  }
+}
+
+.location-icon {
+  font-size: 40rpx;
+  margin-right: $spacing-md;
+}
+
+.location-text-input {
+  flex: 1;
+  font-size: $font-md;
+  color: $text-primary;
+}
+
 </style>

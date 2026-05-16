@@ -13,7 +13,11 @@
     "pages/favorite/index",
     "pages/publish/index",
     "pages/publish/edit",
-    "pages/chat/index"
+    "pages/chat/index",
+    "pages/user/about",
+    "pages/user/feedback",
+    "pages/user/agreement",
+    "pages/user/privacy"
   ],
   "window": {
     "navigationBarTextStyle": "black",
