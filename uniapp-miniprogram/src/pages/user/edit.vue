@@ -13,28 +13,21 @@
         <input class="form-input" v-model="form.nickname" placeholder="请输入昵称" />
       </view>
 
-      <view class="form-item">
-        <text class="form-label">真实姓名</text>
-        <input class="form-input" v-model="form.name" placeholder="请输入真实姓名" />
-      </view>
+
 
       <view class="form-item">
         <text class="form-label">学号</text>
-        <input class="form-input" v-model="form.studentId" placeholder="请输入学号" />
+        <input class="form-input" v-model="form.studentId" type="number" maxlength="10" placeholder="请输入学号（不超过10位）" />
       </view>
 
       <view class="form-item">
         <text class="form-label">手机号</text>
-        <input class="form-input" v-model="form.phone" type="number" placeholder="请输入手机号" />
+        <input class="form-input" v-model="form.phone" type="number" maxlength="11" placeholder="请输入手机号（不超过11位）" />
       </view>
 
       <view class="form-item">
         <text class="form-label">宿舍楼栋</text>
-        <picker mode="selector" :range="dormBuildings" @change="onDormChange">
-          <view class="picker-value">
-            {{ form.dormBuilding || '请选择宿舍楼栋' }}
-          </view>
-        </picker>
+        <input class="form-input" v-model="form.dormBuilding" placeholder="请输入宿舍楼栋" />
       </view>
 
       <view class="form-item">
@@ -57,7 +50,6 @@ import { request } from '@/utils/request'
 const userStore = useUserStore()
 const form = ref({
   nickname: '',
-  name: '',
   studentId: '',
   phone: '',
   email: '',
@@ -65,19 +57,7 @@ const form = ref({
   dormBuilding: ''
 })
 
-const dormBuildings = [
-  '1号楼', '2号楼', '3号楼', '4号楼', '5号楼',
-  '6号楼', '7号楼', '8号楼', '9号楼', '10号楼',
-  '11号楼', '12号楼', '13号楼', '14号楼', '15号楼',
-  '16号楼', '17号楼', '18号楼', '19号楼', '20号楼',
-  '南苑1号楼', '南苑2号楼', '南苑3号楼', '南苑4号楼',
-  '北苑1号楼', '北苑2号楼', '北苑3号楼', '北苑4号楼'
-]
 
-function onDormChange(e: any) {
-  const index = e.detail.value
-  form.value.dormBuilding = dormBuildings[index]
-}
 
 function getImageUrl(url?: string) {
   if (!url) return 'http://localhost:3000/uploads/default-avatar.png'
@@ -144,8 +124,8 @@ function validateForm() {
     return false
   }
 
-  if (form.value.phone && !/^1[3-9]\d{9}$/.test(form.value.phone)) {
-    uni.showToast({ title: '请输入正确的手机号', icon: 'none' })
+  if (form.value.phone && !/^\d{1,11}$/.test(form.value.phone)) {
+    uni.showToast({ title: '手机号不能超过11位数字', icon: 'none' })
     return false
   }
 
@@ -154,13 +134,8 @@ function validateForm() {
     return false
   }
 
-  if (form.value.studentId && !/^[A-Za-z0-9]{4,20}$/.test(form.value.studentId)) {
-    uni.showToast({ title: '学号格式不正确', icon: 'none' })
-    return false
-  }
-
-  if (form.value.name && form.value.name.length > 50) {
-    uni.showToast({ title: '真实姓名不能超过50个字符', icon: 'none' })
+  if (form.value.studentId && !/^\d{1,10}$/.test(form.value.studentId)) {
+    uni.showToast({ title: '学号不能超过10位数字', icon: 'none' })
     return false
   }
 
@@ -177,7 +152,6 @@ async function handleSave() {
       method: 'PUT',
       data: {
         nickname: form.value.nickname.trim(),
-        name: form.value.name.trim(),
         studentId: form.value.studentId.trim(),
         phone: form.value.phone.trim(),
         email: form.value.email.trim(),
@@ -207,7 +181,6 @@ onMounted(() => {
   if (userStore.user) {
     form.value = {
       nickname: userStore.user.nickname || '',
-      name: userStore.user.name || '',
       studentId: userStore.user.studentId || '',
       phone: userStore.user.phone || '',
       email: userStore.user.email || '',

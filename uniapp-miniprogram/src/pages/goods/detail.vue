@@ -42,15 +42,21 @@
     <view class="bottom-bar" :class="{ 'disabled': isSold && !isFromFavorite }">
       <view class="bottom-left">
         <view class="action-item" @click="goToChat">
-          <text class="action-icon">💬</text>
+          <view class="action-icon">
+            <LineIcon name="chat" />
+          </view>
           <text class="action-text">聊天</text>
         </view>
         <view class="action-item" @click="collect">
-          <text class="action-icon">{{ collected ? '❤️' : '🤍' }}</text>
+          <view class="action-icon">
+            <LineIcon name="heart" :active="collected" />
+          </view>
           <text class="action-text">{{ collected ? '已收藏' : '收藏' }}</text>
         </view>
         <view class="action-item" @click="handleShare">
-          <text class="action-icon">🔗</text>
+          <view class="action-icon">
+            <LineIcon name="share" />
+          </view>
           <text class="action-text">分享</text>
         </view>
       </view>
@@ -70,6 +76,8 @@ import { createOrder } from '@/api/order'
 import { addFavorite, removeFavorite, getFavorites } from '@/api/favorite'
 import { createWechatPay } from '@/api/pay'
 import { useUserStore } from '@/stores/user'
+import { formatImageUrl } from '@/utils/request'
+import LineIcon from '@/components/LineIcon.vue'
 
 const goods = ref<Goods | null>(null)
 const collected = ref(false)
@@ -78,7 +86,7 @@ const userStore = useUserStore()
 const isFromFavorite = ref(false)
 
 const isSold = computed(() => {
-  return goods.value?.status === 'SOLD' || goods.value?.status === 1
+  return goods.value?.status === 'SOLD' || goods.value?.status === 0
 })
 
 const imagesArray = ref<string[]>([])
@@ -109,14 +117,12 @@ function getCategoryText(category?: string): string {
 }
 
 function getImageUrl(url?: string): string {
-  if (!url || url === '[]') return 'https://via.placeholder.com/400x600/667EEA/FFFFFF?text=No+Image'
-  if (url.startsWith('http')) return url
-  return `http://localhost:3000${url}`
+  return formatImageUrl(url)
 }
 
 function handleImageError(e: any) {
   const image = e.target
-  image.src = 'https://via.placeholder.com/400x600/667EEA/FFFFFF?text=No+Image'
+  image.src = formatImageUrl('')
 }
 
 function formatDate(dateStr?: string) {
@@ -355,13 +361,6 @@ onMounted(() => {
   font-weight: 700;
   color: $accent-color;
   letter-spacing: 2rpx;
-  
-  &::before {
-    content: '¥';
-    font-size: 40rpx;
-    font-weight: 600;
-    margin-right: 4rpx;
-  }
 }
 
 .goods-info {
@@ -479,102 +478,103 @@ onMounted(() => {
 
 .bottom-bar {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 140rpx;
-  background-color: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(20rpx);
+  bottom: 40rpx;
+  left: 24rpx;
+  right: 24rpx;
+  height: 100rpx;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,1) 100%);
+  backdrop-filter: blur(24rpx);
   display: flex;
   align-items: center;
-  padding: 0 $spacing-lg;
-  box-shadow: 0 -8rpx 40rpx rgba(102, 126, 234, 0.1);
-  border-top: 2rpx solid rgba(102, 126, 234, 0.06);
-  padding-bottom: constant(safe-area-inset-bottom);
-  padding-bottom: env(safe-area-inset-bottom);
+  justify-content: space-between;
+  padding: 0 20rpx;
+  box-shadow: 0 -4rpx 20rpx rgba(79, 70, 229, 0.06);
+  border-radius: 28rpx;
 }
 
 .bottom-left {
   display: flex;
-  gap: $spacing-xl;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 24rpx;
 }
 
 .action-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: $spacing-xs;
-  transition: all $transition-fast;
+  justify-content: center;
+  width: 60rpx;
+  height: 100%;
+  padding: 4rpx 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   
   &:active {
-    transform: scale(0.92);
+    transform: scale(0.85);
+    opacity: 0.5;
   }
 }
 
 .action-icon {
-  font-size: 56rpx;
+  width: 34rpx;
+  height: 34rpx;
 }
 
 .action-text {
-  font-size: $font-xs;
-  color: $text-secondary;
-  margin-top: $spacing-xs;
-  font-weight: 500;
+  font-size: 16rpx;
+  color: #999;
+  margin-top: 2rpx;
+  font-weight: 400;
 }
 
 .bottom-right {
-  flex: 1;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
-  gap: $spacing-md;
+  gap: 16rpx;
 }
 
 .btn-secondary {
   width: 180rpx;
-  height: 96rpx;
-  line-height: 96rpx;
+  height: 88rpx;
+  line-height: 88rpx;
   text-align: center;
-  @include gradient-bg;
-  color: $primary-color;
-  border-radius: $radius-full;
-  font-size: $font-md;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(124, 58, 237, 0.08) 100%);
+  color: #4F46E5;
+  border-radius: 44rpx;
+  font-size: 30rpx;
   font-weight: 600;
-  box-shadow: 0 4rpx 16rpx rgba(102, 126, 234, 0.12);
-  border: 2rpx solid rgba(102, 126, 234, 0.15);
-  transition: all $transition-fast;
+  border: 2rpx solid rgba(79, 70, 229, 0.15);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   
   &:active {
-    transform: scale(0.94);
-    box-shadow: 0 2rpx 8rpx rgba(102, 126, 234, 0.18);
+    transform: scale(0.96);
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(124, 58, 237, 0.15) 100%);
   }
 }
 
 .btn-primary {
   width: 220rpx;
-  height: 96rpx;
-  line-height: 96rpx;
+  height: 88rpx;
+  line-height: 88rpx;
   text-align: center;
-  @include gradient-primary;
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
   color: #fff;
-  border-radius: $radius-full;
-  font-size: $font-md;
+  border-radius: 44rpx;
+  font-size: 30rpx;
   font-weight: 600;
-  box-shadow: 0 10rpx 32rpx rgba(102, 126, 234, 0.4);
-  transition: all $transition-fast;
+  box-shadow: 0 10rpx 32rpx rgba(79, 70, 229, 0.4);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   
   &:active {
-    transform: scale(0.94);
-    box-shadow: 0 5rpx 16rpx rgba(102, 126, 234, 0.5);
+    transform: scale(0.96);
+    box-shadow: 0 6rpx 20rpx rgba(79, 70, 229, 0.5);
   }
 }
 
 .btn-disabled {
-  background: $text-placeholder !important;
+  background: linear-gradient(135deg, #d9d9d9 0%, #bfbfbf 100%) !important;
   box-shadow: none !important;
-  
-  &:active {
-    transform: none;
-  }
 }
 
 .sold-badge {

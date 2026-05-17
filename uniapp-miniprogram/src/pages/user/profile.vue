@@ -15,7 +15,9 @@
 
     <view class="header" v-else>
       <view class="login-prompt" @click="goToLogin">
-        <text class="login-icon">🔒</text>
+        <view class="login-icon">
+          <LineIcon name="info" />
+        </view>
         <text class="login-text">点击登录</text>
       </view>
     </view>
@@ -33,25 +35,33 @@
 
     <view class="menu-list">
       <view class="menu-item" @click="goToPublish">
-        <text class="menu-icon">📤</text>
+        <view class="menu-icon">
+          <LineIcon name="plus" />
+        </view>
         <text class="menu-text">发布商品</text>
         <text class="menu-arrow">›</text>
       </view>
 
       <view class="menu-item" @click="goToMyGoods">
-        <text class="menu-icon">📦</text>
+        <view class="menu-icon">
+          <LineIcon name="order" />
+        </view>
         <text class="menu-text">我的发布</text>
         <text class="menu-arrow">›</text>
       </view>
 
       <view class="menu-item" @click="goToOrders">
-        <text class="menu-icon">🛒</text>
+        <view class="menu-icon">
+          <LineIcon name="wallet" />
+        </view>
         <text class="menu-text">我的订单</text>
         <text class="menu-arrow">›</text>
       </view>
 
       <view class="menu-item" @click="goToFavorites">
-        <text class="menu-icon">❤️</text>
+        <view class="menu-icon">
+          <LineIcon name="heart" />
+        </view>
         <text class="menu-text">我的收藏</text>
         <text class="menu-arrow">›</text>
       </view>
@@ -59,13 +69,17 @@
 
     <view class="menu-list">
       <view class="menu-item" @click="goToSettings">
-        <text class="menu-icon">⚙️</text>
+        <view class="menu-icon">
+          <LineIcon name="settings" />
+        </view>
         <text class="menu-text">设置</text>
         <text class="menu-arrow">›</text>
       </view>
 
       <view class="menu-item" @click="goToAbout">
-        <text class="menu-icon">ℹ️</text>
+        <view class="menu-icon">
+          <LineIcon name="info" />
+        </view>
         <text class="menu-text">关于我们</text>
         <text class="menu-arrow">›</text>
       </view>
@@ -73,22 +87,33 @@
 
     <view class="menu-list" v-if="user">
       <view class="menu-item logout-item" @click="handleLogout">
-        <text class="menu-icon">🚪</text>
+        <view class="menu-icon">
+          <LineIcon name="trash" />
+        </view>
         <text class="menu-text">退出登录</text>
       </view>
     </view>
 
     <view class="tab-bar">
       <view class="tab-item" @click="switchToHome">
-        <text class="tab-icon">🏠</text>
+        <view class="tab-icon">
+          <LineIcon name="home" />
+        </view>
         <text class="tab-text">首页</text>
       </view>
-      <view class="tab-item" @click="switchToGoods">
-        <text class="tab-icon">📦</text>
-        <text class="tab-text">商品</text>
+      <view class="tab-item publish-item" @click="switchToPublish">
+        <view class="publish-btn">
+          <view class="publish-icon-cross">
+            <view class="cross-line cross-h"></view>
+            <view class="cross-line cross-v"></view>
+          </view>
+        </view>
+        <text class="tab-text">发布</text>
       </view>
       <view class="tab-item active">
-        <text class="tab-icon">👤</text>
+        <view class="tab-icon">
+          <LineIcon name="user" :active="true" />
+        </view>
         <text class="tab-text">我的</text>
       </view>
     </view>
@@ -99,7 +124,10 @@
 import { ref, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { getMyGoods } from '@/api/goods'
+import { getSellOrders } from '@/api/order'
 import type { User } from '@/api/auth'
+import { formatImageUrl } from '@/utils/request'
+import LineIcon from '@/components/LineIcon.vue'
 
 const userStore = useUserStore()
 const user = ref<User | null>(null)
@@ -110,18 +138,26 @@ const stats = ref({
 
 function getImageUrl(url?: string) {
   if (!url) return 'https://api.dicebear.com/9.x/initials/svg?seed=User&backgroundColor=b6e3f4'
-  if (url.startsWith('http')) return url
-  return `http://localhost:3000${url}`
+  return formatImageUrl(url)
 }
 
 async function loadUserData() {
   if (!userStore.token) return
+  
   try {
     const myGoods = await getMyGoods()
     stats.value.goodsCount = Array.isArray(myGoods) ? myGoods.length : 0
-    stats.value.orderCount = Array.isArray(myGoods) ? myGoods.filter(g => g.status === 'SOLD' || g.status === 1).length : 0
   } catch (err) {
-    console.error('加载用户数据失败', err)
+    console.error('加载商品数据失败', err)
+    stats.value.goodsCount = 0
+  }
+  
+  try {
+    const sellOrders = await getSellOrders()
+    stats.value.orderCount = Array.isArray(sellOrders) ? sellOrders.length : 0
+  } catch (err) {
+    console.error('加载订单数据失败', err)
+    stats.value.orderCount = 0
   }
 }
 
@@ -205,8 +241,8 @@ function switchToHome() {
   uni.reLaunch({ url: '/pages/index/index' })
 }
 
-function switchToGoods() {
-  uni.navigateTo({ url: '/pages/goods/list' })
+function switchToPublish() {
+  uni.navigateTo({ url: '/pages/publish/index' })
 }
 
 function handleLogout() {
@@ -236,7 +272,8 @@ onMounted(() => {
 .container {
   min-height: 100vh;
   background-color: $bg-color;
-  padding-bottom: $tabbar-height;
+  padding-bottom: calc(160rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
 }
 
 .header {
@@ -343,7 +380,8 @@ onMounted(() => {
 }
 
 .login-icon {
-  font-size: 100rpx;
+  width: 60rpx;
+  height: 60rpx;
   margin-bottom: $spacing-md;
   opacity: 0.8;
 }
@@ -360,9 +398,14 @@ onMounted(() => {
   padding: $spacing-xl 0;
   background: $bg-white;
   margin: $spacing-md $spacing-lg;
-  border-radius: $radius-xl;
+  border-radius: $radius-2xl;
   @include shadow-card;
-  border: 2rpx solid rgba(102, 126, 234, 0.06);
+  border: 2rpx solid rgba(79, 70, 229, 0.04);
+  transition: all $transition-normal;
+  
+  &:active {
+    @include shadow-card-hover;
+  }
 }
 
 .stat-item {
@@ -405,34 +448,41 @@ onMounted(() => {
 
 .menu-list {
   background: $bg-white;
-  margin: 16rpx $spacing-lg;
-  border-radius: $radius-xl;
+  margin: $spacing-sm $spacing-lg;
+  border-radius: $radius-2xl;
   @include shadow-card;
   overflow: hidden;
-  border: 2rpx solid rgba(102, 126, 234, 0.06);
+  border: 2rpx solid rgba(79, 70, 229, 0.04);
 }
 
 .menu-item {
   display: flex;
   align-items: center;
-  padding: $spacing-md $spacing-lg;
-  border-bottom: 2rpx solid $border-color;
-  transition: all $transition-fast;
+  padding: $spacing-lg $spacing-lg;
+  border-bottom: 2rpx solid $border-light;
+  transition: all $transition-normal;
+  position: relative;
   
   &:last-child {
     border-bottom: none;
   }
   
   &:active {
-    background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
-    transform: scale(0.98);
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.03) 0%, rgba(124, 58, 237, 0.03) 100%);
+    transform: scale(0.99);
   }
 }
 
 .menu-icon {
-  font-size: 48rpx;
+  width: 40rpx;
+  height: 40rpx;
   margin-right: $spacing-lg;
-  opacity: 0.7;
+  opacity: 0.8;
+  transition: all $transition-fast;
+  
+  .menu-item:active & {
+    transform: scale(1.1);
+  }
 }
 
 .menu-text {
@@ -529,5 +579,56 @@ onMounted(() => {
   font-size: $font-xs;
   color: $text-light;
   transition: all $transition-normal;
+}
+
+.publish-item {
+  position: relative;
+  flex: 1.2;
+}
+
+.publish-btn {
+  width: 120rpx;
+  height: 120rpx;
+  background: linear-gradient(135deg, $accent-color 0%, #ee5a5a 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -50rpx;
+  box-shadow: 0 16rpx 48rpx rgba(245, 87, 108, 0.5);
+  border: 6rpx solid $bg-white;
+  transition: all $transition-slow;
+  
+  &:active {
+    transform: scale(0.88);
+    box-shadow: 0 8rpx 24rpx rgba(245, 87, 108, 0.6);
+  }
+}
+
+.publish-icon-cross {
+  position: relative;
+  width: 52rpx;
+  height: 52rpx;
+}
+
+.cross-line {
+  position: absolute;
+  background-color: #fff;
+  border-radius: 4rpx;
+  transition: all $transition-fast;
+}
+
+.cross-h {
+  width: 100%;
+  height: 8rpx;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.cross-v {
+  width: 8rpx;
+  height: 100%;
+  left: 50%;
+  transform: translateX(-50%);
 }
 </style>

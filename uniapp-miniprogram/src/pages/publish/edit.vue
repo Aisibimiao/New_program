@@ -41,6 +41,13 @@
           </view>
         </picker>
 
+        <picker mode="selector" :range="semesterOptions" @change="onSemesterChange" style="margin-top: 20rpx;">
+          <view class="picker-input">
+            {{ form.semester || '请选择学期' }}
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
+
         <input 
           class="form-input" 
           v-model="form.bookName" 
@@ -174,7 +181,9 @@ const majorOptions = [
 ]
 
 // 年级选项
-const gradeOptions = ['大一', '大二', '大三', '大四', '研究生', '其他']
+const gradeOptions = ['2023', '2024', '2025', '2026']
+// 学期选项
+const semesterOptions = ['上', '下']
 
 const images = ref<string[]>([])
 const form = ref({
@@ -186,7 +195,8 @@ const form = ref({
   college: '',
   major: '',
   bookName: '',
-  grade: ''
+  grade: '',
+  semester: ''
 })
 
 const selectedCategoryLabel = computed(() => {
@@ -253,6 +263,10 @@ function onMajorChange(e: any) {
 
 function onGradeChange(e: any) {
   form.value.grade = gradeOptions[e.detail.value]
+}
+
+function onSemesterChange(e: any) {
+  form.value.semester = semesterOptions[e.detail.value]
 }
 
 async function chooseImage() {

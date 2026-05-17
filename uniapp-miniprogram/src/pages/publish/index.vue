@@ -39,10 +39,17 @@
           </view>
         </picker>
 
+        <picker mode="selector" :range="semesterOptions" @change="onSemesterChange" style="margin-top: 20rpx;">
+          <view class="picker-input">
+            {{ form.semester || '请选择学期' }}
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
+
         <input
           class="form-input"
           v-model="form.bookName"
-          placeholder="请输入书名"
+          placeholder="请输入书名/一整套"
           style="margin-top: 20rpx;"
         />
       </view>
@@ -137,11 +144,11 @@ import { ref, computed } from 'vue'
 import { createGoods, uploadImage } from '@/api/goods'
 
 const categories = [
-  { value: 'ELECTRONICS', label: '电子产品' },
-  { value: 'BEAUTY', label: '生活美妆' },
-  { value: 'BOOK', label: '书籍' },
-  { value: 'VIRTUAL', label: '虚拟物品' },
+  { value: 'ELECTRONICS', label: '数码产品' },
+  { value: 'CLOTHING', label: '服饰鞋包' },
+  { value: 'BOOK', label: '图书教材' },
   { value: 'SPORTS', label: '运动户外' },
+  { value: 'LIFE', label: '生活用品' },
   { value: 'OTHER', label: '其他' }
 ]
 const categoryLabels = categories.map(c => c.label)
@@ -156,7 +163,8 @@ const majorOptions = [
   '机械工程', '电气工程', '会计学', '市场营销', '其他专业'
 ]
 
-const gradeOptions = ['大一', '大二', '大三', '大四', '研究生', '其他']
+const gradeOptions = ['2023', '2024', '2025', '2026']
+const semesterOptions = ['上', '下']
 
 const images = ref<string[]>([])
 const submitting = ref(false)
@@ -169,6 +177,7 @@ const form = ref({
   major: '',
   bookName: '',
   grade: '',
+  semester: '',
   location: ''
 })
 
@@ -216,6 +225,10 @@ function onMajorChange(e: any) {
 
 function onGradeChange(e: any) {
   form.value.grade = gradeOptions[e.detail.value]
+}
+
+function onSemesterChange(e: any) {
+  form.value.semester = semesterOptions[e.detail.value]
 }
 
 function chooseImage() {
@@ -289,31 +302,36 @@ async function handleSubmit() {
 
 .container {
   min-height: 100vh;
-  background-color: $bg-color;
+  @include gradient-bg;
   display: flex;
   flex-direction: column;
 }
 
 .content-scroll {
   flex: 1;
-  padding: $spacing-md;
-  padding-bottom: 180rpx;
+  padding: $spacing-lg;
+  padding-bottom: 200rpx;
 }
 
 .form-section {
   background-color: $bg-white;
-  border-radius: $radius-xl;
-  padding: $spacing-lg;
-  margin-bottom: $spacing-md;
+  border-radius: $radius-2xl;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-lg;
   @include shadow-card;
-  border: 2rpx solid rgba(102, 126, 234, 0.06);
+  border: 2rpx solid rgba(79, 70, 229, 0.05);
+  transition: all $transition-normal;
+  
+  &:active {
+    @include shadow-card-hover;
+  }
 }
 
 .section-title {
-  font-size: $font-md;
+  font-size: $font-lg;
   font-weight: 600;
   color: $text-primary;
-  margin-bottom: $spacing-md;
+  margin-bottom: $spacing-lg;
   display: flex;
   align-items: center;
   
@@ -321,9 +339,9 @@ async function handleSubmit() {
     content: '';
     width: 6rpx;
     height: 32rpx;
-    @include gradient-primary;
-    border-radius: $radius-full;
-    margin-right: $spacing-sm;
+    background: linear-gradient(180deg, $primary-color 0%, $primary-light 100%);
+    border-radius: 6rpx;
+    margin-right: $spacing-md;
   }
 }
 
@@ -331,16 +349,18 @@ async function handleSubmit() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 96rpx;
-  background-color: $bg-color;
+  height: 100rpx;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.02) 0%, rgba(124, 58, 237, 0.02) 100%);
   border-radius: $radius-lg;
   padding: 0 $spacing-lg;
   font-size: $font-md;
   color: $text-primary;
-  transition: all $transition-fast;
+  transition: all $transition-normal;
+  border: 2rpx solid transparent;
   
   &:active {
-    background-color: darken($bg-color, 3%);
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+    border-color: rgba(79, 70, 229, 0.1);
     transform: scale(0.99);
   }
 }
@@ -348,11 +368,12 @@ async function handleSubmit() {
 .picker-arrow {
   font-size: $font-lg;
   color: $text-light;
-  transition: transform $transition-fast;
+  transition: all $transition-fast;
 }
 
 .picker-input:active .picker-arrow {
-  transform: rotate(90deg);
+  transform: rotate(90deg) scale(1.1);
+  color: $primary-color;
 }
 
 .upload-area {
@@ -467,16 +488,18 @@ async function handleSubmit() {
 
 .form-input {
   width: 100%;
-  height: 96rpx;
+  height: 100rpx;
   font-size: $font-md;
   padding: 0 $spacing-lg;
-  background-color: $bg-color;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.02) 0%, rgba(124, 58, 237, 0.02) 100%);
   border-radius: $radius-lg;
-  transition: all $transition-fast;
+  transition: all $transition-normal;
+  border: 2rpx solid transparent;
   
   &:focus {
-    background-color: darken($bg-color, 2%);
-    box-shadow: 0 0 0 4rpx rgba(102, 126, 234, 0.15);
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+    border-color: rgba(79, 70, 229, 0.2);
+    box-shadow: 0 0 0 6rpx rgba(79, 70, 229, 0.12);
   }
 }
 

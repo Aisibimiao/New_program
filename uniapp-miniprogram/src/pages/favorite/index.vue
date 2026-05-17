@@ -19,7 +19,7 @@
           :key="item.id"
         >
           <view class="goods-card" @click="goToDetail(item.goodsId, item.goods?.status)">
-            <view class="sold-tag" v-if="item.goods?.status === 'SOLD' || item.goods?.status === 1">
+            <view class="sold-tag" v-if="item.goods?.status === 'SOLD' || item.goods?.status === 0">
               <text>已售出</text>
             </view>
             <image class="goods-image" :src="getImageUrl(item.goods?.images?.[0])" mode="aspectFill" />
@@ -39,7 +39,9 @@
       </view>
 
       <view v-if="favorites.length === 0" class="empty">
-        <text class="empty-icon">🤍</text>
+        <view class="empty-icon">
+          <LineIcon name="heart" />
+        </view>
         <text class="empty-text">暂无收藏</text>
       </view>
     </scroll-view>
@@ -51,6 +53,7 @@ import { ref, onMounted } from 'vue'
 import { getFavorites, removeFavorite } from '@/api/favorite'
 import type { Favorite } from '@/api/favorite'
 import { useUserStore } from '@/stores/user'
+import LineIcon from '@/components/LineIcon.vue'
 
 const userStore = useUserStore()
 
@@ -64,7 +67,7 @@ function getImageUrl(url?: string) {
 }
 
 function goToDetail(goodsId: string, status?: string | number) {
-  const isSold = status === 'SOLD' || status === 1
+  const isSold = status === 'SOLD' || status === 0
   if (isSold) {
     uni.showModal({
       title: '提示',
@@ -156,7 +159,7 @@ onMounted(() => {
 
 .favorite-item {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   background-color: #fff;
   border-radius: 16rpx;
   padding: 20rpx;
@@ -167,6 +170,7 @@ onMounted(() => {
   flex: 1;
   display: flex;
   position: relative;
+  min-width: 0;
 }
 
 .sold-tag {
@@ -193,27 +197,36 @@ onMounted(() => {
 .goods-info {
   flex: 1;
   padding: 0 20rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 180rpx;
 }
 
 .goods-name {
-  display: block;
+  display: -webkit-box;
   font-size: 32rpx;
   font-weight: bold;
   color: #333;
-  margin-bottom: 10rpx;
+  margin-bottom: 12rpx;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
 }
 
 .goods-desc {
-  display: block;
+  display: -webkit-box;
   font-size: 26rpx;
   color: #999;
-  margin-bottom: 15rpx;
+  margin-bottom: 16rpx;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+  flex-shrink: 0;
 }
 
 .goods-price-row {
@@ -235,6 +248,7 @@ onMounted(() => {
 }
 
 .remove-btn {
+  flex-shrink: 0;
   width: 100rpx;
   height: 60rpx;
   line-height: 60rpx;
@@ -243,6 +257,10 @@ onMounted(() => {
   color: #666;
   border-radius: 30rpx;
   font-size: 26rpx;
+  margin-left: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .empty {
@@ -253,7 +271,8 @@ onMounted(() => {
 }
 
 .empty-icon {
-  font-size: 100rpx;
+  width: 80rpx;
+  height: 80rpx;
   margin-bottom: 30rpx;
 }
 

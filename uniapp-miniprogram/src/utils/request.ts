@@ -1,4 +1,5 @@
 const baseURL = 'http://localhost:3000/api'
+const imageBaseURL = 'http://localhost:3000'
 
 interface RequestOptions {
   url: string
@@ -6,6 +7,7 @@ interface RequestOptions {
   data?: Record<string, any>
   header?: Record<string, string>
   timeout?: number
+  showErrorToast?: boolean
 }
 
 interface ResponseData {
@@ -17,6 +19,14 @@ interface ResponseData {
   goods?: any
   user?: any
   token?: string
+}
+
+function showErrorToast(msg: string) {
+  uni.showToast({
+    title: msg,
+    icon: 'none',
+    duration: 2500
+  })
 }
 
 export function request<T>(options: RequestOptions): Promise<T> {
@@ -38,7 +48,7 @@ export function request<T>(options: RequestOptions): Promise<T> {
       method: options.method || 'GET',
       data: options.data,
       header,
-      timeout: options.timeout || 30000,
+      timeout: options.timeout || 15000,
       success: (res) => {
         console.log(`[API响应] ${requestUrl}`, { statusCode: res.statusCode, data: res.data })
         const data = res.data as ResponseData
@@ -58,17 +68,41 @@ export function request<T>(options: RequestOptions): Promise<T> {
           }
         } else {
           console.error(`[API错误] ${requestUrl}`, { statusCode: res.statusCode, msg: data.msg })
+          const errorMsg = data.msg || `请求失败 (${res.statusCode})`
+
           if (res.statusCode === 401) {
             uni.removeStorageSync('token')
             uni.removeStorageSync('user')
-            uni.navigateTo({ url: '/pages/user/login' })
+            showErrorToast('登录已过期，请重新登录')
+            setTimeout(() => {
+              uni.redirectTo({ url: '/pages/user/login' })
+            }, 1500)
+          } else if (res.statusCode === 403) {
+            showErrorToast('暂无权限，请联系管理员')
+          } else if (res.statusCode === 404) {
+            showErrorToast('资源不存在')
+          } else if (res.statusCode === 500) {
+            showErrorToast('服务器内部错误，请稍后重试')
+          } else if (options.showErrorToast !== false) {
+            showErrorToast(errorMsg)
           }
-          reject(new Error(data.msg || `请求失败 (${res.statusCode})`))
+
+          reject(new Error(errorMsg))
         }
       },
       fail: (err) => {
         console.error(`[API网络错误] ${requestUrl}`, err)
-        reject(new Error(err.errMsg || '网络错误'))
+        const errorMsg = err.errMsg || '网络请求失败'
+
+        if (err.errMsg?.includes('timeout')) {
+          showErrorToast('请求超时，请检查网络连接')
+        } else if (err.errMsg?.includes('fail')) {
+          showErrorToast('网络连接失败，请检查网络')
+        } else if (options.showErrorToast !== false) {
+          showErrorToast(errorMsg)
+        }
+
+        reject(new Error(errorMsg))
       }
     })
   })
@@ -107,4 +141,25 @@ export function uploadFile(url: string, filePath: string, name: string): Promise
       }
     })
   })
+}
+
+const placeholderImage = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23667EEA" width="400" height="300"/%3E%3Ctext fill="white" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3E暂无图片%3C/text%3E%3C/svg%3E'
+
+export function formatImageUrl(url?: string): string {
+  if (!url || url === '[]' || url === 'null' || url === '') {
+    return placeholderImage
+  }
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
+  }
+  if (url.startsWith('data:image/')) {
+    return url
+  }
+  if (url.startsWith('/')) {
+    return `${imageBaseURL}${url}`
+  }
+  if (url.startsWith('uploads/') || url.startsWith('static/')) {
+    return `${imageBaseURL}/${url}`
+  }
+  return `${imageBaseURL}/${url}`
 }

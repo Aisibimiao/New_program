@@ -2,12 +2,16 @@
   <view class="settings-container">
     <view class="menu-group">
       <view class="menu-item">
-        <text class="menu-icon">🔔</text>
+        <view class="menu-icon">
+          <LineIcon name="bell" />
+        </view>
         <text class="menu-label">交易提醒</text>
         <switch class="menu-switch" :checked="settings.tradeReminder" @change="onTradeReminderChange" />
       </view>
       <view class="menu-item" @click="showPrivacySettings">
-        <text class="menu-icon">👥</text>
+        <view class="menu-icon">
+          <LineIcon name="users" />
+        </view>
         <text class="menu-label">允许谁联系我</text>
         <text class="menu-arrow">›</text>
       </view>
@@ -15,12 +19,16 @@
 
     <view class="menu-group">
       <view class="menu-item" @click="clearCache">
-        <text class="menu-icon">🗑️</text>
+        <view class="menu-icon">
+          <LineIcon name="trash" />
+        </view>
         <text class="menu-label">清理缓存</text>
         <text class="menu-value">{{ cacheSize }}</text>
       </view>
       <view class="menu-item" @click="checkUpdate">
-        <text class="menu-icon">🔄</text>
+        <view class="menu-icon">
+          <LineIcon name="refresh" />
+        </view>
         <text class="menu-label">版本更新</text>
         <text class="menu-value">v1.0.0</text>
       </view>
@@ -28,17 +36,23 @@
 
     <view class="menu-group">
       <view class="menu-item" @click="showPrivacy">
-        <text class="menu-icon">🔒</text>
+        <view class="menu-icon">
+          <LineIcon name="lock" />
+        </view>
         <text class="menu-label">隐私政策</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" @click="showAgreement">
-        <text class="menu-icon">📜</text>
+        <view class="menu-icon">
+          <LineIcon name="file" />
+        </view>
         <text class="menu-label">用户协议</text>
         <text class="menu-arrow">›</text>
       </view>
       <view class="menu-item" @click="showAbout">
-        <text class="menu-icon">ℹ️</text>
+        <view class="menu-icon">
+          <LineIcon name="info" />
+        </view>
         <text class="menu-label">关于我们</text>
         <text class="menu-arrow">›</text>
       </view>
@@ -46,7 +60,9 @@
 
     <view class="menu-group">
       <view class="menu-item" @click="handleLogout">
-        <text class="menu-icon">🚪</text>
+        <view class="menu-icon">
+          <LineIcon name="door" />
+        </view>
         <text class="menu-label logout-text">退出登录</text>
       </view>
     </view>
@@ -102,6 +118,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
+import LineIcon from '@/components/LineIcon.vue'
 
 const userStore = useUserStore()
 
@@ -320,7 +337,8 @@ function handleLogout() {
 }
 
 .menu-icon {
-  font-size: 36rpx;
+  width: 36rpx;
+  height: 36rpx;
   margin-right: 20rpx;
 }
 

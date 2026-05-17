@@ -33,9 +33,13 @@
       <view class="search-bar">
         <view class="category-dropdown" @click="toggleCategory">
           <text class="category-text">{{ selectedCategoryLabel }}</text>
-          <text class="category-arrow">▼</text>
+          <view class="category-arrow">
+            <LineIcon name="arrow-down" />
+          </view>
         </view>
-        <text class="search-icon">🔍</text>
+        <view class="search-icon">
+          <LineIcon name="search" />
+        </view>
         <input
           class="search-input"
           v-model="searchKeyword"
@@ -75,6 +79,11 @@
       scroll-y
       @scroll="onScroll"
       :scroll-top="scrollTop"
+      @scrolltoupper="onPullDownRefresh"
+      @scrolltolower="onReachBottom"
+      :refresher-enabled="true"
+      :refresher-triggered="isRefreshing"
+      :refresher-threshold="45"
     >
       <view class="scroll-content">
         <view class="header-placeholder" v-if="isSticky"></view>
@@ -91,6 +100,7 @@
                   class="goods-image"
                   :src="getImageUrl(goods.images?.[0])"
                   mode="aspectFill"
+                  lazy-load
                   @load="onImageLoad(goods.id)"
                   @error="handleImageError($event, goods.id)"
                   :class="{ 'image-loaded': imageLoadedMap[goods.id] }"
@@ -106,7 +116,9 @@
                   <text class="goods-price">¥{{ goods.price }}</text>
                   <text v-if="goods.originalPrice" class="goods-original-price">¥{{ goods.originalPrice }}</text>
                   <view class="favorite-btn" @click="toggleFavorite(goods.id)">
-                    <text class="favorite-icon">{{ isFavorite(goods.id) ? '❤️' : '🤍' }}</text>
+                    <view class="favorite-icon">
+                      <LineIcon name="heart" :active="isFavorite(goods.id)" />
+                    </view>
                   </view>
                 </view>
                 <text class="goods-time">{{ formatTime(goods.createdAt) }}</text>
@@ -130,20 +142,23 @@
 
     <view class="tab-bar">
       <view class="tab-item active" @click="goToHome()">
-        <text class="tab-icon">🏠</text>
+        <view class="tab-icon">
+          <LineIcon name="home" :active="true" />
+        </view>
         <text class="tab-text">首页</text>
       </view>
       <view class="tab-item publish-item" @click="goToPublish()">
         <view class="publish-btn">
           <view class="publish-icon-cross">
-            <view class="cross-line cross-h"></view>
-            <view class="cross-line cross-v"></view>
+            <LineIcon name="plus" />
           </view>
         </view>
         <text class="tab-text">发布</text>
       </view>
       <view class="tab-item" @click="goToProfile()">
-        <text class="tab-icon">👤</text>
+        <view class="tab-icon">
+          <LineIcon name="user" />
+        </view>
         <text class="tab-text">我的</text>
       </view>
     </view>
@@ -155,6 +170,8 @@ import { ref, computed, onMounted } from 'vue'
 import { getGoods, type Goods } from '@/api/goods'
 import { getFavorites, addFavorite, removeFavorite } from '@/api/favorite'
 import { useUserStore } from '@/stores/user'
+import { formatImageUrl } from '@/utils/request'
+import LineIcon from '@/components/LineIcon.vue'
 
 const userStore = useUserStore()
 const searchKeyword = ref('')
@@ -163,6 +180,7 @@ const favoriteIds = ref<string[]>([])
 const page = ref(1)
 const hasMore = ref(true)
 const loading = ref(false)
+const isRefreshing = ref(false)
 const scrollTop = ref(0)
 const isSticky = ref(false)
 const showCategoryPopup = ref(false)
@@ -174,7 +192,7 @@ let lastClickTime = 0
 const categories = [
   { value: 'ELECTRONICS', label: '数码产品' },
   { value: 'CLOTHING', label: '服饰鞋包' },
-  { value: 'BOOKS', label: '图书教材' },
+  { value: 'BOOK', label: '图书教材' },
   { value: 'SPORTS', label: '运动户外' },
   { value: 'LIFE', label: '生活用品' },
   { value: 'OTHER', label: '其他' }
@@ -193,7 +211,7 @@ const mockGoods: Goods[] = [
     description: '95成新，使用半年，无磕碰，电池健康度92%',
     price: 5999,
     originalPrice: 8999,
-    images: ['https://via.placeholder.com/400x300/667EEA/FFFFFF?text=iPhone+14+Pro'],
+    images: ['data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23667EEA" width="400" height="300"/%3E%3Ctext fill="white" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3EiPhone 14 Pro%3C/text%3E%3C/svg%3E'],
     category: 'ELECTRONICS',
     condition: 3,
     status: 1,
@@ -207,7 +225,7 @@ const mockGoods: Goods[] = [
     description: '全新未拆封，考研必备教材',
     price: 35,
     originalPrice: 59,
-    images: ['https://via.placeholder.com/400x300/42E695/FFFFFF?text=高等数学'],
+    images: ['data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%2342E695" width="400" height="300"/%3E%3Ctext fill="white" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3E高等数学%3C/text%3E%3C/svg%3E'],
     category: 'BOOKS',
     condition: 5,
     status: 1,
@@ -221,7 +239,7 @@ const mockGoods: Goods[] = [
     description: '42码，穿过几次，几乎全新',
     price: 499,
     originalPrice: 799,
-    images: ['https://via.placeholder.com/400x300/F093FB/FFFFFF?text=Nike+AF1'],
+    images: ['data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23F093FB" width="400" height="300"/%3E%3Ctext fill="white" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3ENike AF1%3C/text%3E%3C/svg%3E'],
     category: 'CLOTHING',
     condition: 4,
     status: 1,
@@ -235,7 +253,7 @@ const mockGoods: Goods[] = [
     description: '含球拍、球、护腕，九成新',
     price: 120,
     originalPrice: 260,
-    images: ['https://via.placeholder.com/400x300/FF6B6B/FFFFFF?text=羽毛球拍'],
+    images: ['data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23FF6B6B" width="400" height="300"/%3E%3Ctext fill="white" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3E羽毛球拍%3C/text%3E%3C/svg%3E'],
     category: 'SPORTS',
     condition: 3,
     status: 1,
@@ -249,7 +267,7 @@ const mockGoods: Goods[] = [
     description: '护眼台灯，可调节亮度色温',
     price: 89,
     originalPrice: 169,
-    images: ['https://via.placeholder.com/400x300/FFD26F/FFFFFF?text=小米台灯'],
+    images: ['data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23FFD26F" width="400" height="300"/%3E%3Ctext fill="white" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3E小米台灯%3C/text%3E%3C/svg%3E'],
     category: 'LIFE',
     condition: 4,
     status: 1,
@@ -260,10 +278,7 @@ const mockGoods: Goods[] = [
 ]
 
 function getImageUrl(url?: string) {
-  if (!url || url === '[]') return 'https://via.placeholder.com/400x300/667EEA/FFFFFF?text=No+Image'
-  if (url.startsWith('http')) return url
-  if (url.startsWith('/')) return `http://localhost:3000${url}`
-  return url
+  return formatImageUrl(url)
 }
 
 function onImageLoad(goodsId: string) {
@@ -272,7 +287,7 @@ function onImageLoad(goodsId: string) {
 
 function handleImageError(e: any, goodsId: string) {
   const image = e.target
-  image.src = 'https://via.placeholder.com/400x300/667EEA/FFFFFF?text=No+Image'
+  image.src = formatImageUrl('')
   imageLoadedMap.value[goodsId] = true
 }
 
@@ -398,43 +413,73 @@ function onScroll(e: any) {
   isSticky.value = scrollY >= 300
 }
 
-function loadGoods() {
-  if (loading.value || !hasMore.value) return
+function onPullDownRefresh() {
+  if (isRefreshing.value) return
+  
+  isRefreshing.value = true
+  page.value = 1
+  hasMore.value = true
+  goodsList.value = []
+  
+  setTimeout(() => {
+    loadGoods().then(() => {
+      isRefreshing.value = false
+      uni.showToast({ title: '刷新成功', icon: 'none' })
+    }).catch(() => {
+      isRefreshing.value = false
+    })
+  }, 500)
+}
 
-  loading.value = true
-  const params: Record<string, any> = { page: page.value, limit: 6 }
-  if (searchKeyword.value) params.keyword = searchKeyword.value
-  if (selectedCategory.value) params.category = selectedCategory.value
+function onReachBottom() {
+  if (loading.value || !hasMore.value || isRefreshing.value) return
+  loadGoods()
+}
 
-  getGoods(params).then((result) => {
-    if (result.list && result.list.length > 0) {
-      goodsList.value = [...goodsList.value, ...result.list]
-      page.value++
-      if (result.list.length < 6) {
+function loadGoods(): Promise<void> {
+  return new Promise((resolve) => {
+    if (loading.value || !hasMore.value) {
+      resolve()
+      return
+    }
+
+    loading.value = true
+    const params: Record<string, any> = { page: page.value, limit: 6 }
+    if (searchKeyword.value) params.keyword = searchKeyword.value
+    if (selectedCategory.value) params.category = selectedCategory.value
+
+    getGoods(params).then((result) => {
+      if (result.list && result.list.length > 0) {
+        goodsList.value = [...goodsList.value, ...result.list]
+        page.value++
+        if (result.list.length < 6) {
+          hasMore.value = false
+        }
+      } else {
         hasMore.value = false
       }
-    } else {
+      loading.value = false
+      resolve()
+    }).catch((err) => {
+      console.error('加载商品失败，使用mock数据', err)
+      if (goodsList.value.length === 0) {
+        let filtered = mockGoods
+        if (selectedCategory.value) {
+          filtered = filtered.filter(g => g.category === selectedCategory.value)
+        }
+        if (searchKeyword.value) {
+          const keyword = searchKeyword.value.toLowerCase()
+          filtered = filtered.filter(g =>
+            g.name.toLowerCase().includes(keyword) ||
+            g.description.toLowerCase().includes(keyword)
+          )
+        }
+        goodsList.value = filtered
+      }
       hasMore.value = false
-    }
-    loading.value = false
-  }).catch((err) => {
-    console.error('加载商品失败，使用mock数据', err)
-    if (goodsList.value.length === 0) {
-      let filtered = mockGoods
-      if (selectedCategory.value) {
-        filtered = filtered.filter(g => g.category === selectedCategory.value)
-      }
-      if (searchKeyword.value) {
-        const keyword = searchKeyword.value.toLowerCase()
-        filtered = filtered.filter(g =>
-          g.name.toLowerCase().includes(keyword) ||
-          g.description.toLowerCase().includes(keyword)
-        )
-      }
-      goodsList.value = filtered
-    }
-    hasMore.value = false
-    loading.value = false
+      loading.value = false
+      resolve()
+    })
   })
 }
 
@@ -554,30 +599,47 @@ onMounted(() => {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-20rpx);
+    transform: translateY(-16rpx);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.5;
   }
 }
 
 .banner-2 {
-  background: linear-gradient(135deg, $info-color 0%, #00f2fe 100%);
+  background: linear-gradient(135deg, $accent-color 0%, $accent-light 100%);
 }
 
 .banner-3 {
-  background: linear-gradient(135deg, $success-color 0%, #38f9d7 100%);
+  background: linear-gradient(135deg, $secondary-color 0%, #22d3ee 100%);
 }
 
 .banner-text {
   font-size: $font-title;
   font-weight: 700;
   color: #fff;
-  text-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+  text-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.2);
+  letter-spacing: 2rpx;
+  position: relative;
+  z-index: 10;
 }
 
 .banner-sub {
-  font-size: $font-sm;
-  color: rgba(255, 255, 255, 0.9);
-  margin-top: $spacing-sm;
-  letter-spacing: 2rpx;
+  font-size: $font-md;
+  color: rgba(255, 255, 255, 0.92);
+  margin-top: $spacing-md;
+  letter-spacing: 4rpx;
+  position: relative;
+  z-index: 10;
+  font-weight: 500;
 }
 
 .search-wrapper {
@@ -643,8 +705,8 @@ onMounted(() => {
 }
 
 .category-arrow {
-  font-size: $font-xs;
-  color: $text-light;
+  width: 24rpx;
+  height: 24rpx;
   margin-left: $spacing-xs;
   transition: all $transition-fast;
   transform: rotate(0deg);
@@ -655,7 +717,8 @@ onMounted(() => {
 }
 
 .search-icon {
-  font-size: $font-lg;
+  width: 32rpx;
+  height: 32rpx;
   margin-right: $spacing-sm;
   opacity: 0.6;
 }
@@ -713,13 +776,13 @@ onMounted(() => {
 
 .category-list {
   background-color: $bg-white;
-  border-radius: $radius-xl;
-  padding: $spacing-sm;
-  width: 85%;
+  border-radius: $radius-2xl;
+  padding: $spacing-md;
+  width: 88%;
   max-height: 65vh;
   overflow-y: auto;
-  box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.15);
-  animation: slideUp 0.3s ease;
+  @include shadow-lg;
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes slideUp {
@@ -736,17 +799,19 @@ onMounted(() => {
 .category-item {
   padding: $spacing-lg;
   text-align: center;
-  border-radius: $radius-md;
-  margin-bottom: $spacing-xs;
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-sm;
   font-size: $font-md;
-  color: $text-primary;
+  color: $text-secondary;
   background-color: $bg-color;
-  transition: all $transition-fast;
+  transition: all $transition-normal;
+  font-weight: 500;
   
   &.active {
     @include gradient-primary;
     color: #fff;
-    box-shadow: 0 6rpx 20rpx rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8rpx 24rpx rgba(79, 70, 229, 0.4);
+    transform: scale(1.02);
   }
   
   &:active {
@@ -778,15 +843,15 @@ onMounted(() => {
 
 .goods-card {
   background-color: $bg-white;
-  border-radius: 28rpx;
+  border-radius: $radius-2xl;
   overflow: hidden;
-  box-shadow: 0 4rpx 16rpx rgba(102, 126, 234, 0.08);
-  transition: all $transition-slow;
-  border: none;
+  @include shadow-card;
+  transition: all $transition-normal;
+  border: 2rpx solid rgba(79, 70, 229, 0.04);
   
   &:active {
-    transform: translateY(-6rpx) scale(1.01);
-    box-shadow: 0 12rpx 32rpx rgba(102, 126, 234, 0.15);
+    transform: translateY(-8rpx) scale(1.01);
+    @include shadow-card-hover;
   }
 }
 
@@ -877,7 +942,8 @@ onMounted(() => {
 }
 
 .favorite-icon {
-  font-size: 48rpx;
+  width: 36rpx;
+  height: 36rpx;
 }
 
 .goods-time {
