@@ -1,5 +1,5 @@
-const baseURL = 'http://localhost:3000/api'
-const imageBaseURL = 'http://localhost:3000'
+const baseURL = 'http://47.236.64.92/api'
+const imageBaseURL = 'http://47.236.64.92'
 
 interface RequestOptions {
   url: string
