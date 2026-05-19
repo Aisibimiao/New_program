@@ -1,120 +1,156 @@
 <template>
-  <view class="container">
-    <view class="header" v-if="user">
-      <view class="user-info">
-        <image class="avatar" :src="getImageUrl(user.avatar)" mode="aspectFill" />
-        <view class="user-detail">
-          <text class="nickname">{{ user.nickname || user.name || '用户' }}</text>
-          <text class="role">{{ user.role === 'ADMIN' ? '管理员' : '普通用户' }}</text>
-        </view>
-      </view>
-      <view class="edit-btn" @click="goToEdit">
-        <text>编辑资料</text>
-      </view>
+  <view class="line-container">
+    <view class="line-header-bar">
+      <view class="line-spacer"></view>
+      <text class="line-header-title">个人中心</text>
+      <view class="line-spacer"></view>
     </view>
 
-    <view class="header" v-else>
-      <view class="login-prompt" @click="goToLogin">
-        <view class="login-icon">
-          <LineIcon name="info" />
-        </view>
-        <text class="login-text">点击登录</text>
-      </view>
-    </view>
-
-    <view class="stats-section" v-if="user">
-      <view class="stat-item">
-        <text class="stat-num">{{ stats.goodsCount }}</text>
-        <text class="stat-label">发布商品</text>
-      </view>
-      <view class="stat-item">
-        <text class="stat-num">{{ stats.orderCount }}</text>
-        <text class="stat-label">已售出</text>
-      </view>
-    </view>
-
-    <view class="menu-list">
-      <view class="menu-item" @click="goToPublish">
-        <view class="menu-icon">
-          <LineIcon name="plus" />
-        </view>
-        <text class="menu-text">发布商品</text>
-        <text class="menu-arrow">›</text>
-      </view>
-
-      <view class="menu-item" @click="goToMyGoods">
-        <view class="menu-icon">
-          <LineIcon name="order" />
-        </view>
-        <text class="menu-text">我的发布</text>
-        <text class="menu-arrow">›</text>
-      </view>
-
-      <view class="menu-item" @click="goToOrders">
-        <view class="menu-icon">
-          <LineIcon name="wallet" />
-        </view>
-        <text class="menu-text">我的订单</text>
-        <text class="menu-arrow">›</text>
-      </view>
-
-      <view class="menu-item" @click="goToFavorites">
-        <view class="menu-icon">
-          <LineIcon name="heart" />
-        </view>
-        <text class="menu-text">我的收藏</text>
-        <text class="menu-arrow">›</text>
-      </view>
-    </view>
-
-    <view class="menu-list">
-      <view class="menu-item" @click="goToSettings">
-        <view class="menu-icon">
-          <LineIcon name="settings" />
-        </view>
-        <text class="menu-text">设置</text>
-        <text class="menu-arrow">›</text>
-      </view>
-
-      <view class="menu-item" @click="goToAbout">
-        <view class="menu-icon">
-          <LineIcon name="info" />
-        </view>
-        <text class="menu-text">关于我们</text>
-        <text class="menu-arrow">›</text>
-      </view>
-    </view>
-
-    <view class="menu-list" v-if="user">
-      <view class="menu-item logout-item" @click="handleLogout">
-        <view class="menu-icon">
-          <LineIcon name="trash" />
-        </view>
-        <text class="menu-text">退出登录</text>
-      </view>
-    </view>
-
-    <view class="tab-bar">
-      <view class="tab-item" @click="switchToHome">
-        <view class="tab-icon">
-          <LineIcon name="home" />
-        </view>
-        <text class="tab-text">首页</text>
-      </view>
-      <view class="tab-item publish-item" @click="switchToPublish">
-        <view class="publish-btn">
-          <view class="publish-icon-cross">
-            <view class="cross-line cross-h"></view>
-            <view class="cross-line cross-v"></view>
+    <scroll-view class="line-content-scroll" scroll-y>
+      <view class="line-header-section" v-if="user">
+        <view class="line-user-info">
+          <view class="line-avatar-wrapper">
+            <image class="line-avatar" :src="getImageUrl(user.avatar)" mode="aspectFill" />
+            <view class="line-avatar-border"></view>
+          </view>
+          <view class="line-user-detail">
+            <text class="line-nickname">{{ user.nickname || user.name || '用户' }}</text>
+            <view class="line-role-tag">
+              <text class="line-role">{{ user.role === 'ADMIN' ? '管理员' : '普通用户' }}</text>
+            </view>
           </view>
         </view>
-        <text class="tab-text">发布</text>
+        <view class="line-edit-btn" @click="goToEdit">
+          <text class="line-edit-text">编辑资料</text>
+        </view>
       </view>
-      <view class="tab-item active">
-        <view class="tab-icon">
+
+      <view class="line-header-section" v-else>
+        <view class="line-login-prompt" @click="goToLogin">
+          <view class="line-login-icon">
+            <LineIcon name="user" />
+          </view>
+          <text class="line-login-text">点击登录</text>
+          <view class="line-login-line"></view>
+        </view>
+      </view>
+
+      <view class="line-stats-section" v-if="user">
+        <view class="line-stat-item">
+          <text class="line-stat-num">{{ stats.goodsCount }}</text>
+          <text class="line-stat-label">发布商品</text>
+        </view>
+        <view class="line-stat-divider"></view>
+        <view class="line-stat-item">
+          <text class="line-stat-num">{{ stats.orderCount }}</text>
+          <text class="line-stat-label">已售出</text>
+        </view>
+      </view>
+
+      <view class="line-menu-list">
+        <view class="line-menu-item" @click="goToPublish">
+          <view class="line-menu-icon">
+            <LineIcon name="plus" />
+          </view>
+          <text class="line-menu-text">发布商品</text>
+          <view class="line-menu-arrow">
+            <LineIcon name="arrow-right" />
+          </view>
+        </view>
+
+        <view class="line-menu-divider"></view>
+
+        <view class="line-menu-item" @click="goToMyGoods">
+          <view class="line-menu-icon">
+            <LineIcon name="order" />
+          </view>
+          <text class="line-menu-text">我的发布</text>
+          <view class="line-menu-arrow">
+            <LineIcon name="arrow-right" />
+          </view>
+        </view>
+
+        <view class="line-menu-divider"></view>
+
+        <view class="line-menu-item" @click="goToOrders">
+          <view class="line-menu-icon">
+            <LineIcon name="wallet" />
+          </view>
+          <text class="line-menu-text">我的订单</text>
+          <view class="line-menu-arrow">
+            <LineIcon name="arrow-right" />
+          </view>
+        </view>
+
+        <view class="line-menu-divider"></view>
+
+        <view class="line-menu-item" @click="goToFavorites">
+          <view class="line-menu-icon">
+            <LineIcon name="heart" />
+          </view>
+          <text class="line-menu-text">我的收藏</text>
+          <view class="line-menu-arrow">
+            <LineIcon name="arrow-right" />
+          </view>
+        </view>
+      </view>
+
+      <view class="line-menu-list">
+        <view class="line-menu-item" @click="goToSettings">
+          <view class="line-menu-icon">
+            <LineIcon name="settings" />
+          </view>
+          <text class="line-menu-text">设置</text>
+          <view class="line-menu-arrow">
+            <LineIcon name="arrow-right" />
+          </view>
+        </view>
+
+        <view class="line-menu-divider"></view>
+
+        <view class="line-menu-item" @click="goToAbout">
+          <view class="line-menu-icon">
+            <LineIcon name="info" />
+          </view>
+          <text class="line-menu-text">关于我们</text>
+          <view class="line-menu-arrow">
+            <LineIcon name="arrow-right" />
+          </view>
+        </view>
+      </view>
+
+      <view class="line-menu-list" v-if="user">
+        <view class="line-menu-item line-logout-item" @click="handleLogout">
+          <view class="line-menu-icon">
+            <LineIcon name="trash" />
+          </view>
+          <text class="line-menu-text">退出登录</text>
+        </view>
+      </view>
+
+      <view class="line-bottom-space"></view>
+    </scroll-view>
+
+    <view class="line-tab-bar">
+      <view class="line-tab-item" @click="switchToHome">
+        <view class="line-tab-icon">
+          <LineIcon name="home" />
+        </view>
+        <view class="line-tab-indicator"></view>
+        <text class="line-tab-text">首页</text>
+      </view>
+      <view class="line-tab-item line-publish-item" @click="switchToPublish">
+        <view class="line-publish-btn">
+          <LineIcon name="plus" />
+        </view>
+        <text class="line-tab-text">发布</text>
+      </view>
+      <view class="line-tab-item line-tab-active">
+        <view class="line-tab-icon">
           <LineIcon name="user" :active="true" />
         </view>
-        <text class="tab-text">我的</text>
+        <view class="line-tab-indicator line-indicator-active"></view>
+        <text class="line-tab-text">我的</text>
       </view>
     </view>
   </view>
@@ -267,368 +303,357 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/variables.scss';
+@import '@/styles/line-ui.scss';
 
-.container {
+.line-container {
   min-height: 100vh;
-  background-color: $bg-color;
-  padding-bottom: calc(160rpx + constant(safe-area-inset-bottom));
+  background-color: $line-bg;
   padding-bottom: calc(160rpx + env(safe-area-inset-bottom));
 }
 
-.header {
-  @include gradient-primary;
-  padding: 80rpx $spacing-xl $spacing-xl;
+.line-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 32rpx;
+  padding-top: calc(20rpx + env(safe-area-inset-top));
+  background-color: white;
+  position: relative;
+  z-index: 100;
+  border-bottom: 3rpx solid $line-primary;
+}
+
+.line-spacer {
+  width: 60rpx;
+}
+
+.line-header-title {
+  font-size: $line-font-lg;
+  font-weight: 600;
+  color: $line-primary;
+  letter-spacing: 4rpx;
+}
+
+.line-content-scroll {
+  flex: 1;
+}
+
+.line-header-section {
+  background-color: white;
+  padding: 32rpx;
+  border-bottom: 3rpx solid $line-primary;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: 0 0 $radius-xl $radius-xl;
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -60%;
-    right: -30%;
-    width: 80%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: -20%;
-    width: 50%;
-    height: 80%;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 50%;
-  }
 }
 
-.user-info {
+.line-user-info {
   display: flex;
   align-items: center;
+}
+
+.line-avatar-wrapper {
   position: relative;
-  z-index: 1;
+  width: 120rpx;
+  height: 120rpx;
 }
 
-.avatar {
-  width: 160rpx;
-  height: 160rpx;
+.line-avatar {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  border: 6rpx solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.15);
-  transition: all $transition-normal;
-  
-  &:active {
-    transform: scale(0.95);
-  }
 }
 
-.user-detail {
-  margin-left: $spacing-lg;
+.line-avatar-border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 3rpx solid $line-primary;
+  border-radius: 50%;
+  pointer-events: none;
 }
 
-.nickname {
+.line-user-detail {
+  margin-left: 24rpx;
+}
+
+.line-nickname {
   display: block;
-  font-size: $font-xl;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: $spacing-xs;
-  text-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.15);
-}
-
-.role {
-  font-size: $font-sm;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: $line-font-xl;
+  font-weight: 600;
+  color: $line-primary;
+  margin-bottom: 12rpx;
   letter-spacing: 2rpx;
 }
 
-.edit-btn {
-  background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(10rpx);
-  padding: $spacing-sm $spacing-lg;
-  border-radius: $radius-full;
-  border: 2rpx solid rgba(255, 255, 255, 0.25);
-  transition: all $transition-fast;
-  position: relative;
-  z-index: 1;
+.line-role-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6rpx 16rpx;
+  border: 2rpx solid $line-border;
+  border-radius: $line-radius;
+}
+
+.line-role {
+  font-size: $line-font-sm;
+  color: $line-light;
+  letter-spacing: 1rpx;
+}
+
+.line-edit-btn {
+  border: 3rpx solid $line-primary;
+  padding: 12rpx 24rpx;
+  border-radius: $line-radius;
+  transition: all 0.2s ease;
   
   &:active {
-    background: rgba(255, 255, 255, 0.28);
-    transform: scale(0.96);
-  }
-}
-
-.edit-btn text {
-  color: #fff;
-  font-size: $font-sm;
-  font-weight: 500;
-}
-
-.login-prompt {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: $spacing-xl 0;
-  position: relative;
-  z-index: 1;
-}
-
-.login-icon {
-  width: 60rpx;
-  height: 60rpx;
-  margin-bottom: $spacing-md;
-  opacity: 0.8;
-}
-
-.login-text {
-  color: #fff;
-  font-size: $font-lg;
-  font-weight: 500;
-}
-
-.stats-section {
-  display: flex;
-  justify-content: space-around;
-  padding: $spacing-xl 0;
-  background: $bg-white;
-  margin: $spacing-md $spacing-lg;
-  border-radius: $radius-2xl;
-  @include shadow-card;
-  border: 2rpx solid rgba(79, 70, 229, 0.04);
-  transition: all $transition-normal;
-  
-  &:active {
-    @include shadow-card-hover;
-  }
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0 $spacing-lg;
-  
-  &:not(:last-child) {
-    position: relative;
+    background-color: $line-primary;
+    transform: scale(0.95);
     
-    &::after {
-      content: '';
-      position: absolute;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 2rpx;
-      height: 60%;
-      background: $border-color;
+    .line-edit-text {
+      color: white;
     }
   }
 }
 
-.stat-num {
-  font-size: 56rpx;
-  font-weight: 700;
-  @include gradient-primary;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.stat-label {
-  font-size: $font-sm;
-  color: $text-light;
-  margin-top: $spacing-sm;
+.line-edit-text {
+  font-size: $line-font-sm;
+  color: $line-primary;
   font-weight: 500;
+  letter-spacing: 1rpx;
+  transition: all 0.2s ease;
 }
 
-.menu-list {
-  background: $bg-white;
-  margin: $spacing-sm $spacing-lg;
-  border-radius: $radius-2xl;
-  @include shadow-card;
-  overflow: hidden;
-  border: 2rpx solid rgba(79, 70, 229, 0.04);
+.line-login-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 12rpx;
 }
 
-.menu-item {
+.line-login-icon {
+  width: 60rpx;
+  height: 60rpx;
   display: flex;
   align-items: center;
-  padding: $spacing-lg $spacing-lg;
-  border-bottom: 2rpx solid $border-light;
-  transition: all $transition-normal;
-  position: relative;
-  
-  &:last-child {
-    border-bottom: none;
-  }
+  justify-content: center;
+}
+
+.line-login-text {
+  font-size: $line-font-lg;
+  font-weight: 600;
+  color: $line-primary;
+  letter-spacing: 2rpx;
+}
+
+.line-login-line {
+  width: 100rpx;
+  height: 3rpx;
+  background-color: $line-primary;
+}
+
+.line-stats-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 24rpx 32rpx;
+  padding: 32rpx;
+  background-color: white;
+  border: 3rpx solid $line-primary;
+  border-radius: $line-radius-lg;
+}
+
+.line-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 32rpx;
+}
+
+.line-stat-num {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: $line-accent;
+  letter-spacing: 2rpx;
+}
+
+.line-stat-label {
+  font-size: $line-font-sm;
+  color: $line-light;
+  margin-top: 12rpx;
+  font-weight: 500;
+  letter-spacing: 1rpx;
+}
+
+.line-stat-divider {
+  width: 2rpx;
+  height: 80rpx;
+  background-color: $line-border;
+}
+
+.line-menu-list {
+  background-color: white;
+  margin: 16rpx 32rpx;
+  border: 3rpx solid $line-primary;
+  border-radius: $line-radius-lg;
+  overflow: hidden;
+}
+
+.line-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 28rpx 32rpx;
+  transition: all 0.2s ease;
   
   &:active {
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.03) 0%, rgba(124, 58, 237, 0.03) 100%);
-    transform: scale(0.99);
+    background-color: $line-bg;
   }
 }
 
-.menu-icon {
+.line-menu-icon {
   width: 40rpx;
   height: 40rpx;
-  margin-right: $spacing-lg;
-  opacity: 0.8;
-  transition: all $transition-fast;
-  
-  .menu-item:active & {
-    transform: scale(1.1);
-  }
+  margin-right: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.menu-text {
+.line-menu-text {
   flex: 1;
-  font-size: $font-md;
-  color: $text-primary;
+  font-size: $line-font-md;
+  color: $line-primary;
   font-weight: 500;
+  letter-spacing: 1rpx;
 }
 
-.menu-arrow {
-  font-size: $font-lg;
-  color: $text-placeholder;
-  transition: all $transition-fast;
-  
-  .menu-item:active & {
-    transform: translateX(8rpx);
-  }
+.line-menu-arrow {
+  width: 32rpx;
+  height: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.logout-item {
-  .menu-text {
-    color: $accent-color;
+.line-menu-divider {
+  height: 2rpx;
+  background-color: $line-border;
+  margin: 0 32rpx;
+}
+
+.line-logout-item {
+  .line-menu-text {
+    color: $line-danger;
     font-weight: 600;
   }
-  
-  .menu-icon {
-    opacity: 0.8;
-  }
 }
 
-.tab-bar {
+.line-bottom-space {
+  height: 80rpx;
+}
+
+.line-tab-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
+  background-color: white;
   display: flex;
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20rpx);
+  align-items: flex-start;
   padding: 16rpx 0;
-  padding-bottom: calc(16rpx + constant(safe-area-inset-bottom));
   padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
-  box-shadow: 0 -8rpx 32rpx rgba(102, 126, 234, 0.08);
-  border-top: 2rpx solid rgba(102, 126, 234, 0.05);
+  border-top: 3rpx solid $line-primary;
+  z-index: 200;
 }
 
-.tab-item {
+.line-tab-item {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: all $transition-fast;
+  justify-content: center;
+  padding: 0 8rpx;
+  position: relative;
+  transition: all 0.2s ease;
   
   &:active {
     transform: scale(0.95);
   }
-  
-  &.active {
-    .tab-icon {
-      transform: scale(1.1);
-      
-      &::after {
-        width: 40rpx;
-      }
-    }
-    
-    .tab-text {
-      color: $primary-color;
-      font-weight: 600;
-    }
+}
+
+.line-tab-icon {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.line-tab-indicator {
+  width: 0;
+  height: 3rpx;
+  background-color: $line-accent;
+  margin-top: 4rpx;
+  transition: width 0.2s ease;
+}
+
+.line-indicator-active {
+  width: 40rpx;
+}
+
+.line-tab-text {
+  font-size: $line-font-xs;
+  color: $line-light;
+  margin-top: 6rpx;
+  letter-spacing: 1rpx;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.line-tab-active {
+  .line-tab-text {
+    color: $line-accent;
+    font-weight: 600;
   }
 }
 
-.tab-icon {
-  font-size: 52rpx;
-  margin-bottom: $spacing-xs;
-  transition: all $transition-normal;
-  position: relative;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -6rpx;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 6rpx;
-    background: $primary-color;
-    border-radius: $radius-full;
-    transition: width $transition-normal;
-  }
-}
-
-.tab-text {
-  font-size: $font-xs;
-  color: $text-light;
-  transition: all $transition-normal;
-}
-
-.publish-item {
-  position: relative;
+.line-publish-item {
   flex: 1.2;
 }
 
-.publish-btn {
+.line-publish-btn {
   width: 120rpx;
   height: 120rpx;
-  background: linear-gradient(135deg, $accent-color 0%, #ee5a5a 100%);
+  border: 4rpx solid $line-primary;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: -50rpx;
-  box-shadow: 0 16rpx 48rpx rgba(245, 87, 108, 0.5);
-  border: 6rpx solid $bg-white;
-  transition: all $transition-slow;
+  margin-top: -60rpx;
+  background-color: white;
+  position: relative;
+  transition: all 0.2s ease;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 6rpx;
+    left: 6rpx;
+    right: 6rpx;
+    bottom: 6rpx;
+    border: 2rpx dashed $line-border;
+    border-radius: 50%;
+    pointer-events: none;
+  }
   
   &:active {
     transform: scale(0.88);
-    box-shadow: 0 8rpx 24rpx rgba(245, 87, 108, 0.6);
+    border-color: $line-accent;
   }
-}
-
-.publish-icon-cross {
-  position: relative;
-  width: 52rpx;
-  height: 52rpx;
-}
-
-.cross-line {
-  position: absolute;
-  background-color: #fff;
-  border-radius: 4rpx;
-  transition: all $transition-fast;
-}
-
-.cross-h {
-  width: 100%;
-  height: 8rpx;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.cross-v {
-  width: 8rpx;
-  height: 100%;
-  left: 50%;
-  transform: translateX(-50%);
 }
 </style>

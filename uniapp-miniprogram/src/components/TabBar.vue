@@ -1,24 +1,24 @@
 <template>
-  <view class="tab-bar">
+  <view class="line-tab-bar">
     <view 
-      class="tab-item" 
+      class="line-tab-item" 
       v-for="(item, index) in tabs" 
       :key="index"
       :class="{ active: currentIndex === index }"
       @click="switchTab(index)"
     >
-      <view v-if="index === 1" class="tab-icon publish-icon">
-        <view class="publish-btn">
-          <view class="publish-icon-cross">
-            <view class="cross-line cross-h"></view>
-            <view class="cross-line cross-v"></view>
+      <view v-if="index === 1" class="line-tab-icon line-publish-icon">
+        <view class="line-publish-btn">
+          <view class="line-publish-icon-cross">
+            <view class="line-cross-line line-cross-h"></view>
+            <view class="line-cross-line line-cross-v"></view>
           </view>
         </view>
       </view>
-      <view v-else class="tab-icon">
+      <view v-else class="line-tab-icon">
         <LineIcon :name="item.icon" :active="currentIndex === index" />
       </view>
-      <text class="tab-text">{{ item.text }}</text>
+      <text class="line-tab-text">{{ item.text }}</text>
     </view>
   </view>
 </template>
@@ -53,95 +53,122 @@ defineExpose({ setCurrentIndex })
 </script>
 
 <style lang="scss" scoped>
-.tab-bar {
+.line-tab-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 120rpx;
-  background-color: #fff;
+  height: 130rpx;
+  background-color: #f8f9fa;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.05);
+  border-top: 3rpx solid #e0e0e0;
   padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -4rpx 20rpx rgba(26, 26, 46, 0.08);
 }
 
-.tab-item {
+.line-tab-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10rpx 40rpx;
-  transition: all 0.3s ease;
+  padding: 12rpx 50rpx;
+  transition: all 0.25s ease;
+  position: relative;
 }
 
-.tab-icon {
-  width: 48rpx;
-  height: 48rpx;
-  margin-bottom: 5rpx;
+.line-tab-icon {
+  width: 52rpx;
+  height: 52rpx;
+  margin-bottom: 8rpx;
 }
 
-.tab-text {
+.line-tab-text {
   font-size: 24rpx;
-  color: #999;
+  color: #8a8a9e;
+  font-weight: 500;
+  letter-spacing: 1rpx;
 }
 
-.tab-item.active {
-  .tab-icon:not(.publish-icon) {
+.line-tab-item.active {
+  .line-tab-icon:not(.line-publish-icon) {
     transform: scale(1.1);
   }
-  .tab-text {
-    color: #667eea;
-    font-weight: bold;
+  .line-tab-text {
+    color: #3f37c9;
+    font-weight: 600;
+  }
+  &::before {
+    content: '';
+    position: absolute;
+    top: 8rpx;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60rpx;
+    height: 4rpx;
+    background: linear-gradient(90deg, #3f37c9 0%, #4a4a6a 100%);
+    border-radius: 2rpx;
   }
 }
 
-.publish-icon {
+.line-publish-icon {
   width: auto;
   height: auto;
   margin-bottom: 0;
 }
 
-.publish-btn {
-  width: 100rpx;
-  height: 100rpx;
-  background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
+.line-publish-btn {
+  width: 110rpx;
+  height: 110rpx;
+  background: transparent;
+  border: 4rpx solid #3f37c9;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: -40rpx;
-  box-shadow: 0 12rpx 32rpx rgba(245, 87, 108, 0.4);
-  border: 4rpx solid #fff;
-  transition: all 0.3s ease;
+  margin-top: -50rpx;
+  position: relative;
+  transition: all 0.25s ease;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -8rpx;
+    left: -8rpx;
+    right: -8rpx;
+    bottom: -8rpx;
+    border: 2rpx dashed #3f37c9;
+    border-radius: 50%;
+    opacity: 0.5;
+  }
   
   &:active {
     transform: scale(0.9);
-    box-shadow: 0 6rpx 16rpx rgba(245, 87, 108, 0.5);
+    background: rgba(63, 55, 201, 0.1);
   }
 }
 
-.publish-icon-cross {
+.line-publish-icon-cross {
   position: relative;
-  width: 44rpx;
-  height: 44rpx;
+  width: 48rpx;
+  height: 48rpx;
 }
 
-.cross-line {
+.line-cross-line {
   position: absolute;
-  background-color: #fff;
-  border-radius: 4rpx;
+  background-color: #3f37c9;
+  border-radius: 3rpx;
   transition: all 0.2s ease;
 }
 
-.cross-h {
+.line-cross-h {
   width: 100%;
   height: 6rpx;
   top: 50%;
   transform: translateY(-50%);
 }
 
-.cross-v {
+.line-cross-v {
   width: 6rpx;
   height: 100%;
   left: 50%;

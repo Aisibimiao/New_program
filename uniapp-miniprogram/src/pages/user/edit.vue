@@ -1,43 +1,75 @@
 <template>
-  <view class="container">
-    <view class="avatar-section">
-      <view class="avatar-wrap" @click="chooseAvatar">
-        <image class="avatar" :src="getImageUrl(form.avatar)" mode="aspectFill" />
-        <text class="avatar-tip">点击更换头像</text>
+  <view class="line-edit-container">
+    <view class="line-header-bar">
+      <view class="line-back-btn" @click="goBack">
+        <LineIcon name="arrow-left" />
+      </view>
+      <text class="line-header-title">编辑资料</text>
+      <view class="line-header-right">
+        <view class="line-header-dot"></view>
       </view>
     </view>
 
-    <view class="form-section">
-      <view class="form-item">
-        <text class="form-label">昵称</text>
-        <input class="form-input" v-model="form.nickname" placeholder="请输入昵称" />
+    <scroll-view class="line-content-scroll" scroll-y>
+      <view class="line-avatar-section">
+        <view class="line-avatar-wrap" @click="chooseAvatar">
+          <view class="line-avatar-wrapper">
+            <image class="line-avatar" :src="getImageUrl(form.avatar)" mode="aspectFill" />
+            <view class="line-avatar-border"></view>
+          </view>
+          <text class="line-avatar-tip">点击更换头像</text>
+        </view>
       </view>
 
+      <view class="line-form-section">
+        <view class="line-form-item">
+          <text class="line-form-label">昵称</text>
+          <view class="line-input-wrapper">
+            <input class="line-form-input" v-model="form.nickname" placeholder="请输入昵称" placeholder-class="line-placeholder" />
+            <view class="line-input-border"></view>
+          </view>
+        </view>
 
+        <view class="line-form-item">
+          <text class="line-form-label">学号</text>
+          <view class="line-input-wrapper">
+            <input class="line-form-input" v-model="form.studentId" type="number" maxlength="10" placeholder="请输入学号（不超过10位）" placeholder-class="line-placeholder" />
+            <view class="line-input-border"></view>
+          </view>
+        </view>
 
-      <view class="form-item">
-        <text class="form-label">学号</text>
-        <input class="form-input" v-model="form.studentId" type="number" maxlength="10" placeholder="请输入学号（不超过10位）" />
+        <view class="line-form-item">
+          <text class="line-form-label">手机号</text>
+          <view class="line-input-wrapper">
+            <input class="line-form-input" v-model="form.phone" type="number" maxlength="11" placeholder="请输入手机号（不超过11位）" placeholder-class="line-placeholder" />
+            <view class="line-input-border"></view>
+          </view>
+        </view>
+
+        <view class="line-form-item">
+          <text class="line-form-label">宿舍楼栋</text>
+          <view class="line-input-wrapper">
+            <input class="line-form-input" v-model="form.dormBuilding" placeholder="请输入宿舍楼栋" placeholder-class="line-placeholder" />
+            <view class="line-input-border"></view>
+          </view>
+        </view>
+
+        <view class="line-form-item">
+          <text class="line-form-label">邮箱</text>
+          <view class="line-input-wrapper">
+            <input class="line-form-input" v-model="form.email" type="email" placeholder="请输入邮箱" placeholder-class="line-placeholder" />
+            <view class="line-input-border"></view>
+          </view>
+        </view>
       </view>
 
-      <view class="form-item">
-        <text class="form-label">手机号</text>
-        <input class="form-input" v-model="form.phone" type="number" maxlength="11" placeholder="请输入手机号（不超过11位）" />
-      </view>
+      <view class="line-bottom-space"></view>
+    </scroll-view>
 
-      <view class="form-item">
-        <text class="form-label">宿舍楼栋</text>
-        <input class="form-input" v-model="form.dormBuilding" placeholder="请输入宿舍楼栋" />
+    <view class="line-bottom-bar">
+      <view class="line-save-btn" @click="handleSave">
+        <text>保存</text>
       </view>
-
-      <view class="form-item">
-        <text class="form-label">邮箱</text>
-        <input class="form-input" v-model="form.email" type="email" placeholder="请输入邮箱" />
-      </view>
-    </view>
-
-    <view class="save-btn" @click="handleSave">
-      <text>保存</text>
     </view>
   </view>
 </template>
@@ -46,6 +78,7 @@
 import { ref, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { request } from '@/utils/request'
+import LineIcon from '@/components/LineIcon.vue'
 
 const userStore = useUserStore()
 const form = ref({
@@ -57,12 +90,14 @@ const form = ref({
   dormBuilding: ''
 })
 
-
-
 function getImageUrl(url?: string) {
-  if (!url) return 'http://localhost:3000/uploads/default-avatar.png'
+  if (!url) return 'http://47.236.64.92/uploads/default-avatar.png'
   if (url.startsWith('http')) return url
-  return `http://localhost:3000${url}`
+  return `http://47.236.64.92${url}`
+}
+
+function goBack() {
+  uni.navigateBack()
 }
 
 function chooseAvatar() {
@@ -90,7 +125,7 @@ async function uploadAvatar(filePath: string) {
   const token = uni.getStorageSync('token')
   return new Promise((resolve, reject) => {
     uni.uploadFile({
-      url: 'http://localhost:3000/api/auth/avatar',
+      url: 'http://47.236.64.92/api/auth/avatar',
       filePath,
       name: 'file',
       header: { 'Authorization': `Bearer ${token}` },
@@ -192,75 +227,164 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.container {
+@import '@/styles/line-ui.scss';
+
+.line-edit-container {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: $line-bg;
+  display: flex;
+  flex-direction: column;
 }
 
-.avatar-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 60rpx 0;
+.line-content-scroll {
+  flex: 1;
+  padding: 24rpx;
+  padding-bottom: 160rpx;
+}
+
+.line-avatar-section {
+  padding: 40rpx 0;
   display: flex;
   justify-content: center;
+  margin-bottom: 24rpx;
 }
 
-.avatar-wrap {
+.line-avatar-wrap {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.avatar {
-  width: 180rpx;
-  height: 180rpx;
+.line-avatar-wrapper {
+  position: relative;
+}
+
+.line-avatar {
+  width: 160rpx;
+  height: 160rpx;
   border-radius: 50%;
-  border: 6rpx solid rgba(255, 255, 255, 0.5);
 }
 
-.avatar-tip {
+.line-avatar-border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: $line-normal solid $line-primary;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.line-avatar-tip {
   margin-top: 20rpx;
-  font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: $line-font-sm;
+  color: $line-light;
 }
 
-.form-section {
+.line-form-section {
   background-color: #fff;
-  margin: 20rpx;
-  border-radius: 20rpx;
-  padding: 10rpx 0;
+  border: $line-normal solid $line-border;
+  border-radius: $line-radius;
+  padding: 20rpx 0;
+  position: relative;
 }
 
-.form-item {
+.line-form-section::before {
+  content: '';
+  position: absolute;
+  top: -6rpx;
+  left: 24rpx;
+  right: 24rpx;
+  height: 6rpx;
+  background: repeating-linear-gradient(
+    90deg,
+    $line-border 0rpx,
+    $line-border 8rpx,
+    transparent 8rpx,
+    transparent 16rpx
+  );
+}
+
+.line-form-item {
   display: flex;
   align-items: center;
   padding: 30rpx;
-  border-bottom: 1rpx solid #f0f0f0;
+  border-bottom: $line-thin dashed $line-border;
   &:last-child {
     border-bottom: none;
   }
 }
 
-.form-label {
+.line-form-label {
   width: 160rpx;
-  font-size: 30rpx;
-  color: #333;
+  font-size: $line-font-md;
+  color: $line-primary;
 }
 
-.form-input {
+.line-input-wrapper {
   flex: 1;
-  font-size: 30rpx;
-  color: #333;
+  position: relative;
 }
 
-.save-btn {
-  margin: 40rpx 20rpx;
+.line-form-input {
+  width: 100%;
+  font-size: $line-font-md;
+  color: $line-primary;
+}
+
+.line-input-border {
+  position: absolute;
+  bottom: -8rpx;
+  left: 0;
+  right: 0;
+  height: 2rpx;
+  background: repeating-linear-gradient(
+    90deg,
+    $line-border 0rpx,
+    $line-border 6rpx,
+    transparent 6rpx,
+    transparent 12rpx
+  );
+}
+
+.line-placeholder {
+  color: $line-light;
+}
+
+.line-bottom-space {
+  height: 40rpx;
+}
+
+.line-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24rpx;
+  padding-bottom: calc(24rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  background-color: #fff;
+  border-top: $line-thin solid $line-border;
+  z-index: 100;
+}
+
+.line-save-btn {
   height: 100rpx;
-  line-height: 100rpx;
-  text-align: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: $line-normal solid $line-primary;
+  border-radius: $line-radius;
+  background-color: $line-primary;
   color: #fff;
-  border-radius: 50rpx;
-  font-size: 32rpx;
-  font-weight: bold;
+  font-size: $line-font-lg;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+  transition: all 0.2s ease;
+  
+  &:active {
+    transform: scale(0.98);
+  }
 }
 </style>

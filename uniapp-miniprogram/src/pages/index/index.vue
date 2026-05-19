@@ -1,165 +1,146 @@
 <template>
-  <view class="container">
-    <view class="header-area">
-      <view class="title-section">
-        <text class="title">重庆电子科技职业大学校园交易软件</text>
+  <view class="line-container">
+    <view class="line-header">
+      <view class="line-title-bar">
+        <view class="line-dot"></view>
+        <text class="line-title">校园二手交易</text>
+        <view class="line-dot"></view>
       </view>
-
-      <view class="banner-section">
-        <swiper class="banner-swiper" indicator-dots autoplay circular interval="3000">
-          <swiper-item>
-            <view class="banner-item">
-              <text class="banner-text">🎒 新学期特惠</text>
-              <text class="banner-sub">精选二手好物</text>
-            </view>
-          </swiper-item>
-          <swiper-item>
-            <view class="banner-item banner-2">
-              <text class="banner-text">📚 教材低价转卖</text>
-              <text class="banner-sub">开学必备</text>
-            </view>
-          </swiper-item>
-          <swiper-item>
-            <view class="banner-item banner-3">
-              <text class="banner-text">🎮 数码好物</text>
-              <text class="banner-sub">品质保证</text>
-            </view>
-          </swiper-item>
-        </swiper>
+      
+      <view class="line-banner-box">
+        <view class="line-banner">
+          <swiper class="line-swiper" indicator-dots autoplay circular interval="3500" :indicator-color="$line-border" :indicator-active-color="$line-accent">
+            <swiper-item>
+              <view class="line-banner-item">
+                <view class="line-banner-content">
+                  <text class="line-banner-text">发现好物</text>
+                  <view class="line-banner-line"></view>
+                  <text class="line-banner-sub">探索校园闲置</text>
+                </view>
+              </view>
+            </swiper-item>
+            <swiper-item>
+              <view class="line-banner-item">
+                <view class="line-banner-content">
+                  <text class="line-banner-text">快速出手</text>
+                  <view class="line-banner-line"></view>
+                  <text class="line-banner-sub">发布你的闲置</text>
+                </view>
+              </view>
+            </swiper-item>
+            <swiper-item>
+              <view class="line-banner-item">
+                <view class="line-banner-content">
+                  <text class="line-banner-text">环保交易</text>
+                  <view class="line-banner-line"></view>
+                  <text class="line-banner-sub">让价值延续</text>
+                </view>
+              </view>
+            </swiper-item>
+          </swiper>
+        </view>
       </view>
     </view>
 
-    <view class="search-wrapper" :class="{ 'fixed': isSticky }">
-      <view class="search-bar">
-        <view class="category-dropdown" @click="toggleCategory">
-          <text class="category-text">{{ selectedCategoryLabel }}</text>
-          <view class="category-arrow">
+    <view class="line-search-wrapper" :class="{ 'fixed': isSticky }">
+      <view class="line-search-box">
+        <view class="line-category-picker" @click="toggleCategory">
+          <text class="line-category-text">{{ selectedCategoryLabel }}</text>
+          <view class="line-category-arrow">
             <LineIcon name="arrow-down" />
           </view>
         </view>
-        <view class="search-icon">
+        <view class="line-search-icon">
           <LineIcon name="search" />
         </view>
         <input
-          class="search-input"
+          class="line-search-input"
           v-model="searchKeyword"
-          placeholder="搜索商品"
+          placeholder="搜索商品..."
           confirm-type="search"
           @confirm="handleSearch"
         />
-        <view class="search-btn" @click="handleSearch">
-          <text>搜索</text>
-        </view>
       </view>
     </view>
 
-    <view class="category-popup" v-if="showCategoryPopup" @click="toggleCategory">
-      <view class="category-list" @click.stop>
-        <view
-          class="category-item"
-          :class="{ active: selectedCategory === '' }"
-          @click="selectCategory('')"
-        >
+    <view class="line-category-popup" v-if="showCategoryPopup" @click="toggleCategory">
+      <view class="line-category-container" @click.stop>
+        <view class="line-category-item" :class="{ active: selectedCategory === '' }" @click="selectCategory('')">
           <text>全部</text>
         </view>
-        <view
-          class="category-item"
-          v-for="cat in categories"
-          :key="cat.value"
-          :class="{ active: selectedCategory === cat.value }"
-          @click="selectCategory(cat.value)"
-        >
+        <view class="line-category-item" v-for="cat in categories" :key="cat.value" :class="{ active: selectedCategory === cat.value }" @click="selectCategory(cat.value)">
           <text>{{ cat.label }}</text>
         </view>
       </view>
     </view>
 
-    <scroll-view
-      class="main-scroll"
-      scroll-y
-      @scroll="onScroll"
-      :scroll-top="scrollTop"
-      @scrolltoupper="onPullDownRefresh"
-      @scrolltolower="onReachBottom"
-      :refresher-enabled="true"
-      :refresher-triggered="isRefreshing"
-      :refresher-threshold="45"
-    >
-      <view class="scroll-content">
-        <view class="header-placeholder" v-if="isSticky"></view>
-
-        <view class="goods-section">
-          <view class="goods-list">
-            <view
-              class="goods-card"
-              v-for="goods in goodsList"
-              :key="goods.id"
-            >
-              <view class="goods-image-wrapper" @click="goToDetail(goods.id)">
-                <image
-                  class="goods-image"
-                  :src="getImageUrl(goods.images?.[0])"
-                  mode="aspectFill"
-                  lazy-load
-                  @load="onImageLoad(goods.id)"
-                  @error="handleImageError($event, goods.id)"
-                  :class="{ 'image-loaded': imageLoadedMap[goods.id] }"
-                />
-                <view class="image-placeholder" v-if="!imageLoadedMap[goods.id]">
-                  <text class="placeholder-text">加载中...</text>
-                </view>
+    <scroll-view class="line-main-scroll" scroll-y @scroll="onScroll" :scroll-top="scrollTop" @scrolltoupper="onPullDownRefresh" @scrolltolower="onReachBottom" :refresher-enabled="true" :refresher-triggered="isRefreshing">
+      <view class="line-scroll-content">
+        <view class="line-header-placeholder" v-if="isSticky"></view>
+        
+        <view class="line-goods-section">
+          <view class="line-goods-list">
+            <view class="line-goods-card" v-for="goods in goodsList" :key="goods.id">
+              <view class="line-goods-image-box" @click="goToDetail(goods.id)">
+                <image class="line-goods-image" :src="getImageUrl(goods.images?.[0])" mode="aspectFill" lazy-load @load="onImageLoad(goods.id)" @error="handleImageError($event, goods.id)" :class="{ 'loaded': imageLoadedMap[goods.id] }" />
+                <view class="line-goods-image-border"></view>
               </view>
-              <view class="goods-info">
-                <text class="goods-name" @click="goToDetail(goods.id)">{{ goods.name }}</text>
-                <text class="goods-desc" @click="goToDetail(goods.id)">{{ goods.description }}</text>
-                <view class="goods-price-row">
-                  <text class="goods-price">¥{{ goods.price }}</text>
-                  <text v-if="goods.originalPrice" class="goods-original-price">¥{{ goods.originalPrice }}</text>
-                  <view class="favorite-btn" @click="toggleFavorite(goods.id)">
-                    <view class="favorite-icon">
-                      <LineIcon name="heart" :active="isFavorite(goods.id)" />
-                    </view>
+              <view class="line-goods-info">
+                <text class="line-goods-name" @click="goToDetail(goods.id)">{{ goods.name }}</text>
+                <text class="line-goods-desc" @click="goToDetail(goods.id)">{{ goods.description }}</text>
+                <view class="line-goods-bottom">
+                  <text class="line-goods-price">¥{{ goods.price }}</text>
+                  <view class="line-favorite-btn" @click="toggleFavorite(goods.id)">
+                    <LineIcon name="heart" :active="isFavorite(goods.id)" />
                   </view>
                 </view>
-                <text class="goods-time">{{ formatTime(goods.createdAt) }}</text>
+                <view class="line-goods-time">
+                  <text>{{ formatTime(goods.createdAt) }}</text>
+                </view>
               </view>
             </view>
           </view>
-
-          <view class="load-more" v-if="loading">
-            <text class="loading-text">加载中...</text>
+          
+          <view class="line-load-more" v-if="loading">
+            <view class="line-loading-dots">
+              <view class="line-dot"></view>
+              <view class="line-dot"></view>
+              <view class="line-dot"></view>
+            </view>
+            <text class="line-load-text">加载中</text>
           </view>
-          <view class="no-more" v-else-if="!hasMore && goodsList.length > 0">
-            <text class="no-more-text">暂无更多物品</text>
-          </view>
-          <view class="empty-state" v-else-if="goodsList.length === 0 && !loading">
-            <text class="empty-icon">📦</text>
-            <text class="empty-text">暂无商品</text>
+          
+          <view class="line-empty-state" v-else-if="goodsList.length === 0 && !loading">
+            <view class="line-empty-icon">
+              <LineIcon name="box" />
+            </view>
+            <text class="line-empty-text">暂无商品</text>
+            <view class="line-empty-line"></view>
           </view>
         </view>
       </view>
     </scroll-view>
 
-    <view class="tab-bar">
-      <view class="tab-item active" @click="goToHome()">
-        <view class="tab-icon">
+    <view class="line-tab-bar">
+      <view class="line-tab-item active" @click="goToHome()">
+        <view class="line-tab-icon">
           <LineIcon name="home" :active="true" />
         </view>
-        <text class="tab-text">首页</text>
+        <view class="line-tab-indicator active"></view>
+        <text class="line-tab-label">首页</text>
       </view>
-      <view class="tab-item publish-item" @click="goToPublish()">
-        <view class="publish-btn">
-          <view class="publish-icon-cross">
-            <LineIcon name="plus" />
-          </view>
+      <view class="line-tab-item publish" @click="goToPublish()">
+        <view class="line-publish-btn">
+          <LineIcon name="plus" />
         </view>
-        <text class="tab-text">发布</text>
+        <text class="line-tab-label">发布</text>
       </view>
-      <view class="tab-item" @click="goToProfile()">
-        <view class="tab-icon">
+      <view class="line-tab-item" @click="goToProfile()">
+        <view class="line-tab-icon">
           <LineIcon name="user" />
         </view>
-        <text class="tab-text">我的</text>
+        <view class="line-tab-indicator"></view>
+        <text class="line-tab-label">我的</text>
       </view>
     </view>
   </view>
@@ -211,7 +192,7 @@ const mockGoods: Goods[] = [
     description: '95成新，使用半年，无磕碰，电池健康度92%',
     price: 5999,
     originalPrice: 8999,
-    images: ['data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23667EEA" width="400" height="300"/%3E%3Ctext fill="white" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3EiPhone 14 Pro%3C/text%3E%3C/svg%3E'],
+    images: ['data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="none" stroke="%231a1a2e" stroke-width="3" width="400" height="300"/%3E%3Ctext fill="%231a1a2e" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3EiPhone 14 Pro%3C/text%3E%3C/svg%3E'],
     category: 'ELECTRONICS',
     condition: 3,
     status: 1,
@@ -225,7 +206,7 @@ const mockGoods: Goods[] = [
     description: '全新未拆封，考研必备教材',
     price: 35,
     originalPrice: 59,
-    images: ['data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%2342E695" width="400" height="300"/%3E%3Ctext fill="white" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3E高等数学%3C/text%3E%3C/svg%3E'],
+    images: ['data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="none" stroke="%231a1a2e" stroke-width="3" width="400" height="300"/%3E%3Ctext fill="%231a1a2e" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3E高等数学%3C/text%3E%3C/svg%3E'],
     category: 'BOOKS',
     condition: 5,
     status: 1,
@@ -239,41 +220,13 @@ const mockGoods: Goods[] = [
     description: '42码，穿过几次，几乎全新',
     price: 499,
     originalPrice: 799,
-    images: ['data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23F093FB" width="400" height="300"/%3E%3Ctext fill="white" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3ENike AF1%3C/text%3E%3C/svg%3E'],
+    images: ['data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="none" stroke="%231a1a2e" stroke-width="3" width="400" height="300"/%3E%3Ctext fill="%231a1a2e" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3ENike AF1%3C/text%3E%3C/svg%3E'],
     category: 'CLOTHING',
     condition: 4,
     status: 1,
     userId: '3',
     createdAt: '2024-01-13',
     updatedAt: '2024-01-13'
-  },
-  {
-    id: '4',
-    name: '羽毛球拍套装',
-    description: '含球拍、球、护腕，九成新',
-    price: 120,
-    originalPrice: 260,
-    images: ['data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23FF6B6B" width="400" height="300"/%3E%3Ctext fill="white" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3E羽毛球拍%3C/text%3E%3C/svg%3E'],
-    category: 'SPORTS',
-    condition: 3,
-    status: 1,
-    userId: '4',
-    createdAt: '2024-01-12',
-    updatedAt: '2024-01-12'
-  },
-  {
-    id: '5',
-    name: '小米台灯Pro',
-    description: '护眼台灯，可调节亮度色温',
-    price: 89,
-    originalPrice: 169,
-    images: ['data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23FFD26F" width="400" height="300"/%3E%3Ctext fill="white" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3E小米台灯%3C/text%3E%3C/svg%3E'],
-    category: 'LIFE',
-    condition: 4,
-    status: 1,
-    userId: '5',
-    createdAt: '2024-01-11',
-    updatedAt: '2024-01-11'
   }
 ]
 
@@ -415,12 +368,10 @@ function onScroll(e: any) {
 
 function onPullDownRefresh() {
   if (isRefreshing.value) return
-  
   isRefreshing.value = true
   page.value = 1
   hasMore.value = true
   goodsList.value = []
-  
   setTimeout(() => {
     loadGoods().then(() => {
       isRefreshing.value = false
@@ -491,632 +442,495 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/variables.scss';
+@import '@/styles/line-ui.scss';
 
-.container {
+.line-container {
   min-height: 100vh;
-  background-color: $bg-color;
-  padding-bottom: $tabbar-height;
+  background-color: $line-bg;
+  padding-bottom: 160rpx;
 }
 
-.header-area {
-  @include gradient-primary;
-  padding: 80rpx $spacing-lg $spacing-lg;
-  border-radius: 0 0 $radius-xl $radius-xl;
-  position: relative;
+.line-header {
+  padding: 40rpx 32rpx 24rpx;
+}
+
+.line-title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 0;
+}
+
+.line-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border: 3rpx solid $line-primary;
+  border-radius: 50%;
+}
+
+.line-title {
+  font-size: $line-font-lg;
+  font-weight: 600;
+  color: $line-primary;
+  letter-spacing: 6rpx;
+}
+
+.line-banner-box {
+  margin-top: 24rpx;
+}
+
+.line-banner {
+  border: 3rpx solid $line-primary;
+  border-radius: $line-radius-lg;
   overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -30%;
-    width: 60%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: -20%;
-    width: 40%;
-    height: 80%;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 50%;
-  }
 }
 
-.title-section {
-  padding: $spacing-md 0;
-  position: relative;
-  z-index: 1;
+.line-swiper {
+  height: 220rpx;
 }
 
-.title {
-  font-size: $font-xl;
-  font-weight: 700;
-  color: #fff;
-  text-align: center;
-  text-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
-  letter-spacing: 4rpx;
-}
-
-.banner-section {
-  margin-top: $spacing-md;
-  border-radius: $radius-lg;
-  overflow: hidden;
-  position: relative;
-  z-index: 1;
-  box-shadow: 0 12rpx 40rpx rgba(102, 126, 234, 0.3);
-}
-
-.banner-swiper {
-  height: 240rpx;
-}
-
-.banner-item {
+.line-banner-item {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, $secondary-color 0%, $accent-color 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+}
+
+.line-banner-content {
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;
-  padding: 0 $spacing-xl;
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -30%;
-    right: -20%;
-    width: 200rpx;
-    height: 200rpx;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 50%;
-    animation: float 3s ease-in-out infinite;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -20%;
-    right: 10%;
-    width: 150rpx;
-    height: 150rpx;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    animation: float 4s ease-in-out infinite 1s;
-  }
+  gap: 12rpx;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-16rpx);
-  }
+.line-banner-text {
+  font-size: $line-font-xl;
+  font-weight: 600;
+  color: $line-primary;
+  letter-spacing: 8rpx;
 }
 
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(1.15);
-    opacity: 0.5;
-  }
+.line-banner-line {
+  width: 100rpx;
+  height: 3rpx;
+  background: $line-accent;
 }
 
-.banner-2 {
-  background: linear-gradient(135deg, $accent-color 0%, $accent-light 100%);
-}
-
-.banner-3 {
-  background: linear-gradient(135deg, $secondary-color 0%, #22d3ee 100%);
-}
-
-.banner-text {
-  font-size: $font-title;
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.2);
-  letter-spacing: 2rpx;
-  position: relative;
-  z-index: 10;
-}
-
-.banner-sub {
-  font-size: $font-md;
-  color: rgba(255, 255, 255, 0.92);
-  margin-top: $spacing-md;
+.line-banner-sub {
+  font-size: $line-font-sm;
+  color: $line-light;
   letter-spacing: 4rpx;
-  position: relative;
-  z-index: 10;
-  font-weight: 500;
 }
 
-.search-wrapper {
-  padding: $spacing-md $spacing-lg;
-  background-color: $bg-color;
+.line-search-wrapper {
+  padding: 16rpx 32rpx;
+  background-color: $line-bg;
   z-index: 100;
-  transition: all $transition-normal;
 }
 
-.search-wrapper.fixed {
+.line-search-wrapper.fixed {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  padding: $spacing-md $spacing-lg;
-  background-color: $bg-white;
-  box-shadow: 0 4rpx 30rpx rgba(0, 0, 0, 0.08);
-  padding-top: calc($spacing-md + env(safe-area-inset-top));
-  padding-top: calc($spacing-md + constant(safe-area-inset-top));
+  padding: 16rpx 32rpx;
+  padding-top: calc(16rpx + env(safe-area-inset-top));
+  background-color: white;
+  border-bottom: 2rpx solid $line-border;
 }
 
-.search-bar {
+.line-search-box {
   display: flex;
   align-items: center;
-  background-color: $bg-white;
-  border-radius: $radius-full;
-  padding: $spacing-sm $spacing-lg;
-  box-shadow: 0 8rpx 32rpx rgba(102, 126, 234, 0.12);
-  border: 2rpx solid rgba(102, 126, 234, 0.08);
-  transition: all $transition-normal;
-  
-  &:active {
-    transform: scale(0.98);
-    box-shadow: 0 4rpx 16rpx rgba(102, 126, 234, 0.18);
-    border-color: rgba(102, 126, 234, 0.2);
-  }
+  background-color: white;
+  border: 3rpx solid $line-primary;
+  border-radius: $line-radius-lg;
+  padding: 12rpx 16rpx;
+  position: relative;
 }
 
-.category-dropdown {
+.line-category-picker {
   display: flex;
   align-items: center;
-  padding: $spacing-xs $spacing-md;
-  margin-right: $spacing-md;
-  @include gradient-bg;
-  border-radius: $radius-lg;
-  border-right: 2rpx solid rgba(102, 126, 234, 0.12);
-  transition: all $transition-fast;
-  
-  &:active {
-    @include gradient-primary;
-    border-color: transparent;
-    
-    .category-text, .category-arrow {
-      color: #fff;
-    }
-  }
+  padding: 8rpx 16rpx;
+  margin-right: 12rpx;
+  border-right: 2rpx solid $line-border;
+  transition: all 0.2s ease;
 }
 
-.category-text {
-  font-size: $font-sm;
-  color: $text-secondary;
+.line-category-text {
+  font-size: $line-font-sm;
+  color: $line-secondary;
   font-weight: 500;
 }
 
-.category-arrow {
-  width: 24rpx;
-  height: 24rpx;
-  margin-left: $spacing-xs;
-  transition: all $transition-fast;
-  transform: rotate(0deg);
+.line-category-arrow {
+  width: 28rpx;
+  height: 28rpx;
+  margin-left: 8rpx;
 }
 
-.category-dropdown:active .category-arrow {
-  transform: rotate(180deg);
+.line-search-icon {
+  width: 36rpx;
+  height: 36rpx;
+  margin-right: 12rpx;
 }
 
-.search-icon {
-  width: 32rpx;
-  height: 32rpx;
-  margin-right: $spacing-sm;
-  opacity: 0.6;
-}
-
-.search-input {
+.line-search-input {
   flex: 1;
-  height: 60rpx;
-  font-size: $font-md;
-  color: $text-primary;
+  height: 56rpx;
+  font-size: $line-font-md;
+  color: $line-primary;
 }
 
-.search-btn {
-  padding: $spacing-sm $spacing-lg;
-  @include gradient-primary;
-  border-radius: $radius-lg;
-  margin-left: $spacing-md;
-  box-shadow: 0 6rpx 20rpx rgba(102, 126, 234, 0.35);
-  transition: all $transition-fast;
-  
-  &:active {
-    transform: scale(0.92);
-    box-shadow: 0 3rpx 10rpx rgba(102, 126, 234, 0.45);
-  }
-}
-
-.search-btn text {
-  color: #fff;
-  font-size: $font-sm;
-  font-weight: 600;
-}
-
-.category-popup {
+.line-category-popup {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.35);
   z-index: 200;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   padding-top: 220rpx;
-  animation: fadeIn 0.2s ease;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.category-list {
-  background-color: $bg-white;
-  border-radius: $radius-2xl;
-  padding: $spacing-md;
-  width: 88%;
-  max-height: 65vh;
+.line-category-container {
+  background-color: white;
+  border: 3rpx solid $line-primary;
+  border-radius: $line-radius-lg;
+  padding: 16rpx;
+  width: 85%;
+  max-height: 70vh;
   overflow-y: auto;
-  @include shadow-lg;
-  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(40rpx);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.category-item {
-  padding: $spacing-lg;
+.line-category-item {
+  padding: 20rpx;
   text-align: center;
-  border-radius: $radius-lg;
-  margin-bottom: $spacing-sm;
-  font-size: $font-md;
-  color: $text-secondary;
-  background-color: $bg-color;
-  transition: all $transition-normal;
+  border: 2rpx solid transparent;
+  border-radius: $line-radius;
+  margin-bottom: 8rpx;
+  font-size: $line-font-md;
+  color: $line-secondary;
+  transition: all 0.2s ease;
   font-weight: 500;
-  
+
   &.active {
-    @include gradient-primary;
-    color: #fff;
-    box-shadow: 0 8rpx 24rpx rgba(79, 70, 229, 0.4);
-    transform: scale(1.02);
+    border-color: $line-accent;
+    color: $line-accent;
+    font-weight: 600;
   }
-  
+
   &:active {
     transform: scale(0.98);
   }
 }
 
-.main-scroll {
-  height: calc(100vh - $tabbar-height);
+.line-main-scroll {
+  height: calc(100vh - 160rpx);
 }
 
-.scroll-content {
-  padding-bottom: $spacing-lg;
+.line-scroll-content {
+  padding-bottom: 32rpx;
 }
 
-.header-placeholder {
-  height: 360rpx;
+.line-header-placeholder {
+  height: 380rpx;
 }
 
-.goods-section {
-  padding: $spacing-md $spacing-lg;
+.line-goods-section {
+  padding: 16rpx 32rpx;
 }
 
-.goods-list {
+.line-goods-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: $spacing-md;
+  gap: 20rpx;
 }
 
-.goods-card {
-  background-color: $bg-white;
-  border-radius: $radius-2xl;
+.line-goods-card {
+  background-color: white;
+  border: 3rpx solid $line-primary;
+  border-radius: $line-radius-lg;
   overflow: hidden;
-  @include shadow-card;
-  transition: all $transition-normal;
-  border: 2rpx solid rgba(79, 70, 229, 0.04);
-  
+  position: relative;
+  transition: all 0.2s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 8rpx;
+    left: 8rpx;
+    right: 8rpx;
+    bottom: 8rpx;
+    border: 1rpx dashed $line-border;
+    border-radius: 8rpx;
+    pointer-events: none;
+  }
+
   &:active {
-    transform: translateY(-8rpx) scale(1.01);
-    @include shadow-card-hover;
+    transform: translateY(-4rpx);
+    border-color: $line-accent;
   }
 }
 
-.goods-image-wrapper {
+.line-goods-image-box {
   width: 100%;
-  height: 300rpx;
+  height: 280rpx;
   overflow: hidden;
-  @include gradient-bg;
   position: relative;
+  background: white;
 }
 
-.goods-image {
+.line-goods-image {
   width: 100%;
   height: 100%;
   opacity: 0;
-  transition: opacity $transition-normal;
-  transform: scale(1.05);
+  transition: opacity 0.3s ease;
 }
 
-.goods-image.image-loaded {
+.line-goods-image.loaded {
   opacity: 1;
-  transform: scale(1);
 }
 
-.image-placeholder {
+.line-goods-image-border {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  @include flex-center;
-  @include gradient-bg;
+  right: 0;
+  bottom: 0;
+  border-bottom: 3rpx solid $line-primary;
+  pointer-events: none;
 }
 
-.placeholder-text {
-  font-size: $font-sm;
-  color: $text-light;
-}
-
-.goods-info {
+.line-goods-info {
   padding: 20rpx 20rpx 16rpx;
 }
 
-.goods-name {
-  font-size: $font-md;
+.line-goods-name {
+  font-size: $line-font-md;
   font-weight: 600;
-  color: $text-primary;
-  @include text-clamp(1);
+  color: $line-primary;
+  @include line-clamp(1);
+  line-height: 1.3;
+}
+
+.line-goods-desc {
+  font-size: $line-font-xs;
+  color: $line-light;
+  margin-top: 8rpx;
+  @include line-clamp(2);
   line-height: 1.4;
 }
 
-.goods-desc {
-  font-size: $font-xs;
-  color: $text-light;
-  margin-top: 8rpx;
-  @include text-ellipsis;
-}
-
-.goods-price-row {
+.line-goods-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: 16rpx;
 }
 
-.goods-price {
-  font-size: 40rpx;
+.line-goods-price {
+  font-size: 36rpx;
   font-weight: 700;
-  color: $accent-color;
-  letter-spacing: 0.5rpx;
+  color: $line-accent;
+  letter-spacing: 1rpx;
 }
 
-.goods-original-price {
-  font-size: $font-xs;
-  color: $text-placeholder;
-  text-decoration: line-through;
-  margin-left: $spacing-xs;
-  flex: 1;
-}
+.line-favorite-btn {
+  width: 40rpx;
+  height: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 
-.favorite-btn {
-  padding: 4rpx;
-  transition: all $transition-fast;
-  
   &:active {
-    transform: scale(0.88);
+    transform: scale(0.9);
   }
 }
 
-.favorite-icon {
-  width: 36rpx;
-  height: 36rpx;
-}
-
-.goods-time {
-  font-size: $font-xs;
-  color: $text-placeholder;
+.line-goods-time {
   margin-top: 12rpx;
+  padding-top: 12rpx;
+  border-top: 2rpx dashed $line-border;
 }
 
-.load-more {
-  text-align: center;
-  padding: $spacing-lg;
+.line-goods-time text {
+  font-size: $line-font-xs;
+  color: $line-light;
 }
 
-.loading-text {
-  font-size: $font-sm;
-  color: $text-light;
-}
-
-.no-more {
-  text-align: center;
-  padding: $spacing-lg;
-}
-
-.no-more-text {
-  font-size: $font-sm;
-  color: $text-placeholder;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 120rpx $spacing-lg;
-}
-
-.empty-icon {
-  font-size: 120rpx;
-  margin-bottom: $spacing-md;
-  opacity: 0.5;
-}
-
-.empty-text {
-  font-size: $font-md;
-  color: $text-light;
-}
-
-.tab-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20rpx);
-  display: flex;
-  padding: $spacing-sm 0;
-  padding-bottom: calc($spacing-sm + constant(safe-area-inset-bottom));
-  padding-bottom: calc($spacing-sm + env(safe-area-inset-bottom));
-  box-shadow: 0 -8rpx 40rpx rgba(102, 126, 234, 0.08);
-  border-top: 2rpx solid rgba(102, 126, 234, 0.05);
-}
-
-.tab-item {
-  flex: 1;
+.line-load-more {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: $spacing-xs 0;
-  transition: all $transition-fast;
-  
-  &:active {
-    transform: scale(0.95);
+  padding: 48rpx;
+  gap: 16rpx;
+}
+
+.line-loading-dots {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.line-loading-dots .line-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-color: $line-accent;
+  animation: dotBounce 1.2s ease infinite;
+}
+
+.line-loading-dots .line-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.line-loading-dots .line-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10rpx);
   }
 }
 
-.tab-icon {
-  font-size: 52rpx;
-  transition: all $transition-normal;
-  position: relative;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -8rpx;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 6rpx;
-    background: $primary-color;
-    border-radius: $radius-full;
-    transition: width $transition-normal;
-  }
+.line-load-text {
+  font-size: $line-font-sm;
+  color: $line-light;
+  letter-spacing: 2rpx;
 }
 
-.tab-text {
-  font-size: $font-xs;
-  color: $text-light;
-  margin-top: $spacing-xs;
-  transition: all $transition-normal;
+.line-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 32rpx;
+  gap: 20rpx;
 }
 
-.tab-item.active {
-  .tab-icon {
-    transform: scale(1.1);
-    
-    &::after {
-      width: 40rpx;
-    }
-  }
-  
-  .tab-text {
-    color: $primary-color;
-    font-weight: 600;
-  }
-}
-
-.publish-item {
-  position: relative;
-  flex: 1.2;
-}
-
-.publish-btn {
-  width: 120rpx;
-  height: 120rpx;
-  background: linear-gradient(135deg, $accent-color 0%, #ee5a5a 100%);
+.line-empty-icon {
+  width: 100rpx;
+  height: 100rpx;
+  border: 3rpx dashed $line-border;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: -50rpx;
-  box-shadow: 0 16rpx 48rpx rgba(245, 87, 108, 0.5);
-  border: 6rpx solid $bg-white;
-  transition: all $transition-slow;
-  
-  &:active {
-    transform: scale(0.88);
-    box-shadow: 0 8rpx 24rpx rgba(245, 87, 108, 0.6);
-  }
 }
 
-.publish-icon-cross {
-  position: relative;
-  width: 52rpx;
-  height: 52rpx;
+.line-empty-text {
+  font-size: $line-font-md;
+  color: $line-light;
+  letter-spacing: 4rpx;
 }
 
-.cross-line {
-  position: absolute;
-  background-color: #fff;
-  border-radius: 4rpx;
-  transition: all $transition-fast;
+.line-empty-line {
+  width: 80rpx;
+  height: 3rpx;
+  background: $line-border;
 }
 
-.cross-h {
-  width: 100%;
-  height: 8rpx;
-  top: 50%;
+.line-tab-bar {
+  position: fixed;
+  bottom: 0;
   left: 0;
-  transform: translateY(-50%);
+  right: 0;
+  background-color: white;
+  display: flex;
+  align-items: flex-start;
+  padding: 12rpx 0;
+  padding-bottom: calc(12rpx + env(safe-area-inset-bottom));
+  border-top: 3rpx solid $line-primary;
 }
 
-.cross-v {
-  width: 8rpx;
-  height: 100%;
-  left: 50%;
-  top: 0;
-  transform: translateX(-50%);
+.line-tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8rpx 0;
+  position: relative;
 }
 
-.publish-btn:active {
-  .cross-line {
-    background-color: rgba(255, 255, 255, 0.9);
+.line-tab-icon {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.line-tab-indicator {
+  width: 0;
+  height: 3rpx;
+  background: $line-accent;
+  margin-top: 4rpx;
+  transition: width 0.2s ease;
+}
+
+.line-tab-indicator.active {
+  width: 40rpx;
+}
+
+.line-tab-label {
+  font-size: $line-font-xs;
+  color: $line-light;
+  margin-top: 6rpx;
+  letter-spacing: 1rpx;
+  font-weight: 500;
+}
+
+.line-tab-item.active .line-tab-label {
+  color: $line-accent;
+  font-weight: 600;
+}
+
+.line-tab-item.publish {
+  flex: 1.2;
+}
+
+.line-publish-btn {
+  width: 120rpx;
+  height: 120rpx;
+  border: 4rpx solid $line-primary;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -60rpx;
+  background: white;
+  position: relative;
+  transition: all 0.2s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 6rpx;
+    left: 6rpx;
+    right: 6rpx;
+    bottom: 6rpx;
+    border: 2rpx dashed $line-border;
+    border-radius: 50%;
+  }
+
+  &:active {
+    transform: scale(0.95);
+    border-color: $line-accent;
   }
 }
 
-.publish-item .tab-text {
-  margin-top: $spacing-sm;
+.line-tab-item.publish .line-tab-label {
+  margin-top: 10rpx;
 }
 </style>

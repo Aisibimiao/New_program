@@ -1,138 +1,179 @@
 <template>
-  <view class="container">
-    <scroll-view class="content-scroll" scroll-y>
-      <view class="form-section">
-        <view class="section-title">
+  <view class="line-publish-container">
+    <view class="line-header-bar">
+      <view class="line-back-btn" @click="goBack">
+        <LineIcon name="arrow-left" />
+      </view>
+      <text class="line-header-title">发布商品</text>
+      <view class="line-header-right">
+        <view class="line-header-dot"></view>
+      </view>
+    </view>
+
+    <scroll-view class="line-content-scroll" scroll-y>
+      <view class="line-form-section">
+        <view class="line-section-title">
+          <view class="line-title-line"></view>
           <text>商品分类</text>
         </view>
         <picker mode="selector" :range="categoryLabels" @change="onCategoryChange">
-          <view class="picker-input">
-            {{ selectedCategory || '请选择分类' }}
-            <text class="picker-arrow">›</text>
+          <view class="line-picker-input">
+            <text class="line-picker-text">{{ selectedCategory || '请选择分类' }}</text>
+            <LineIcon name="chevron-right" />
           </view>
         </picker>
       </view>
 
-      <view class="form-section" v-if="form.category === 'BOOK'">
-        <view class="section-title">
+      <view class="line-form-section" v-if="form.category === 'BOOK'">
+        <view class="line-section-title">
+          <view class="line-title-line"></view>
           <text>书籍信息</text>
         </view>
 
         <picker mode="selector" :range="collegeOptions" @change="onCollegeChange">
-          <view class="picker-input">
-            {{ form.college || '请选择学院' }}
-            <text class="picker-arrow">›</text>
+          <view class="line-picker-input">
+            <text class="line-picker-text">{{ form.college || '请选择学院' }}</text>
+            <LineIcon name="chevron-right" />
           </view>
         </picker>
 
-        <picker mode="selector" :range="majorOptions" @change="onMajorChange" style="margin-top: 20rpx;">
-          <view class="picker-input">
-            {{ form.major || '请选择专业' }}
-            <text class="picker-arrow">›</text>
+        <picker mode="selector" :range="majorOptions" @change="onMajorChange">
+          <view class="line-picker-input">
+            <text class="line-picker-text">{{ form.major || '请选择专业' }}</text>
+            <LineIcon name="chevron-right" />
           </view>
         </picker>
 
-        <picker mode="selector" :range="gradeOptions" @change="onGradeChange" style="margin-top: 20rpx;">
-          <view class="picker-input">
-            {{ form.grade || '请选择年级' }}
-            <text class="picker-arrow">›</text>
+        <picker mode="selector" :range="gradeOptions" @change="onGradeChange">
+          <view class="line-picker-input">
+            <text class="line-picker-text">{{ form.grade || '请选择年级' }}</text>
+            <LineIcon name="chevron-right" />
           </view>
         </picker>
 
-        <picker mode="selector" :range="semesterOptions" @change="onSemesterChange" style="margin-top: 20rpx;">
-          <view class="picker-input">
-            {{ form.semester || '请选择学期' }}
-            <text class="picker-arrow">›</text>
+        <picker mode="selector" :range="semesterOptions" @change="onSemesterChange">
+          <view class="line-picker-input">
+            <text class="line-picker-text">{{ form.semester || '请选择学期' }}</text>
+            <LineIcon name="chevron-right" />
           </view>
         </picker>
 
-        <input
-          class="form-input"
-          v-model="form.bookName"
-          placeholder="请输入书名/一整套"
-          style="margin-top: 20rpx;"
-        />
+        <view class="line-input-wrapper">
+          <input
+            class="line-form-input"
+            v-model="form.bookName"
+            placeholder="请输入书名/一整套"
+            placeholder-class="line-placeholder"
+          />
+          <view class="line-input-border"></view>
+        </view>
       </view>
 
-      <view class="form-section">
-        <view class="section-title">
+      <view class="line-form-section">
+        <view class="line-section-title">
+          <view class="line-title-line"></view>
           <text>商品名称</text>
         </view>
-        <input
-          class="form-input"
-          v-model="form.name"
-          placeholder="请输入商品名称"
-        />
+        <view class="line-input-wrapper">
+          <input
+            class="line-form-input"
+            v-model="form.name"
+            placeholder="请输入商品名称"
+            placeholder-class="line-placeholder"
+          />
+          <view class="line-input-border"></view>
+        </view>
       </view>
 
-      <view class="form-section">
-        <view class="section-title">
+      <view class="line-form-section">
+        <view class="line-section-title">
+          <view class="line-title-line"></view>
           <text>商品描述</text>
         </view>
-        <textarea
-          class="form-textarea"
-          v-model="form.description"
-          placeholder="请输入商品描述"
-          :maxlength="500"
-        />
-        <text class="textarea-count">{{ form.description.length }}/500</text>
+        <view class="line-textarea-wrapper">
+          <textarea
+            class="line-form-textarea"
+            v-model="form.description"
+            placeholder="请输入商品描述"
+            placeholder-class="line-placeholder"
+            :maxlength="500"
+          />
+          <view class="line-textarea-border"></view>
+        </view>
+        <text class="line-textarea-count">{{ form.description.length }}/500</text>
       </view>
 
-      <view class="form-section">
-        <view class="section-title">
-          <text>商品图片 (最多3张)</text>
+      <view class="line-form-section">
+        <view class="line-section-title">
+          <view class="line-title-line"></view>
+          <text>商品图片</text>
+          <text class="line-title-note">（最多3张）</text>
         </view>
-        <view class="upload-area">
+        <view class="line-upload-area">
           <view
-            class="upload-item"
+            class="line-upload-item"
             v-for="(img, index) in images"
             :key="index"
           >
-            <image class="upload-image" :src="img" mode="aspectFill" />
-            <view class="remove-btn" @click="removeImage(index)">
-              <text>✕</text>
+            <view class="line-upload-image-wrapper">
+              <image class="line-upload-image" :src="img" mode="aspectFill" />
+              <view class="line-upload-image-border"></view>
+            </view>
+            <view class="line-remove-btn" @click="removeImage(index)">
+              <LineIcon name="close" />
             </view>
           </view>
-          <view class="upload-btn" @click="chooseImage" v-if="images.length < 3">
-            <text class="upload-icon">+</text>
-            <text class="upload-text">添加图片</text>
+          <view class="line-upload-btn" @click="chooseImage" v-if="images.length < 3">
+            <view class="line-upload-icon-box">
+              <LineIcon name="plus" />
+            </view>
+            <text class="line-upload-text">添加图片</text>
           </view>
         </view>
       </view>
 
-      <view class="form-section">
-        <view class="section-title">
+      <view class="line-form-section">
+        <view class="line-section-title">
+          <view class="line-title-line"></view>
           <text>发布金额</text>
         </view>
-        <view class="form-input price-input-wrap">
-          <text class="price-symbol">¥</text>
+        <view class="line-price-input-wrapper">
+          <text class="line-price-symbol">¥</text>
           <input
-            class="price-input"
+            class="line-price-input"
             v-model="form.price"
             placeholder="0"
+            placeholder-class="line-placeholder"
             type="digit"
           />
+          <view class="line-price-border"></view>
         </view>
       </view>
 
-      <view class="form-section">
-        <view class="section-title">
+      <view class="line-form-section">
+        <view class="line-section-title">
+          <view class="line-title-line"></view>
           <text>交易地点</text>
         </view>
-        <view class="form-input location-input">
-          <text class="location-icon">📍</text>
+        <view class="line-location-input-wrapper">
+          <view class="line-location-icon">
+            <LineIcon name="location" />
+          </view>
           <input
-            class="location-text-input"
+            class="line-location-input"
             v-model="form.location"
             placeholder="比如：北区食堂"
-            placeholder-class="location-placeholder"
+            placeholder-class="line-placeholder"
           />
+          <view class="line-location-border"></view>
         </view>
       </view>
+
+      <view class="line-bottom-space"></view>
     </scroll-view>
 
-    <view class="bottom-bar">
-      <view class="submit-btn" :class="{ disabled: !canSubmit || submitting }" @click="handleSubmit">
+    <view class="line-bottom-bar">
+      <view class="line-submit-btn" :class="{ disabled: !canSubmit || submitting }" @click="handleSubmit">
         <text>{{ submitting ? '发布中...' : '发布商品' }}</text>
       </view>
     </view>
@@ -142,6 +183,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { createGoods, uploadImage } from '@/api/goods'
+import LineIcon from '@/components/LineIcon.vue'
 
 const categories = [
   { value: 'ELECTRONICS', label: '数码产品' },
@@ -203,6 +245,10 @@ const canSubmit = computed(() => {
   
   return baseValid
 })
+
+function goBack() {
+  uni.navigateBack()
+}
 
 function onCategoryChange(e: any) {
   const index = e.detail.value
@@ -298,334 +344,394 @@ async function handleSubmit() {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/variables.scss';
+@import '@/styles/line-ui.scss';
 
-.container {
+.line-publish-container {
   min-height: 100vh;
-  @include gradient-bg;
+  background-color: $line-bg;
   display: flex;
   flex-direction: column;
 }
 
-.content-scroll {
+.line-content-scroll {
   flex: 1;
-  padding: $spacing-lg;
+  padding: 24rpx;
   padding-bottom: 200rpx;
 }
 
-.form-section {
-  background-color: $bg-white;
-  border-radius: $radius-2xl;
-  padding: $spacing-xl;
-  margin-bottom: $spacing-lg;
-  @include shadow-card;
-  border: 2rpx solid rgba(79, 70, 229, 0.05);
-  transition: all $transition-normal;
-  
-  &:active {
-    @include shadow-card-hover;
-  }
-}
-
-.section-title {
-  font-size: $font-lg;
-  font-weight: 600;
-  color: $text-primary;
-  margin-bottom: $spacing-lg;
-  display: flex;
-  align-items: center;
+.line-form-section {
+  background-color: #fff;
+  border: $line-normal solid $line-border;
+  border-radius: $line-radius;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  position: relative;
   
   &::before {
     content: '';
-    width: 6rpx;
-    height: 32rpx;
-    background: linear-gradient(180deg, $primary-color 0%, $primary-light 100%);
-    border-radius: 6rpx;
-    margin-right: $spacing-md;
+    position: absolute;
+    top: -6rpx;
+    left: 24rpx;
+    right: 24rpx;
+    height: 6rpx;
+    background: repeating-linear-gradient(
+      90deg,
+      $line-border 0rpx,
+      $line-border 8rpx,
+      transparent 8rpx,
+      transparent 16rpx
+    );
   }
 }
 
-.picker-input {
+.line-section-title {
+  font-size: $line-font-lg;
+  font-weight: 600;
+  color: $line-primary;
+  margin-bottom: 24rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.line-title-line {
+  width: 4rpx;
+  height: 28rpx;
+  background-color: $line-accent;
+  border-radius: 2rpx;
+}
+
+.line-title-note {
+  font-size: $line-font-sm;
+  color: $line-light;
+  font-weight: 400;
+}
+
+.line-picker-input {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 100rpx;
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.02) 0%, rgba(124, 58, 237, 0.02) 100%);
-  border-radius: $radius-lg;
-  padding: 0 $spacing-lg;
-  font-size: $font-md;
-  color: $text-primary;
-  transition: all $transition-normal;
-  border: 2rpx solid transparent;
+  height: 96rpx;
+  border: $line-thin solid $line-border;
+  border-radius: $line-radius-sm;
+  padding: 0 24rpx;
+  margin-bottom: 16rpx;
+  position: relative;
+  transition: all 0.2s ease;
   
   &:active {
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
-    border-color: rgba(79, 70, 229, 0.1);
-    transform: scale(0.99);
+    border-color: $line-accent;
   }
 }
 
-.picker-arrow {
-  font-size: $font-lg;
-  color: $text-light;
-  transition: all $transition-fast;
+.line-picker-text {
+  font-size: $line-font-md;
+  color: $line-primary;
 }
 
-.picker-input:active .picker-arrow {
-  transform: rotate(90deg) scale(1.1);
-  color: $primary-color;
+.line-input-wrapper {
+  position: relative;
+  margin-bottom: 16rpx;
 }
 
-.upload-area {
+.line-form-input {
+  width: 100%;
+  height: 96rpx;
+  font-size: $line-font-md;
+  padding: 0 24rpx;
+  border: $line-thin solid $line-border;
+  border-radius: $line-radius-sm;
+  color: $line-primary;
+  background-color: #fff;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    border-color: $line-accent;
+  }
+}
+
+.line-input-border {
+  position: absolute;
+  bottom: 0;
+  left: 24rpx;
+  right: 24rpx;
+  height: 2rpx;
+  background: repeating-linear-gradient(
+    90deg,
+    $line-border 0rpx,
+    $line-border 6rpx,
+    transparent 6rpx,
+    transparent 12rpx
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  
+  .line-form-input:focus + & {
+    opacity: 1;
+  }
+}
+
+.line-textarea-wrapper {
+  position: relative;
+}
+
+.line-form-textarea {
+  width: 100%;
+  height: 240rpx;
+  font-size: $line-font-md;
+  padding: 20rpx;
+  border: $line-thin solid $line-border;
+  border-radius: $line-radius-sm;
+  color: $line-primary;
+  background-color: #fff;
+  line-height: 1.6;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    border-color: $line-accent;
+  }
+}
+
+.line-textarea-border {
+  position: absolute;
+  bottom: 0;
+  left: 20rpx;
+  right: 20rpx;
+  height: 2rpx;
+  background: repeating-linear-gradient(
+    90deg,
+    $line-border 0rpx,
+    $line-border 6rpx,
+    transparent 6rpx,
+    transparent 12rpx
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  
+  .line-form-textarea:focus + & {
+    opacity: 1;
+  }
+}
+
+.line-textarea-count {
+  display: block;
+  text-align: right;
+  font-size: $line-font-sm;
+  color: $line-light;
+  margin-top: 12rpx;
+}
+
+.line-placeholder {
+  color: $line-light;
+}
+
+.line-upload-area {
   display: flex;
   flex-wrap: wrap;
-  gap: $spacing-md;
+  gap: 16rpx;
 }
 
-.upload-item {
+.line-upload-item {
   position: relative;
-  width: calc(33.33% - 16rpx);
+  width: calc(33.33% - 12rpx);
   aspect-ratio: 1;
-  border-radius: $radius-xl;
+  border-radius: $line-radius-sm;
   overflow: hidden;
-  @include shadow-sm;
-  transition: all $transition-normal;
-  
-  &:active {
-    transform: scale(0.95);
-    @include shadow-card;
-  }
 }
 
-.upload-image {
+.line-upload-image-wrapper {
   width: 100%;
   height: 100%;
-  border-radius: $radius-xl;
+  position: relative;
 }
 
-.remove-btn {
+.line-upload-image {
+  width: 100%;
+  height: 100%;
+}
+
+.line-upload-image-border {
   position: absolute;
-  top: $spacing-xs;
-  right: $spacing-xs;
-  width: 52rpx;
-  height: 52rpx;
-  background: linear-gradient(135deg, rgba(231, 76, 60, 0.95) 0%, rgba(220, 53, 69, 0.95) 100%);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: $line-thin solid $line-border;
+  border-radius: $line-radius-sm;
+  pointer-events: none;
+}
+
+.line-remove-btn {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  width: 48rpx;
+  height: 48rpx;
+  background-color: #fff;
+  border: $line-thin solid $line-danger;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-size: $font-sm;
-  font-weight: 600;
-  box-shadow: 0 6rpx 16rpx rgba(231, 76, 60, 0.5);
-  transition: all $transition-fast;
-  animation: fadeIn 0.2s ease-out;
-  
-  &:active {
-    transform: scale(0.85);
-    box-shadow: 0 3rpx 8rpx rgba(231, 76, 60, 0.6);
-  }
+  color: $line-danger;
+  z-index: 10;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.upload-btn {
-  width: calc(33.33% - 16rpx);
+.line-upload-btn {
+  width: calc(33.33% - 12rpx);
   aspect-ratio: 1;
-  border: 4rpx dashed rgba(102, 126, 234, 0.4);
-  border-radius: $radius-xl;
+  border: $line-thin dashed $line-border;
+  border-radius: $line-radius-sm;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-  transition: all $transition-normal;
+  background-color: #fff;
+  transition: all 0.2s ease;
   
   &:active {
-    border-color: $primary-color;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.12) 100%);
-    transform: scale(0.96);
-    border-style: solid;
-  }
-  
-  &:hover {
-    border-color: $primary-color;
+    border-color: $line-accent;
+    background-color: rgba(63, 55, 201, 0.05);
   }
 }
 
-.upload-icon {
-  font-size: 64rpx;
-  color: $primary-color;
-  opacity: 0.7;
-  line-height: 1;
-  transition: all $transition-fast;
-  
-  .upload-btn:active & {
-    transform: scale(1.1);
-    opacity: 0.9;
-  }
-}
-
-.upload-text {
-  font-size: $font-xs;
-  color: $text-light;
-  margin-top: $spacing-xs;
-  transition: all $transition-fast;
-  
-  .upload-btn:active & {
-    color: $primary-color;
-  }
-}
-
-.form-input {
-  width: 100%;
-  height: 100rpx;
-  font-size: $font-md;
-  padding: 0 $spacing-lg;
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.02) 0%, rgba(124, 58, 237, 0.02) 100%);
-  border-radius: $radius-lg;
-  transition: all $transition-normal;
-  border: 2rpx solid transparent;
-  
-  &:focus {
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
-    border-color: rgba(79, 70, 229, 0.2);
-    box-shadow: 0 0 0 6rpx rgba(79, 70, 229, 0.12);
-  }
-}
-
-.form-textarea {
-  width: 100%;
-  height: 240rpx;
-  font-size: $font-md;
-  padding: $spacing-md;
-  background-color: $bg-color;
-  border-radius: $radius-lg;
-  transition: all $transition-fast;
-  
-  &:focus {
-    background-color: darken($bg-color, 2%);
-    box-shadow: 0 0 0 4rpx rgba(102, 126, 234, 0.15);
-  }
-}
-
-.textarea-count {
-  display: block;
-  text-align: right;
-  font-size: $font-xs;
-  color: $text-light;
-  margin-top: $spacing-sm;
-}
-
-.price-input-wrap {
+.line-upload-icon-box {
+  width: 56rpx;
+  height: 56rpx;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: $line-light;
 }
 
-.price-symbol {
-  font-size: 32rpx;
-  color: $accent-color;
-  font-weight: 700;
-  margin-right: $spacing-xs;
+.line-upload-text {
+  font-size: $line-font-sm;
+  color: $line-light;
+  margin-top: 8rpx;
 }
 
-.price-input {
-  flex: 1;
+.line-price-input-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0 24rpx;
+  border: $line-thin solid $line-border;
+  border-radius: $line-radius-sm;
   height: 96rpx;
+}
+
+.line-price-symbol {
+  font-size: 36rpx;
+  color: $line-accent;
+  font-weight: 700;
+  margin-right: 8rpx;
+}
+
+.line-price-input {
+  flex: 1;
+  height: 100%;
   font-size: 36rpx;
   font-weight: 700;
-  color: $text-primary;
-  text-align: left;
+  color: $line-primary;
 }
 
-.bottom-bar {
+.line-price-border {
+  position: absolute;
+  bottom: 0;
+  left: 24rpx;
+  right: 24rpx;
+  height: 2rpx;
+  background: repeating-linear-gradient(
+    90deg,
+    $line-accent 0rpx,
+    $line-accent 8rpx,
+    transparent 8rpx,
+    transparent 16rpx
+  );
+  opacity: 0.5;
+}
+
+.line-location-input-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding: 0 24rpx;
+  border: $line-thin solid $line-border;
+  border-radius: $line-radius-sm;
+  height: 96rpx;
+}
+
+.line-location-icon {
+  width: 40rpx;
+  height: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $line-accent;
+  margin-right: 12rpx;
+}
+
+.line-location-input {
+  flex: 1;
+  height: 100%;
+  font-size: $line-font-md;
+  color: $line-primary;
+}
+
+.line-location-border {
+  position: absolute;
+  bottom: 0;
+  left: 24rpx;
+  right: 24rpx;
+  height: 2rpx;
+  background: repeating-linear-gradient(
+    90deg,
+    $line-accent 0rpx,
+    $line-accent 8rpx,
+    transparent 8rpx,
+    transparent 16rpx
+  );
+  opacity: 0.5;
+}
+
+.line-bottom-space {
+  height: 40rpx;
+}
+
+.line-bottom-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: $spacing-md $spacing-lg;
-  padding-bottom: calc($spacing-md + constant(safe-area-inset-bottom));
-  padding-bottom: calc($spacing-md + env(safe-area-inset-bottom));
-  background-color: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(20rpx);
-  box-shadow: 0 -8rpx 40rpx rgba(102, 126, 234, 0.1);
-  border-top: 2rpx solid rgba(102, 126, 234, 0.06);
+  padding: 24rpx;
+  padding-bottom: calc(24rpx + constant(safe-area-inset-bottom));
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  background-color: #fff;
+  border-top: $line-thin solid $line-border;
+  z-index: 100;
 }
 
-.submit-btn {
-  height: 104rpx;
-  line-height: 104rpx;
-  text-align: center;
-  @include gradient-primary;
+.line-submit-btn {
+  height: 100rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: $line-normal solid $line-primary;
+  border-radius: $line-radius;
+  background-color: $line-primary;
   color: #fff;
-  border-radius: $radius-full;
-  font-size: $font-lg;
+  font-size: $line-font-lg;
   font-weight: 600;
-  box-shadow: 0 12rpx 36rpx rgba(102, 126, 234, 0.4);
-  transition: all $transition-fast;
-  letter-spacing: 4rpx;
+  letter-spacing: 2rpx;
+  transition: all 0.2s ease;
   
   &:active {
-    transform: scale(0.97);
-    box-shadow: 0 6rpx 18rpx rgba(102, 126, 234, 0.5);
+    transform: scale(0.98);
   }
   
   &.disabled {
-    opacity: 0.5;
-    box-shadow: none;
-    
-    &:active {
-      transform: none;
-    }
+    opacity: 0.4;
+    pointer-events: none;
   }
 }
-
-.form-placeholder {
-  padding: $spacing-xl;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-  border-radius: $radius-lg;
-  border: 2rpx dashed rgba(102, 126, 234, 0.2);
-  text-align: center;
-}
-
-.placeholder-text {
-  font-size: $font-sm;
-  color: $text-light;
-}
-
-.location-input {
-  display: flex;
-  align-items: center;
-  background-color: $bg-color;
-  border-radius: $radius-lg;
-  padding: $spacing-md $spacing-lg;
-  transition: all $transition-fast;
-  
-  &:focus-within {
-    box-shadow: 0 0 0 4rpx rgba(102, 126, 234, 0.15);
-    background-color: darken($bg-color, 2%);
-  }
-}
-
-.location-icon {
-  font-size: 40rpx;
-  margin-right: $spacing-md;
-}
-
-.location-text-input {
-  flex: 1;
-  font-size: $font-md;
-  color: $text-primary;
-}
-
 </style>

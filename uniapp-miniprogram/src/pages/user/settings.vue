@@ -1,114 +1,136 @@
 <template>
-  <view class="settings-container">
-    <view class="menu-group">
-      <view class="menu-item">
-        <view class="menu-icon">
-          <LineIcon name="bell" />
-        </view>
-        <text class="menu-label">交易提醒</text>
-        <switch class="menu-switch" :checked="settings.tradeReminder" @change="onTradeReminderChange" />
+  <view class="line-settings-container">
+    <view class="line-header-bar">
+      <view class="line-back-btn" @click="goBack">
+        <LineIcon name="arrow-left" />
       </view>
-      <view class="menu-item" @click="showPrivacySettings">
-        <view class="menu-icon">
-          <LineIcon name="users" />
-        </view>
-        <text class="menu-label">允许谁联系我</text>
-        <text class="menu-arrow">›</text>
+      <text class="line-header-title">设置</text>
+      <view class="line-header-right">
+        <view class="line-header-dot"></view>
       </view>
     </view>
 
-    <view class="menu-group">
-      <view class="menu-item" @click="clearCache">
-        <view class="menu-icon">
-          <LineIcon name="trash" />
+    <scroll-view class="line-content-scroll" scroll-y>
+      <view class="line-menu-group">
+        <view class="line-menu-item">
+          <view class="line-menu-icon">
+            <LineIcon name="bell" />
+          </view>
+          <text class="line-menu-label">交易提醒</text>
+          <switch class="line-menu-switch" :checked="settings.tradeReminder" @change="onTradeReminderChange" color="#3f37c9" />
         </view>
-        <text class="menu-label">清理缓存</text>
-        <text class="menu-value">{{ cacheSize }}</text>
-      </view>
-      <view class="menu-item" @click="checkUpdate">
-        <view class="menu-icon">
-          <LineIcon name="refresh" />
+        <view class="line-menu-item" @click="showPrivacySettings">
+          <view class="line-menu-icon">
+            <LineIcon name="users" />
+          </view>
+          <text class="line-menu-label">允许谁联系我</text>
+          <view class="line-menu-arrow">
+            <LineIcon name="chevron-right" />
+          </view>
         </view>
-        <text class="menu-label">版本更新</text>
-        <text class="menu-value">v1.0.0</text>
       </view>
-    </view>
 
-    <view class="menu-group">
-      <view class="menu-item" @click="showPrivacy">
-        <view class="menu-icon">
-          <LineIcon name="lock" />
+      <view class="line-menu-group">
+        <view class="line-menu-item" @click="clearCache">
+          <view class="line-menu-icon">
+            <LineIcon name="trash" />
+          </view>
+          <text class="line-menu-label">清理缓存</text>
+          <text class="line-menu-value">{{ cacheSize }}</text>
         </view>
-        <text class="menu-label">隐私政策</text>
-        <text class="menu-arrow">›</text>
-      </view>
-      <view class="menu-item" @click="showAgreement">
-        <view class="menu-icon">
-          <LineIcon name="file" />
+        <view class="line-menu-item" @click="checkUpdate">
+          <view class="line-menu-icon">
+            <LineIcon name="refresh" />
+          </view>
+          <text class="line-menu-label">版本更新</text>
+          <text class="line-menu-value">v1.0.0</text>
         </view>
-        <text class="menu-label">用户协议</text>
-        <text class="menu-arrow">›</text>
       </view>
-      <view class="menu-item" @click="showAbout">
-        <view class="menu-icon">
-          <LineIcon name="info" />
-        </view>
-        <text class="menu-label">关于我们</text>
-        <text class="menu-arrow">›</text>
-      </view>
-    </view>
 
-    <view class="menu-group">
-      <view class="menu-item" @click="handleLogout">
-        <view class="menu-icon">
-          <LineIcon name="door" />
+      <view class="line-menu-group">
+        <view class="line-menu-item" @click="showPrivacy">
+          <view class="line-menu-icon">
+            <LineIcon name="lock" />
+          </view>
+          <text class="line-menu-label">隐私政策</text>
+          <view class="line-menu-arrow">
+            <LineIcon name="chevron-right" />
+          </view>
         </view>
-        <text class="menu-label logout-text">退出登录</text>
+        <view class="line-menu-item" @click="showAgreement">
+          <view class="line-menu-icon">
+            <LineIcon name="file" />
+          </view>
+          <text class="line-menu-label">用户协议</text>
+          <view class="line-menu-arrow">
+            <LineIcon name="chevron-right" />
+          </view>
+        </view>
+        <view class="line-menu-item" @click="showAbout">
+          <view class="line-menu-icon">
+            <LineIcon name="info" />
+          </view>
+          <text class="line-menu-label">关于我们</text>
+          <view class="line-menu-arrow">
+            <LineIcon name="chevron-right" />
+          </view>
+        </view>
       </view>
-    </view>
 
-    <view class="popup-mask" v-if="showPopup" @click="closePopup">
-      <view class="popup-content" @click.stop>
-        <view class="popup-header">
-          <text class="popup-title">{{ popupTitle }}</text>
+      <view class="line-menu-group">
+        <view class="line-menu-item" @click="handleLogout">
+          <view class="line-menu-icon">
+            <LineIcon name="door" />
+          </view>
+          <text class="line-menu-label line-logout-text">退出登录</text>
         </view>
-        <scroll-view class="popup-body" scroll-y="true">
-          <view class="popup-text">
+      </view>
+
+      <view class="line-bottom-space"></view>
+    </scroll-view>
+
+    <view class="line-popup-mask" v-if="showPopup" @click="closePopup">
+      <view class="line-popup-content" @click.stop>
+        <view class="line-popup-header">
+          <text class="line-popup-title">{{ popupTitle }}</text>
+        </view>
+        <scroll-view class="line-popup-body" scroll-y="true">
+          <view class="line-popup-text">
             <block v-for="(txt, idx) in popupText" :key="idx">
-              <text class="text-line" v-if="txt">{{ txt }}</text>
-              <view class="empty-line" v-else></view>
+              <text class="line-text-line" v-if="txt">{{ txt }}</text>
+              <view class="line-empty-line" v-else></view>
             </block>
           </view>
         </scroll-view>
-        <view class="popup-footer">
-          <view class="popup-btn" @click="closePopup">确认</view>
+        <view class="line-popup-footer">
+          <view class="line-popup-btn" @click="closePopup">确认</view>
         </view>
       </view>
     </view>
 
-    <view class="popup-mask" v-if="showPrivacyPopup" @click="closePrivacyPopup">
-      <view class="popup-content" @click.stop>
-        <view class="popup-header">
-          <text class="popup-title">允许谁联系我</text>
+    <view class="line-popup-mask" v-if="showPrivacyPopup" @click="closePrivacyPopup">
+      <view class="line-popup-content" @click.stop>
+        <view class="line-popup-header">
+          <text class="line-popup-title">允许谁联系我</text>
         </view>
-        <view class="popup-body">
+        <view class="line-popup-body">
           <radio-group @change="onPrivacyChange">
-            <label class="privacy-option">
-              <radio value="all" :checked="privacySetting === 'all'" />
-              <text class="privacy-label">所有人</text>
+            <label class="line-privacy-option">
+              <radio value="all" :checked="privacySetting === 'all'" color="#3f37c9" />
+              <text class="line-privacy-label">所有人</text>
             </label>
-            <label class="privacy-option">
-              <radio value="friend" :checked="privacySetting === 'friend'" />
-              <text class="privacy-label">仅好友</text>
+            <label class="line-privacy-option">
+              <radio value="friend" :checked="privacySetting === 'friend'" color="#3f37c9" />
+              <text class="line-privacy-label">仅好友</text>
             </label>
-            <label class="privacy-option">
-              <radio value="none" :checked="privacySetting === 'none'" />
-              <text class="privacy-label">不允许</text>
+            <label class="line-privacy-option">
+              <radio value="none" :checked="privacySetting === 'none'" color="#3f37c9" />
+              <text class="line-privacy-label">不允许</text>
             </label>
           </radio-group>
         </view>
-        <view class="popup-footer">
-          <view class="popup-btn" @click="closePrivacyPopup">确认</view>
+        <view class="line-popup-footer">
+          <view class="line-popup-btn" @click="closePrivacyPopup">确认</view>
         </view>
       </view>
     </view>
@@ -222,6 +244,10 @@ const agreementContent = [
   '本平台仅提供二手闲置的信息发布和展示，也不参与用户之间二手闲置的资金交易，也不收取任何交易费用，用户双方在私下交易过程中产生的纠纷或不法侵害或造成损失的，本平台概不负责，请自行甄别信息，自行把控，您已同意和其他用户当面交易验货，本平台概不负责，请自行甄别信息，自行把控，您已同意和其他用户当面交易验货。'
 ]
 
+function goBack() {
+  uni.navigateBack()
+}
+
 onMounted(() => {
   const saved = uni.getStorageSync('settings')
   if (saved) {
@@ -311,64 +337,96 @@ function handleLogout() {
 }
 </script>
 
-<style>
-.settings-container {
+<style lang="scss" scoped>
+@import '@/styles/line-ui.scss';
+
+.line-settings-container {
   min-height: 100vh;
-  background-color: #f5f5f5;
-  padding: 20rpx;
+  background-color: $line-bg;
+  display: flex;
+  flex-direction: column;
 }
 
-.menu-group {
-  background-color: #ffffff;
-  border-radius: 20rpx;
-  margin-bottom: 20rpx;
+.line-content-scroll {
+  flex: 1;
+  padding: 24rpx;
+  padding-bottom: 40rpx;
+}
+
+.line-menu-group {
+  background-color: #fff;
+  border: $line-normal solid $line-border;
+  border-radius: $line-radius;
+  margin-bottom: 24rpx;
   overflow: hidden;
+  position: relative;
 }
 
-.menu-item {
+.line-menu-group::before {
+  content: '';
+  position: absolute;
+  top: -6rpx;
+  left: 24rpx;
+  right: 24rpx;
+  height: 6rpx;
+  background: repeating-linear-gradient(
+    90deg,
+    $line-border 0rpx,
+    $line-border 8rpx,
+    transparent 8rpx,
+    transparent 16rpx
+  );
+}
+
+.line-menu-item {
   display: flex;
   align-items: center;
   padding: 30rpx;
-  border-bottom: 1rpx solid #f0f0f0;
+  border-bottom: $line-thin dashed $line-border;
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
-.menu-item:last-child {
-  border-bottom: none;
-}
-
-.menu-icon {
+.line-menu-icon {
   width: 36rpx;
   height: 36rpx;
   margin-right: 20rpx;
+  color: $line-primary;
 }
 
-.menu-label {
+.line-menu-label {
   flex: 1;
-  font-size: 28rpx;
-  color: #333333;
+  font-size: $line-font-md;
+  color: $line-primary;
 }
 
-.logout-text {
-  color: #ff4d4f;
+.line-logout-text {
+  color: $line-danger;
 }
 
-.menu-value {
-  font-size: 26rpx;
-  color: #999999;
+.line-menu-value {
+  font-size: $line-font-sm;
+  color: $line-light;
   margin-right: 10rpx;
 }
 
-.menu-arrow {
-  font-size: 36rpx;
-  color: #cccccc;
+.line-menu-arrow {
+  width: 24rpx;
+  height: 24rpx;
+  color: $line-light;
 }
 
-.menu-switch {
+.line-menu-switch {
   transform: scale(0.9);
 }
 
+.line-bottom-space {
+  height: 40rpx;
+}
+
 /* 弹窗样式 */
-.popup-mask {
+.line-popup-mask {
   position: fixed;
   top: 0;
   left: 0;
@@ -381,30 +439,31 @@ function handleLogout() {
   z-index: 99999;
 }
 
-.popup-content {
+.line-popup-content {
   width: 680rpx;
   max-height: 80vh;
   background-color: #ffffff;
-  border-radius: 20rpx;
+  border: $line-normal solid $line-primary;
+  border-radius: $line-radius;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-.popup-header {
+.line-popup-header {
   padding: 30rpx;
   text-align: center;
   background-color: #ffffff;
-  border-bottom: 1rpx solid #f0f0f0;
+  border-bottom: $line-thin solid $line-border;
 }
 
-.popup-title {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333333;
+.line-popup-title {
+  font-size: $line-font-lg;
+  font-weight: 600;
+  color: $line-primary;
 }
 
-.popup-body {
+.line-popup-body {
   flex: 1;
   padding: 30rpx 15rpx 30rpx 30rpx;
   max-height: 60vh;
@@ -414,39 +473,58 @@ function handleLogout() {
   width: calc(100% + 15rpx);
   margin-right: -5rpx;
 }
-.popup-body::-webkit-scrollbar {
+
+.line-popup-body::-webkit-scrollbar {
   display: none;
   width: 0;
   height: 0;
   background: transparent;
 }
 
-.popup-text {
+.line-popup-text {
   line-height: 1.8;
 }
 
-.text-line {
+.line-text-line {
   display: block;
-  font-size: 28rpx;
-  color: #333333;
+  font-size: $line-font-sm;
+  color: $line-primary;
   margin-bottom: 12rpx;
 }
 
-.empty-line {
+.line-empty-line {
   height: 15rpx;
 }
 
-.popup-footer {
+.line-popup-footer {
   padding: 25rpx 30rpx;
+  border-top: $line-thin solid $line-border;
 }
 
-.popup-btn {
+.line-popup-btn {
   text-align: center;
   padding: 25rpx;
-  background: linear-gradient(180deg, #ff6b6b 0%, #ff4757 100%);
+  background-color: $line-primary;
+  border: $line-normal solid $line-primary;
   color: #ffffff;
-  border-radius: 10rpx;
-  font-size: 30rpx;
-  font-weight: bold;
+  border-radius: $line-radius-sm;
+  font-size: $line-font-md;
+  font-weight: 600;
+}
+
+.line-privacy-option {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: $line-thin dashed $line-border;
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.line-privacy-label {
+  margin-left: 16rpx;
+  font-size: $line-font-md;
+  color: $line-primary;
 }
 </style>

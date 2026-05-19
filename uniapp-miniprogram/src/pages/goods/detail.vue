@@ -1,68 +1,106 @@
 <template>
-  <view class="container">
-    <scroll-view class="content-scroll" scroll-y>
-      <view class="sold-badge" v-if="isSold">
-        <text class="sold-text">已售出</text>
+  <view class="line-container">
+    <view class="line-header-bar">
+      <view class="line-back-btn" @click="goBack">
+        <LineIcon name="arrow-left" />
       </view>
-
-      <image class="goods-image" :src="getImageUrl(goods?.images?.[0])" mode="aspectFill" @error="handleImageError($event)" />
-
-      <view class="goods-header">
-        <text class="goods-price">¥{{ goods?.price }}</text>
+      <text class="line-header-title">商品详情</text>
+      <view class="line-header-right">
+        <view class="line-header-dot"></view>
       </view>
+    </view>
 
-      <view class="goods-info">
-        <text class="goods-name">{{ goods?.name }}</text>
-        <text class="goods-desc">{{ goods?.description }}</text>
-      </view>
-
-      <view class="goods-meta">
-        <view class="meta-item">
-          <text class="meta-label">分类</text>
-          <text class="meta-value">{{ getCategoryText(goods?.category) }}</text>
+    <scroll-view class="line-content-scroll" scroll-y>
+      <view class="line-image-section">
+        <view class="line-image-wrapper">
+          <image class="line-goods-image" :src="getImageUrl(goods?.images?.[0])" mode="aspectFill" @error="handleImageError($event)" />
+          <view class="line-image-border"></view>
         </view>
-        <view class="meta-item">
-          <text class="meta-label">发布时间</text>
-          <text class="meta-value">{{ formatDate(goods?.createdAt) }}</text>
+        <view class="line-sold-badge" v-if="isSold">
+          <text class="line-sold-text">已售出</text>
         </view>
       </view>
 
-      <view class="seller-info">
-        <text class="section-title">卖家信息</text>
-        <view class="seller-card">
-          <image class="seller-avatar" :src="getImageUrl(goods?.seller?.avatar)" mode="aspectFill" />
-          <view class="seller-detail">
-            <text class="seller-name">{{ goods?.seller?.nickname || goods?.seller?.name || '用户' }}</text>
-            <text class="seller-role">{{ goods?.seller?.role === 'admin' ? '管理员' : '普通用户' }}</text>
+      <view class="line-price-section">
+        <view class="line-price-wrapper">
+          <view class="line-currency">¥</view>
+          <text class="line-price">{{ goods?.price }}</text>
+        </view>
+        <view class="line-price-line"></view>
+      </view>
+
+      <view class="line-info-card">
+        <text class="line-goods-name">{{ goods?.name }}</text>
+        <text class="line-goods-desc">{{ goods?.description }}</text>
+      </view>
+
+      <view class="line-meta-card">
+        <view class="line-meta-item">
+          <text class="line-meta-label">分类</text>
+          <view class="line-meta-value-wrapper">
+            <text class="line-meta-value">{{ getCategoryText(goods?.category) }}</text>
+          </view>
+        </view>
+        <view class="line-divider"></view>
+        <view class="line-meta-item">
+          <text class="line-meta-label">发布时间</text>
+          <view class="line-meta-value-wrapper">
+            <text class="line-meta-value">{{ formatDate(goods?.createdAt) }}</text>
           </view>
         </view>
       </view>
+
+      <view class="line-seller-card">
+        <view class="line-seller-header">
+          <view class="line-seller-icon">
+            <LineIcon name="user" />
+          </view>
+          <text class="line-seller-title">卖家信息</text>
+          <view class="line-seller-line"></view>
+        </view>
+        <view class="line-seller-detail">
+          <view class="line-seller-avatar-wrapper">
+            <image class="line-seller-avatar" :src="getImageUrl(goods?.seller?.avatar)" mode="aspectFill" />
+            <view class="line-avatar-border"></view>
+          </view>
+          <view class="line-seller-info">
+            <text class="line-seller-name">{{ goods?.seller?.nickname || goods?.seller?.name || '用户' }}</text>
+            <view class="line-seller-role-tag">
+              <text class="line-seller-role">{{ goods?.seller?.role === 'admin' ? '管理员' : '普通用户' }}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="line-bottom-space"></view>
     </scroll-view>
 
-    <view class="bottom-bar" :class="{ 'disabled': isSold && !isFromFavorite }">
-      <view class="bottom-left">
-        <view class="action-item" @click="goToChat">
-          <view class="action-icon">
+    <view class="line-bottom-bar" :class="{ 'disabled': isSold && !isFromFavorite }">
+      <view class="line-bottom-left">
+        <view class="line-action-item" @click="goToChat">
+          <view class="line-action-icon">
             <LineIcon name="chat" />
           </view>
-          <text class="action-text">聊天</text>
+          <text class="line-action-text">聊天</text>
         </view>
-        <view class="action-item" @click="collect">
-          <view class="action-icon">
+        <view class="line-action-item" @click="collect">
+          <view class="line-action-icon">
             <LineIcon name="heart" :active="collected" />
           </view>
-          <text class="action-text">{{ collected ? '已收藏' : '收藏' }}</text>
+          <text class="line-action-text">{{ collected ? '已收藏' : '收藏' }}</text>
         </view>
-        <view class="action-item" @click="handleShare">
-          <view class="action-icon">
+        <view class="line-action-item" @click="handleShare">
+          <view class="line-action-icon">
             <LineIcon name="share" />
           </view>
-          <text class="action-text">分享</text>
+          <text class="line-action-text">分享</text>
         </view>
       </view>
-      <view class="bottom-right">
-        <view class="btn-secondary" @click="goToContactSeller">联系卖家</view>
-        <view class="btn-primary" :class="{ 'btn-disabled': isSold }" @click="buyNow">{{ isSold ? '已售出' : '立即购买' }}</view>
+      <view class="line-bottom-right">
+        <view class="line-btn-outline" @click="goToContactSeller">联系卖家</view>
+        <view class="line-btn-primary" :class="{ 'disabled': isSold }" @click="buyNow">
+          <text class="line-btn-text">{{ isSold ? '已售出' : '立即购买' }}</text>
+        </view>
       </view>
     </view>
   </view>
@@ -131,6 +169,10 @@ function formatDate(dateStr?: string) {
   return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`
 }
 
+function goBack() {
+  uni.navigateBack()
+}
+
 function goToChat() {
   if (!userStore.token) {
     uni.showModal({
@@ -168,11 +210,11 @@ async function collect() {
     if (collected.value) {
       await removeFavorite(goods.value?.id?.toString() || '')
       collected.value = false
-      uni.showToast({ title: '取消收藏', icon: 'success' })
+      uni.showToast({ title: '取消收藏', icon: 'none' })
     } else {
       await addFavorite(goods.value?.id?.toString() || '')
       collected.value = true
-      uni.showToast({ title: '收藏成功', icon: 'success' })
+      uni.showToast({ title: '收藏成功', icon: 'none' })
     }
   } catch (err: any) {
     uni.showToast({ title: err.message || '操作失败', icon: 'none' })
@@ -210,7 +252,7 @@ function handleShare() {
         uni.setClipboardData({
           data: shareUrl,
           success: () => {
-            uni.showToast({ title: '链接已复制', icon: 'success' })
+            uni.showToast({ title: '链接已复制', icon: 'none' })
           }
         })
       } else if (res.tapIndex === 1) {
@@ -275,7 +317,7 @@ async function buyNow() {
               signType: 'MD5',
               paySign: payResult.payData?.sign || '',
               success: () => {
-                uni.showToast({ title: '支付成功', icon: 'success' })
+                uni.showToast({ title: '支付成功', icon: 'none' })
                 setTimeout(() => {
                   uni.navigateBack()
                 }, 1500)
@@ -286,7 +328,7 @@ async function buyNow() {
             })
           } else {
             uni.hideLoading()
-            uni.showToast({ title: '下单成功', icon: 'success' })
+            uni.showToast({ title: '下单成功', icon: 'none' })
             setTimeout(() => {
               uni.navigateBack()
             }, 1500)
@@ -330,271 +372,428 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/variables.scss';
+@import '@/styles/line-ui.scss';
 
-.container {
+.line-container {
   min-height: 100vh;
-  background-color: $bg-color;
+  background-color: $line-bg;
   display: flex;
   flex-direction: column;
 }
 
-.content-scroll {
-  flex: 1;
-  padding-bottom: 180rpx;
-}
-
-.goods-image {
-  width: 100%;
-  height: 750rpx;
-  background: linear-gradient(135deg, #f8f9ff 0%, #e8edff 100%);
-}
-
-.goods-header {
-  background-color: $bg-white;
-  padding: $spacing-lg;
+.line-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 32rpx;
+  padding-top: calc(20rpx + env(safe-area-inset-top));
+  background-color: white;
   position: relative;
+  z-index: 100;
+  border-bottom: 3rpx solid $line-primary;
 }
 
-.goods-price {
-  font-size: 64rpx;
-  font-weight: 700;
-  color: $accent-color;
+.line-back-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+.line-header-title {
+  font-size: $line-font-lg;
+  font-weight: 600;
+  color: $line-primary;
+  letter-spacing: 4rpx;
+}
+
+.line-header-right {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.line-header-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border: 3rpx solid $line-primary;
+  border-radius: 50%;
+}
+
+.line-content-scroll {
+  flex: 1;
+  padding-bottom: 200rpx;
+}
+
+.line-image-section {
+  position: relative;
+  width: 100%;
+}
+
+.line-image-wrapper {
+  width: 100%;
+  height: 680rpx;
+  overflow: hidden;
+  position: relative;
+  background-color: white;
+  border-bottom: 3rpx solid $line-primary;
+}
+
+.line-goods-image {
+  width: 100%;
+  height: 100%;
+}
+
+.line-image-border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  border: 2rpx dashed $line-border;
+  margin: 24rpx;
+  border-radius: $line-radius-lg;
+}
+
+.line-sold-badge {
+  position: absolute;
+  top: 40rpx;
+  left: 32rpx;
+  z-index: 20;
+  border: 4rpx solid $line-danger;
+  background-color: white;
+  padding: 16rpx 32rpx;
+  border-radius: $line-radius;
+}
+
+.line-sold-text {
+  color: $line-danger;
+  font-size: $line-font-md;
+  font-weight: 600;
   letter-spacing: 2rpx;
 }
 
-.goods-info {
-  background-color: $bg-white;
-  margin: $spacing-md $spacing-lg;
-  padding: $spacing-xl;
-  border-radius: $radius-xl;
-  @include shadow-card;
-  border: 2rpx solid rgba(102, 126, 234, 0.06);
+.line-price-section {
+  background-color: white;
+  padding: 40rpx 32rpx;
+  border-bottom: 3rpx solid $line-primary;
 }
 
-.goods-name {
-  display: block;
-  font-size: $font-xl;
+.line-price-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+}
+
+.line-currency {
+  font-size: $line-font-lg;
+  font-weight: 600;
+  color: $line-accent;
+  letter-spacing: 2rpx;
+}
+
+.line-price {
+  font-size: 72rpx;
   font-weight: 700;
-  color: $text-primary;
-  margin-bottom: $spacing-md;
+  color: $line-accent;
+  letter-spacing: 4rpx;
+}
+
+.line-price-line {
+  width: 120rpx;
+  height: 4rpx;
+  background-color: $line-accent;
+  margin-top: 16rpx;
+}
+
+.line-info-card {
+  margin: 24rpx 32rpx;
+  background-color: white;
+  border: 3rpx solid $line-primary;
+  border-radius: $line-radius-lg;
+  padding: 32rpx;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 12rpx;
+    left: 12rpx;
+    right: 12rpx;
+    bottom: 12rpx;
+    border: 1rpx dashed $line-border;
+    border-radius: 8rpx;
+    pointer-events: none;
+  }
+}
+
+.line-goods-name {
+  display: block;
+  font-size: $line-font-xl;
+  font-weight: 600;
+  color: $line-primary;
+  margin-bottom: 20rpx;
   line-height: 1.4;
+  letter-spacing: 2rpx;
 }
 
-.goods-desc {
-  font-size: $font-md;
-  color: $text-secondary;
-  line-height: 1.7;
+.line-goods-desc {
+  font-size: $line-font-md;
+  color: $line-secondary;
+  line-height: 1.8;
+  letter-spacing: 1rpx;
 }
 
-.goods-meta {
-  background-color: $bg-white;
-  margin: $spacing-md $spacing-lg;
-  padding: $spacing-xl;
-  border-radius: $radius-xl;
-  @include shadow-card;
-  border: 2rpx solid rgba(102, 126, 234, 0.06);
+.line-meta-card {
+  margin: 24rpx 32rpx;
+  background-color: white;
+  border: 3rpx solid $line-primary;
+  border-radius: $line-radius-lg;
+  padding: 32rpx;
 }
 
-.meta-item {
+.line-meta-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $spacing-md 0;
-  border-bottom: 2rpx solid $border-color;
-  
-  &:last-child {
-    border-bottom: none;
-  }
 }
 
-.meta-label {
-  font-size: $font-md;
-  color: $text-light;
+.line-meta-label {
+  font-size: $line-font-md;
+  color: $line-light;
   font-weight: 500;
+  letter-spacing: 2rpx;
 }
 
-.meta-value {
-  font-size: $font-md;
-  color: $text-primary;
+.line-meta-value-wrapper {
+  border: 2rpx solid $line-border;
+  padding: 12rpx 24rpx;
+  border-radius: $line-radius;
+}
+
+.line-meta-value {
+  font-size: $line-font-md;
+  color: $line-primary;
   font-weight: 600;
+  letter-spacing: 1rpx;
 }
 
-.seller-info {
-  background-color: $bg-white;
-  margin: $spacing-md $spacing-lg;
-  padding: $spacing-xl;
-  border-radius: $radius-xl;
-  @include shadow-card;
-  border: 2rpx solid rgba(102, 126, 234, 0.06);
+.line-divider {
+  height: 2rpx;
+  background-color: $line-border;
+  margin: 24rpx 0;
 }
 
-.section-title {
-  display: block;
-  font-size: $font-lg;
-  font-weight: 700;
-  color: $text-primary;
-  margin-bottom: $spacing-md;
+.line-seller-card {
+  margin: 24rpx 32rpx;
+  background-color: white;
+  border: 3rpx solid $line-primary;
+  border-radius: $line-radius-lg;
+  padding: 32rpx;
 }
 
-.seller-card {
+.line-seller-header {
   display: flex;
   align-items: center;
-  padding: $spacing-lg;
-  @include gradient-bg;
-  border-radius: $radius-lg;
-  transition: all $transition-normal;
-  
-  &:active {
-    transform: scale(0.98);
-    @include shadow-sm;
-  }
+  gap: 16rpx;
+  margin-bottom: 24rpx;
 }
 
-.seller-avatar {
-  width: 140rpx;
-  height: 140rpx;
+.line-seller-icon {
+  width: 40rpx;
+  height: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.line-seller-title {
+  font-size: $line-font-lg;
+  font-weight: 600;
+  color: $line-primary;
+  letter-spacing: 3rpx;
+}
+
+.line-seller-line {
+  flex: 1;
+  height: 3rpx;
+  background-color: $line-border;
+  margin-left: 16rpx;
+}
+
+.line-seller-detail {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 24rpx;
+  border: 2rpx dashed $line-border;
+  border-radius: $line-radius;
+}
+
+.line-seller-avatar-wrapper {
+  position: relative;
+  width: 120rpx;
+  height: 120rpx;
+}
+
+.line-seller-avatar {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  border: 4rpx solid rgba(102, 126, 234, 0.1);
 }
 
-.seller-detail {
-  margin-left: $spacing-lg;
+.line-avatar-border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 3rpx solid $line-primary;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.line-seller-info {
   flex: 1;
 }
 
-.seller-name {
+.line-seller-name {
   display: block;
-  font-size: $font-lg;
+  font-size: $line-font-lg;
   font-weight: 600;
-  color: $text-primary;
-  margin-bottom: $spacing-xs;
+  color: $line-primary;
+  margin-bottom: 12rpx;
+  letter-spacing: 2rpx;
 }
 
-.seller-role {
-  font-size: $font-sm;
-  color: $text-light;
+.line-seller-role-tag {
+  display: inline-flex;
+  align-items: center;
+  border: 2rpx solid $line-border;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
 }
 
-.bottom-bar {
+.line-seller-role {
+  font-size: $line-font-sm;
+  color: $line-light;
+  letter-spacing: 1rpx;
+}
+
+.line-bottom-space {
+  height: 80rpx;
+}
+
+.line-bottom-bar {
   position: fixed;
-  bottom: 40rpx;
+  bottom: 24rpx;
   left: 24rpx;
   right: 24rpx;
-  height: 100rpx;
-  background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,1) 100%);
-  backdrop-filter: blur(24rpx);
+  background-color: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20rpx;
-  box-shadow: 0 -4rpx 20rpx rgba(79, 70, 229, 0.06);
-  border-radius: 28rpx;
+  padding: 16rpx 20rpx;
+  border: 4rpx solid $line-primary;
+  border-radius: $line-radius-lg;
+  z-index: 200;
+  transition: all 0.2s ease;
 }
 
-.bottom-left {
+.line-bottom-bar.disabled {
+  opacity: 0.5;
+}
+
+.line-bottom-left {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 24rpx;
+  gap: 28rpx;
 }
 
-.action-item {
+.line-action-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 60rpx;
-  height: 100%;
-  padding: 4rpx 0;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 6rpx;
+  transition: all 0.2s ease;
   
   &:active {
-    transform: scale(0.85);
-    opacity: 0.5;
+    transform: scale(0.9);
   }
 }
 
-.action-icon {
-  width: 34rpx;
-  height: 34rpx;
-}
-
-.action-text {
-  font-size: 16rpx;
-  color: #999;
-  margin-top: 2rpx;
-  font-weight: 400;
-}
-
-.bottom-right {
+.line-action-icon {
+  width: 40rpx;
+  height: 40rpx;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
+}
+
+.line-action-text {
+  font-size: $line-font-sm;
+  color: $line-light;
+  letter-spacing: 1rpx;
+  font-weight: 500;
+}
+
+.line-bottom-right {
+  display: flex;
+  align-items: center;
   gap: 16rpx;
 }
 
-.btn-secondary {
-  width: 180rpx;
-  height: 88rpx;
-  line-height: 88rpx;
-  text-align: center;
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.08) 0%, rgba(124, 58, 237, 0.08) 100%);
-  color: #4F46E5;
-  border-radius: 44rpx;
-  font-size: 30rpx;
+.line-btn-outline {
+  border: 3rpx solid $line-primary;
+  color: $line-primary;
+  padding: 16rpx 32rpx;
+  border-radius: $line-radius;
+  font-size: $line-font-md;
   font-weight: 600;
-  border: 2rpx solid rgba(79, 70, 229, 0.15);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 2rpx;
+  transition: all 0.2s ease;
   
   &:active {
-    transform: scale(0.96);
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(124, 58, 237, 0.15) 100%);
+    background-color: $line-primary;
+    color: white;
+    transform: scale(0.95);
   }
 }
 
-.btn-primary {
-  width: 220rpx;
-  height: 88rpx;
-  line-height: 88rpx;
-  text-align: center;
-  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-  color: #fff;
-  border-radius: 44rpx;
-  font-size: 30rpx;
+.line-btn-primary {
+  border: 3rpx solid $line-accent;
+  background-color: white;
+  color: $line-accent;
+  padding: 16rpx 36rpx;
+  border-radius: $line-radius;
   font-weight: 600;
-  box-shadow: 0 10rpx 32rpx rgba(79, 70, 229, 0.4);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 2rpx;
+  transition: all 0.2s ease;
   
   &:active {
-    transform: scale(0.96);
-    box-shadow: 0 6rpx 20rpx rgba(79, 70, 229, 0.5);
+    background-color: $line-accent;
+    color: white;
+    transform: scale(0.95);
   }
 }
 
-.btn-disabled {
-  background: linear-gradient(135deg, #d9d9d9 0%, #bfbfbf 100%) !important;
-  box-shadow: none !important;
+.line-btn-primary.disabled {
+  border-color: $line-border;
+  color: $line-light;
+  pointer-events: none;
 }
 
-.sold-badge {
-  position: absolute;
-  top: $spacing-xl;
-  left: $spacing-xl;
-  z-index: 10;
-  background: linear-gradient(135deg, $accent-color 0%, #dc3545 100%);
-  padding: $spacing-sm $spacing-lg;
-  border-radius: $radius-md;
-  box-shadow: 0 6rpx 20rpx rgba(231, 76, 60, 0.4);
-}
-
-.sold-text {
-  color: #fff;
-  font-size: $font-md;
-  font-weight: 600;
-}
-
-.disabled {
-  opacity: 0.5;
+.line-btn-text {
+  font-size: $line-font-md;
 }
 </style>

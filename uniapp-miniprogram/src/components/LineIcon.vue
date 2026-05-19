@@ -122,6 +122,28 @@
         <view class="door-shape"></view>
         <view class="door-handle"></view>
       </view>
+      
+      <!-- 左箭头 -->
+      <view v-else-if="name === 'arrow-left'" class="icon-arrow-left">
+        <view class="arrow-l"></view>
+      </view>
+      
+      <!-- 右箭头 -->
+      <view v-else-if="name === 'chevron-right'" class="icon-chevron-right">
+        <view class="chevron-r"></view>
+      </view>
+      
+      <!-- 关闭图标 -->
+      <view v-else-if="name === 'close'" class="icon-close">
+        <view class="close-line1"></view>
+        <view class="close-line2"></view>
+      </view>
+      
+      <!-- 位置图标 -->
+      <view v-else-if="name === 'location'" class="icon-location">
+        <view class="location-shape"></view>
+        <view class="location-dot"></view>
+      </view>
     </view>
   </view>
 </template>
@@ -1053,6 +1075,127 @@ defineProps<{
 .icon-active .icon-door {
   .door-shape, .door-handle {
     border-color: #4F46E5;
+  }
+}
+
+/* 左箭头 */
+.icon-arrow-left {
+  width: 24rpx;
+  height: 24rpx;
+  position: relative;
+  
+  .arrow-l {
+    width: 0;
+    height: 0;
+    border-top: 10rpx solid transparent;
+    border-bottom: 10rpx solid transparent;
+    border-right: 14rpx solid #999;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.icon-active .icon-arrow-left {
+  .arrow-l {
+    border-right-color: #4F46E5;
+  }
+}
+
+/* 右箭头 */
+.icon-chevron-right {
+  width: 20rpx;
+  height: 20rpx;
+  position: relative;
+  
+  .chevron-r {
+    width: 8rpx;
+    height: 8rpx;
+    border-right: 3rpx solid #999;
+    border-bottom: 3rpx solid #999;
+    transform: rotate(-45deg);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+}
+
+.icon-active .icon-chevron-right {
+  .chevron-r {
+    border-color: #4F46E5;
+  }
+}
+
+/* 关闭图标 */
+.icon-close {
+  width: 24rpx;
+  height: 24rpx;
+  position: relative;
+  
+  .close-line1, .close-line2 {
+    position: absolute;
+    width: 20rpx;
+    height: 3rpx;
+    background-color: #999;
+    border-radius: 2rpx;
+    top: 50%;
+    left: 50%;
+  }
+  
+  .close-line1 {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+  
+  .close-line2 {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+}
+
+.icon-active .icon-close {
+  .close-line1, .close-line2 {
+    background-color: #4F46E5;
+  }
+}
+
+/* 位置图标 */
+.icon-location {
+  width: 24rpx;
+  height: 32rpx;
+  position: relative;
+  
+  .location-shape {
+    width: 20rpx;
+    height: 26rpx;
+    border: 3rpx solid #999;
+    border-radius: 10rpx 10rpx 10rpx 10rpx;
+    border-bottom-left-radius: 50%;
+    border-bottom-right-radius: 50%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .location-dot {
+    width: 8rpx;
+    height: 8rpx;
+    background-color: #999;
+    border-radius: 50%;
+    position: absolute;
+    top: 8rpx;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+.icon-active .icon-location {
+  .location-shape {
+    border-color: #4F46E5;
+  }
+  .location-dot {
+    background-color: #4F46E5;
   }
 }
 </style>

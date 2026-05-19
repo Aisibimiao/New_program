@@ -1,48 +1,56 @@
 <template>
-  <view class="container">
-    <view class="header-bar">
-      <text class="title">我的收藏</text>
-      <text class="count">共 {{ favorites.length }} 件商品</text>
+  <view class="line-favorite-container">
+    <view class="line-header-bar">
+      <view class="line-back-btn" @click="goBack">
+        <LineIcon name="arrow-left" />
+      </view>
+      <text class="line-header-title">我的收藏</text>
+      <view class="line-header-right">
+        <text class="line-count">{{ favorites.length }} 件</text>
+      </view>
     </view>
 
     <scroll-view
-      class="favorite-scroll"
+      class="line-favorite-scroll"
       scroll-y
       :refresher-enabled="true"
       :refresher-triggered="refreshing"
       @refresherrefresh="onRefresh"
     >
-      <view class="favorite-list">
+      <view class="line-favorite-list">
         <view
-          class="favorite-item"
+          class="line-favorite-item"
           v-for="item in favorites"
           :key="item.id"
         >
-          <view class="goods-card" @click="goToDetail(item.goodsId, item.goods?.status)">
-            <view class="sold-tag" v-if="item.goods?.status === 'SOLD' || item.goods?.status === 0">
+          <view class="line-goods-card" @click="goToDetail(item.goodsId, item.goods?.status)">
+            <view class="line-sold-tag" v-if="item.goods?.status === 'SOLD' || item.goods?.status === 0">
               <text>已售出</text>
             </view>
-            <image class="goods-image" :src="getImageUrl(item.goods?.images?.[0])" mode="aspectFill" />
-            <view class="goods-info">
-              <text class="goods-name">{{ item.goods?.name }}</text>
-              <text class="goods-desc">{{ item.goods?.description }}</text>
-              <view class="goods-price-row">
-                <text class="goods-price">¥{{ item.goods?.price }}</text>
-                <text class="original-price" v-if="item.goods?.originalPrice">¥{{ item.goods?.originalPrice }}</text>
+            <view class="line-image-wrapper">
+              <image class="line-goods-image" :src="getImageUrl(item.goods?.images?.[0])" mode="aspectFill" />
+              <view class="line-image-border"></view>
+            </view>
+            <view class="line-goods-info">
+              <text class="line-goods-name">{{ item.goods?.name }}</text>
+              <text class="line-goods-desc">{{ item.goods?.description }}</text>
+              <view class="line-price-row">
+                <text class="line-price">¥{{ item.goods?.price }}</text>
+                <text class="line-original-price" v-if="item.goods?.originalPrice">¥{{ item.goods?.originalPrice }}</text>
               </view>
             </view>
           </view>
-          <view class="remove-btn" @click="handleRemove(item.goodsId)">
-            <text>移除</text>
+          <view class="line-remove-btn" @click="handleRemove(item.goodsId)">
+            <LineIcon name="close" />
           </view>
         </view>
       </view>
 
-      <view v-if="favorites.length === 0" class="empty">
-        <view class="empty-icon">
+      <view v-if="favorites.length === 0" class="line-empty">
+        <view class="line-empty-icon">
           <LineIcon name="heart" />
         </view>
-        <text class="empty-text">暂无收藏</text>
+        <text class="line-empty-text">暂无收藏</text>
       </view>
     </scroll-view>
   </view>
@@ -63,7 +71,11 @@ const refreshing = ref(false)
 function getImageUrl(url?: string) {
   if (!url) return ''
   if (url.startsWith('http')) return url
-  return `http://localhost:3000${url}`
+  return `http://47.236.64.92${url}`
+}
+
+function goBack() {
+  uni.navigateBack()
 }
 
 function goToDetail(goodsId: string, status?: string | number) {
@@ -124,90 +136,94 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.container {
+@import '@/styles/line-ui.scss';
+
+.line-favorite-container {
   min-height: 100vh;
-  background-color: #f5f5f5;
-}
-
-.header-bar {
+  background-color: $line-bg;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 30rpx 40rpx;
-  background-color: #fff;
-  border-bottom: 1rpx solid #f0f0f0;
+  flex-direction: column;
 }
 
-.title {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #333;
+.line-favorite-scroll {
+  flex: 1;
+  padding: 24rpx;
 }
 
-.count {
-  font-size: 28rpx;
-  color: #999;
+.line-favorite-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
 }
 
-.favorite-scroll {
-  height: calc(100vh - 120rpx);
-}
-
-.favorite-list {
-  padding: 20rpx;
-}
-
-.favorite-item {
+.line-favorite-item {
   display: flex;
   align-items: stretch;
   background-color: #fff;
-  border-radius: 16rpx;
+  border: $line-normal solid $line-border;
+  border-radius: $line-radius;
   padding: 20rpx;
-  margin-bottom: 20rpx;
+  position: relative;
 }
 
-.goods-card {
+.line-goods-card {
   flex: 1;
   display: flex;
   position: relative;
   min-width: 0;
 }
 
-.sold-tag {
+.line-sold-tag {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: rgba(231, 76, 60, 0.9);
+  background-color: #fff;
+  border: $line-normal solid $line-danger;
   padding: 6rpx 16rpx;
-  border-radius: 12rpx 0 12rpx 0;
+  border-radius: $line-radius;
   z-index: 1;
 }
 
-.sold-tag text {
+.line-sold-tag text {
   font-size: 22rpx;
-  color: #fff;
+  color: $line-danger;
 }
 
-.goods-image {
-  width: 180rpx;
-  height: 180rpx;
-  border-radius: 12rpx;
+.line-image-wrapper {
+  position: relative;
 }
 
-.goods-info {
+.line-goods-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: $line-radius-sm;
+}
+
+.line-image-border {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: $line-thin solid $line-border;
+  border-radius: $line-radius-sm;
+  pointer-events: none;
+}
+
+.line-goods-info {
   flex: 1;
   padding: 0 20rpx;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 180rpx;
+  min-height: 160rpx;
 }
 
-.goods-name {
+.line-goods-name {
   display: -webkit-box;
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
+  font-size: $line-font-md;
+  font-weight: 600;
+  color: $line-primary;
   margin-bottom: 12rpx;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -216,10 +232,10 @@ onMounted(() => {
   line-height: 1.4;
 }
 
-.goods-desc {
+.line-goods-desc {
   display: -webkit-box;
-  font-size: 26rpx;
-  color: #999;
+  font-size: $line-font-sm;
+  color: $line-light;
   margin-bottom: 16rpx;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -229,55 +245,53 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.goods-price-row {
+.line-price-row {
   display: flex;
   align-items: center;
 }
 
-.goods-price {
+.line-price {
   font-size: 36rpx;
-  font-weight: bold;
-  color: #e74c3c;
+  font-weight: 700;
+  color: $line-accent;
 }
 
-.original-price {
+.line-original-price {
   font-size: 24rpx;
-  color: #ccc;
+  color: $line-light;
   text-decoration: line-through;
   margin-left: 15rpx;
 }
 
-.remove-btn {
+.line-remove-btn {
   flex-shrink: 0;
-  width: 100rpx;
+  width: 60rpx;
   height: 60rpx;
-  line-height: 60rpx;
-  text-align: center;
-  background-color: #f5f5f5;
-  color: #666;
-  border-radius: 30rpx;
-  font-size: 26rpx;
   margin-left: 20rpx;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: $line-thin solid $line-border;
+  border-radius: $line-radius-sm;
+  color: $line-light;
 }
 
-.empty {
+.line-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 100rpx 0;
+  padding: 120rpx 0;
 }
 
-.empty-icon {
+.line-empty-icon {
   width: 80rpx;
   height: 80rpx;
   margin-bottom: 30rpx;
+  color: $line-light;
 }
 
-.empty-text {
-  font-size: 30rpx;
-  color: #999;
+.line-empty-text {
+  font-size: $line-font-md;
+  color: $line-light;
 }
 </style>

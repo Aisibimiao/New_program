@@ -1,71 +1,88 @@
 <template>
-  <view class="container">
-    <view class="tab-bar">
+  <view class="line-container">
+    <view class="line-header-bar">
+      <view class="line-back-btn" @click="goBack()">
+        <LineIcon name="arrow-left" />
+      </view>
+      <text class="line-header-title">我的发布</text>
+      <view class="line-header-right"></view>
+    </view>
+
+    <view class="line-tab-bar-page">
       <view
-        class="tab-item"
+        class="line-tab-item-page"
         :class="{ active: activeTab === 'selling' }"
         @click="activeTab = 'selling'"
       >
         <text>在售中</text>
+        <view class="line-tab-indicator" v-if="activeTab === 'selling'"></view>
       </view>
       <view
-        class="tab-item"
+        class="line-tab-item-page"
         :class="{ active: activeTab === 'sold' }"
         @click="activeTab = 'sold'"
       >
         <text>已售出</text>
+        <view class="line-tab-indicator" v-if="activeTab === 'sold'"></view>
       </view>
     </view>
 
     <scroll-view
-      class="goods-scroll"
+      class="line-goods-scroll"
       scroll-y
       :refresher-enabled="true"
       :refresher-triggered="refreshing"
       @refresherrefresh="onRefresh"
     >
-      <view class="goods-list">
+      <view class="line-goods-list">
         <view
-          class="goods-item"
+          class="line-goods-item"
           v-for="goods in goodsList"
           :key="goods.id"
         >
-          <view class="goods-content" @click="goToDetail(goods.id)">
-            <image class="goods-image" :src="getImageUrl(goods.images[0])" mode="aspectFill" />
-            <view class="goods-info">
-              <text class="goods-name">{{ goods.name }}</text>
-              <text class="goods-desc">{{ goods.description }}</text>
-              <view class="goods-footer">
-                <text class="goods-price">¥{{ goods.price }}</text>
-                <text class="goods-status">{{ goods.status === 1 ? '在售' : '已售出' }}</text>
+          <view class="line-goods-content" @click="goToDetail(goods.id)">
+            <view class="line-goods-image-box">
+              <image class="line-goods-image" :src="getImageUrl(goods.images?.[0])" mode="aspectFill" @error="handleImageError($event)" />
+              <view class="line-goods-image-border"></view>
+            </view>
+            <view class="line-goods-info">
+              <text class="line-goods-name">{{ goods.name }}</text>
+              <text class="line-goods-desc">{{ goods.description }}</text>
+              <view class="line-goods-footer">
+                <text class="line-goods-price">¥{{ goods.price }}</text>
+                <text class="line-goods-status">{{ goods.status === 1 ? '在售' : '已售出' }}</text>
               </view>
             </view>
           </view>
 
-          <view class="goods-actions" v-if="goods.status === 1">
-            <view class="action-btn off-btn" @click="handleOffShelf(goods.id)">
+          <view class="line-goods-actions" v-if="goods.status === 1">
+            <view class="line-action-btn line-off-btn" @click="handleOffShelf(goods.id)">
               <text>下架</text>
             </view>
-            <view class="action-btn edit-btn" @click="goToEdit(goods.id)">
+            <view class="line-action-btn line-edit-btn" @click="goToEdit(goods.id)">
               <text>编辑</text>
             </view>
-            <view class="action-btn delete-btn" @click="handleDelete(goods.id)">
+            <view class="line-action-btn line-delete-btn" @click="handleDelete(goods.id)">
               <text>删除</text>
             </view>
           </view>
 
-          <view class="goods-actions" v-else>
-            <view class="action-btn delete-btn" @click="handleDelete(goods.id)">
+          <view class="line-goods-actions" v-else>
+            <view class="line-action-btn line-delete-btn" @click="handleDelete(goods.id)">
               <text>删除</text>
             </view>
           </view>
         </view>
       </view>
 
-      <view v-if="goodsList.length === 0" class="empty">
-        <text class="empty-icon">📦</text>
-        <text class="empty-text">暂无商品</text>
+      <view v-if="goodsList.length === 0" class="line-empty">
+        <view class="line-empty-icon">
+          <LineIcon name="box" />
+        </view>
+        <text class="line-empty-text">暂无商品</text>
       </view>
+
+      <view class="line-bottom-space"></view>
     </scroll-view>
   </view>
 </template>
@@ -73,23 +90,34 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { getMyGoods, deleteGoods, offShelfGoods, type Goods } from '@/api/goods'
+import LineIcon from '@/components/LineIcon.vue'
 
 const activeTab = ref('selling')
 const goodsList = ref<Goods[]>([])
 const refreshing = ref(false)
 
-function getImageUrl(url?: string) {
-  if (!url) return ''
+function getImageUrl(url?: string): string {
+  if (!url || url === '[]') return ''
   if (url.startsWith('http')) return url
-  return `http://localhost:3000${url}`
+  if (url.startsWith('/')) return `http://47.236.64.92${url}`
+  return url
+}
+
+function handleImageError(e: any) {
+  const image = e.target
+  image.src = ''
+}
+
+function goBack() {
+  uni.navigateBack()
 }
 
 function goToDetail(id: string) {
-  uni.navigateTo({ url: `/pages/goods/detail?id=${id}` })
+  uni.navigateTo({ url: '/pages/goods/detail?id=' + id })
 }
 
 function goToEdit(id: string) {
-  uni.navigateTo({ url: `/pages/publish/edit?id=${id}` })
+  uni.navigateTo({ url: '/pages/publish/edit?id=' + id })
 }
 
 async function handleOffShelf(id: string) {
@@ -161,147 +189,230 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.container {
+.line-container {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background-color: #f8f9fa;
 }
 
-.tab-bar {
+.line-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 30rpx;
+  padding-top: calc(20rpx + var(--status-bar-height, 0px));
+  background-color: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.line-back-btn {
+  width: 70rpx;
+  height: 70rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.line-header-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+  letter-spacing: 1rpx;
+}
+
+.line-header-right {
+  width: 70rpx;
+}
+
+.line-tab-bar-page {
   display: flex;
   background-color: #fff;
   padding: 20rpx 0;
+  border-bottom: 2rpx solid #e0e0e0;
 }
 
-.tab-item {
+.line-tab-item-page {
   flex: 1;
   text-align: center;
-  padding: 20rpx;
-  font-size: 32rpx;
-  color: #666;
+  padding: 16rpx;
+  font-size: 28rpx;
+  color: #4a4a6a;
+  position: relative;
+  transition: all 0.2s ease;
+  
   &.active {
-    color: #667eea;
-    font-weight: bold;
-    border-bottom: 4rpx solid #667eea;
+    color: #3f37c9;
+    font-weight: 600;
   }
 }
 
-.goods-scroll {
-  height: calc(100vh - 100rpx);
+.line-tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 4rpx;
+  background: linear-gradient(90deg, #3f37c9 0%, #4a4a6a 100%);
+  border-radius: 2rpx;
 }
 
-.goods-list {
-  padding: 20rpx;
+.line-goods-scroll {
+  height: calc(100vh - 200rpx - var(--status-bar-height, 0px));
 }
 
-.goods-item {
+.line-goods-list {
+  padding: 30rpx;
+}
+
+.line-goods-item {
   background-color: #fff;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 20rpx;
+  margin-bottom: 24rpx;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.line-goods-content {
+  display: flex;
+  padding: 24rpx;
+}
+
+.line-goods-image-box {
+  position: relative;
+  width: 180rpx;
+  height: 180rpx;
+  flex-shrink: 0;
+}
+
+.line-goods-image {
+  width: 100%;
+  height: 100%;
   border-radius: 16rpx;
-  margin-bottom: 20rpx;
 }
 
-.goods-content {
-  display: flex;
-  padding: 20rpx;
-}
-
-.goods-image {
-  width: 200rpx;
-  height: 200rpx;
+.line-goods-image-border {
+  position: absolute;
+  top: 8rpx;
+  left: 8rpx;
+  right: 8rpx;
+  bottom: 8rpx;
+  border: 2rpx solid rgba(26, 26, 46, 0.1);
   border-radius: 12rpx;
+  pointer-events: none;
 }
 
-.goods-actions {
+.line-goods-info {
+  flex: 1;
+  padding: 0 24rpx;
   display: flex;
-  gap: 15rpx;
-  padding: 15rpx 20rpx;
-  border-top: 1rpx solid #f0f0f0;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.action-btn {
-  flex: 1;
-  height: 70rpx;
-  line-height: 70rpx;
-  text-align: center;
-  border-radius: 35rpx;
-  font-size: 28rpx;
-  font-weight: 500;
-}
-
-.off-btn {
-  background-color: #fff5e6;
-  color: #ff9800;
-}
-
-.edit-btn {
-  background-color: #f0f4ff;
-  color: #667eea;
-}
-
-.delete-btn {
-  background-color: #fff5f5;
-  color: #e74c3c;
-}
-
-.goods-info {
-  flex: 1;
-  padding: 0 20rpx;
-}
-
-.goods-name {
+.line-goods-name {
   display: block;
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 10rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: 0.5rpx;
+}
+
+.line-goods-desc {
+  display: block;
+  font-size: 24rpx;
+  color: #8a8a9e;
+  margin-bottom: 16rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.goods-desc {
-  display: block;
-  font-size: 26rpx;
-  color: #999;
-  margin-bottom: 15rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.goods-footer {
+.line-goods-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.goods-price {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #e74c3c;
+.line-goods-price {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #ef476f;
+  letter-spacing: 1rpx;
 }
 
-.goods-status {
-  font-size: 24rpx;
-  padding: 4rpx 16rpx;
-  border-radius: 20rpx;
-  background-color: #f0f0f0;
-  color: #666;
+.line-goods-status {
+  font-size: 22rpx;
+  color: #4a4a6a;
+  padding: 6rpx 14rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 10rpx;
+  font-weight: 500;
 }
 
-.empty {
+.line-goods-actions {
+  display: flex;
+  gap: 16rpx;
+  padding: 20rpx 24rpx;
+  border-top: 2rpx solid #e0e0e0;
+}
+
+.line-action-btn {
+  flex: 1;
+  height: 70rpx;
+  line-height: 70rpx;
+  text-align: center;
+  border-radius: 14rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.line-off-btn {
+  border: 2rpx solid #ffd166;
+  color: #8a6a00;
+}
+
+.line-edit-btn {
+  border: 2rpx solid #3f37c9;
+  color: #3f37c9;
+}
+
+.line-delete-btn {
+  border: 2rpx solid #ef476f;
+  color: #ef476f;
+}
+
+.line-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 100rpx 0;
+  padding: 120rpx 0;
 }
 
-.empty-icon {
-  font-size: 100rpx;
+.line-empty-icon {
+  width: 120rpx;
+  height: 120rpx;
   margin-bottom: 30rpx;
+  opacity: 0.4;
 }
 
-.empty-text {
-  font-size: 30rpx;
-  color: #999;
+.line-empty-text {
+  font-size: 28rpx;
+  color: #8a8a9e;
+  letter-spacing: 1rpx;
+}
+
+.line-bottom-space {
+  height: 40rpx;
 }
 </style>
