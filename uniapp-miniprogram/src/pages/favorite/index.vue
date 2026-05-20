@@ -58,9 +58,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { getFavorites, removeFavorite } from '@/api/favorite'
 import type { Favorite } from '@/api/favorite'
 import { useUserStore } from '@/stores/user'
+import { formatImageUrl } from '@/utils/request'
 import LineIcon from '@/components/LineIcon.vue'
 
 const userStore = useUserStore()
@@ -69,9 +71,8 @@ const favorites = ref<Favorite[]>([])
 const refreshing = ref(false)
 
 function getImageUrl(url?: string) {
-  if (!url) return ''
-  if (url.startsWith('http')) return url
-  return `http://47.236.64.92${url}`
+  if (!url) return 'https://api.dicebear.com/9.x/initials/png?seed=Goods&backgroundColor=e2e8f0'
+  return formatImageUrl(url)
 }
 
 function goBack() {
@@ -131,6 +132,10 @@ function onRefresh() {
 
 onMounted(() => {
   userStore.initFromStorage()
+  loadFavorites()
+})
+
+onShow(() => {
   loadFavorites()
 })
 </script>

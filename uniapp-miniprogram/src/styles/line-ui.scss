@@ -1,15 +1,21 @@
-// 线条风格UI系统 - 纯净、简约、表意清晰
+// 线条风格UI系统 - 简约清新 + 卡片立体
 
-// 颜色变量
-$line-primary: #1a1a2e;
-$line-secondary: #4a4a6a;
-$line-light: #8a8a9e;
-$line-accent: #3f37c9;
-$line-success: #06d6a0;
-$line-warning: #ffd166;
-$line-danger: #ef476f;
-$line-bg: #f8f9fa;
-$line-border: #e0e0e0;
+// 引入全局变量
+@import './variables.scss';
+
+// 颜色变量 - 清新柔和配色
+$line-primary: $text-primary;
+$line-secondary: $text-secondary;
+$line-light: $text-light;
+$line-accent: $primary-color;
+$line-accent-light: $primary-light;
+$line-success: $success-color;
+$line-warning: $warning-color;
+$line-danger: $danger-color;
+$line-bg: $bg-color;
+$line-bg-card: $bg-card;
+$line-border: $border-color;
+$line-border-light: $border-light;
 
 // 线条粗细
 $line-thin: 2rpx;
@@ -17,6 +23,7 @@ $line-normal: 3rpx;
 $line-thick: 4rpx;
 
 // 圆角变量
+$line-radius-sm: 12rpx;
 $line-radius: 16rpx;
 $line-radius-lg: 24rpx;
 $line-radius-full: 50%;
@@ -49,12 +56,19 @@ $line-font-xl: 48rpx;
   letter-spacing: 1rpx;
 }
 
-// 边框卡片
+// 边框卡片 - 立体效果
 @mixin line-card {
-  border: $line-thin solid $line-border;
+  border: $line-thin solid $line-border-light;
   border-radius: $line-radius-lg;
-  background: white;
+  background: $line-bg-card;
   position: relative;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.03);
+  
+  &:active {
+    box-shadow: 0 8rpx 32rpx rgba(102, 126, 234, 0.15);
+    transform: translateY(-2rpx);
+    transition: all 0.2s ease;
+  }
 }
 
 // 轮廓输入框

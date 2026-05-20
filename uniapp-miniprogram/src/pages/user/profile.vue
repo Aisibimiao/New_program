@@ -49,7 +49,7 @@
 
       <view class="line-menu-list">
         <view class="line-menu-item" @click="goToPublish">
-          <view class="line-menu-icon">
+          <view class="line-menu-icon line-icon-pink">
             <LineIcon name="plus" />
           </view>
           <text class="line-menu-text">发布商品</text>
@@ -61,7 +61,7 @@
         <view class="line-menu-divider"></view>
 
         <view class="line-menu-item" @click="goToMyGoods">
-          <view class="line-menu-icon">
+          <view class="line-menu-icon line-icon-purple">
             <LineIcon name="order" />
           </view>
           <text class="line-menu-text">我的发布</text>
@@ -73,7 +73,7 @@
         <view class="line-menu-divider"></view>
 
         <view class="line-menu-item" @click="goToOrders">
-          <view class="line-menu-icon">
+          <view class="line-menu-icon line-icon-green">
             <LineIcon name="wallet" />
           </view>
           <text class="line-menu-text">我的订单</text>
@@ -85,7 +85,7 @@
         <view class="line-menu-divider"></view>
 
         <view class="line-menu-item" @click="goToFavorites">
-          <view class="line-menu-icon">
+          <view class="line-menu-icon line-icon-red">
             <LineIcon name="heart" />
           </view>
           <text class="line-menu-text">我的收藏</text>
@@ -97,7 +97,7 @@
 
       <view class="line-menu-list">
         <view class="line-menu-item" @click="goToSettings">
-          <view class="line-menu-icon">
+          <view class="line-menu-icon line-icon-blue">
             <LineIcon name="settings" />
           </view>
           <text class="line-menu-text">设置</text>
@@ -109,7 +109,7 @@
         <view class="line-menu-divider"></view>
 
         <view class="line-menu-item" @click="goToAbout">
-          <view class="line-menu-icon">
+          <view class="line-menu-icon line-icon-orange">
             <LineIcon name="info" />
           </view>
           <text class="line-menu-text">关于我们</text>
@@ -158,6 +158,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
 import { getMyGoods } from '@/api/goods'
 import { getSellOrders } from '@/api/order'
@@ -300,6 +301,10 @@ function handleLogout() {
 onMounted(() => {
   refreshUser()
 })
+
+onShow(() => {
+  refreshUser()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -317,10 +322,9 @@ onMounted(() => {
   justify-content: space-between;
   padding: 20rpx 32rpx;
   padding-top: calc(20rpx + env(safe-area-inset-top));
-  background-color: white;
+  background-color: $line-bg-card;
   position: relative;
   z-index: 100;
-  border-bottom: 3rpx solid $line-primary;
 }
 
 .line-spacer {
@@ -339,9 +343,8 @@ onMounted(() => {
 }
 
 .line-header-section {
-  background-color: white;
+  background: linear-gradient(135deg, $line-accent 0%, $line-accent-light 100%);
   padding: 32rpx;
-  border-bottom: 3rpx solid $line-primary;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -383,7 +386,7 @@ onMounted(() => {
   display: block;
   font-size: $line-font-xl;
   font-weight: 600;
-  color: $line-primary;
+  color: white;
   margin-bottom: 12rpx;
   letter-spacing: 2rpx;
 }
@@ -392,24 +395,25 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   padding: 6rpx 16rpx;
-  border: 2rpx solid $line-border;
+  border: 2rpx solid rgba(255, 255, 255, 0.5);
   border-radius: $line-radius;
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .line-role {
   font-size: $line-font-sm;
-  color: $line-light;
+  color: white;
   letter-spacing: 1rpx;
 }
 
 .line-edit-btn {
-  border: 3rpx solid $line-primary;
+  border: 2rpx solid rgba(255, 255, 255, 0.8);
   padding: 12rpx 24rpx;
   border-radius: $line-radius;
   transition: all 0.2s ease;
   
   &:active {
-    background-color: $line-primary;
+    background-color: rgba(255, 255, 255, 0.2);
     transform: scale(0.95);
     
     .line-edit-text {
@@ -462,9 +466,9 @@ onMounted(() => {
   justify-content: center;
   margin: 24rpx 32rpx;
   padding: 32rpx;
-  background-color: white;
-  border: 3rpx solid $line-primary;
+  background-color: $line-bg-card;
   border-radius: $line-radius-lg;
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.04);
 }
 
 .line-stat-item {
@@ -497,11 +501,11 @@ onMounted(() => {
 }
 
 .line-menu-list {
-  background-color: white;
+  background-color: $line-bg-card;
   margin: 16rpx 32rpx;
-  border: 3rpx solid $line-primary;
   border-radius: $line-radius-lg;
   overflow: hidden;
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.04);
 }
 
 .line-menu-item {
@@ -522,6 +526,30 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.line-icon-pink {
+  color: #f687b3;
+}
+
+.line-icon-purple {
+  color: $line-accent;
+}
+
+.line-icon-green {
+  color: $line-success;
+}
+
+.line-icon-red {
+  color: $line-danger;
+}
+
+.line-icon-blue {
+  color: #63b3ed;
+}
+
+.line-icon-orange {
+  color: $line-warning;
 }
 
 .line-menu-text {
@@ -562,12 +590,12 @@ onMounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: white;
+  background-color: $line-bg-card;
   display: flex;
   align-items: flex-start;
   padding: 16rpx 0;
   padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
-  border-top: 3rpx solid $line-primary;
+  border-top: 2rpx solid $line-border-light;
   z-index: 200;
 }
 

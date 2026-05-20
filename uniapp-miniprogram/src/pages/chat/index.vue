@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { useUserStore } from '@/stores/user'
 import { getMessages, sendMessage as apiSendMessage, type ChatMessage } from '@/api/chat'
 
@@ -195,6 +195,10 @@ onMounted(() => {
   
   updateCurrentTime()
   uni.setNavigationBarTitle({ title: goodsName.value || '联系卖家' })
+  loadMessages()
+})
+
+onShow(() => {
   loadMessages()
 })
 </script>

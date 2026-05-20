@@ -1,9 +1,7 @@
 <template>
   <view class="line-container">
     <view class="line-header-bar">
-      <view class="line-back-btn" @click="goBack()">
-        <LineIcon name="arrow-left" />
-      </view>
+      <view class="line-header-left"></view>
       <text class="line-header-title">我的发布</text>
       <view class="line-header-right"></view>
     </view>
@@ -89,6 +87,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { getMyGoods, deleteGoods, offShelfGoods, type Goods } from '@/api/goods'
 import LineIcon from '@/components/LineIcon.vue'
 
@@ -109,7 +108,7 @@ function handleImageError(e: any) {
 }
 
 function goBack() {
-  uni.navigateBack()
+  uni.reLaunch({ url: '/pages/index/index' })
 }
 
 function goToDetail(id: string) {
@@ -184,6 +183,10 @@ watch(activeTab, () => {
 })
 
 onMounted(() => {
+  loadGoods()
+})
+
+onShow(() => {
   loadGoods()
 })
 </script>

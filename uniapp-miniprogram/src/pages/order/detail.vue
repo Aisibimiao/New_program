@@ -86,7 +86,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { getOrderDetail, cancelOrder, confirmOrder, shipOrder, receiveOrder } from '@/api/order'
 import type { Order } from '@/api/order'
 import { useUserStore } from '@/stores/user'
@@ -233,6 +233,10 @@ onLoad((options) => {
 })
 
 onMounted(() => {
+  loadData()
+})
+
+onShow(() => {
   loadData()
 })
 </script>

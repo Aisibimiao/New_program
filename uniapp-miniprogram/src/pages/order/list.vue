@@ -78,6 +78,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { getBuyOrders, getSellOrders, cancelOrder, confirmOrder } from '@/api/order'
 import type { Order } from '@/api/order'
 
@@ -180,6 +181,10 @@ watch(activeTab, () => {
 })
 
 onMounted(() => {
+  loadOrders()
+})
+
+onShow(() => {
   loadOrders()
 })
 </script>

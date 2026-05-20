@@ -110,7 +110,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { getGoods, type Goods } from '@/api/goods'
 import { useUserStore } from '@/stores/user'
 import LineIcon from '@/components/LineIcon.vue'
@@ -241,6 +241,13 @@ onMounted(() => {
   userStore.initFromStorage()
   loadGoods()
   tabBarRef.value?.setCurrentIndex(1)
+})
+
+onShow(() => {
+  page.value = 1
+  hasMore.value = true
+  goodsList.value = []
+  loadGoods()
 })
 </script>
 

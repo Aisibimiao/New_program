@@ -116,7 +116,7 @@
             :key="index"
           >
             <view class="line-upload-image-wrapper">
-              <image class="line-upload-image" :src="img" mode="aspectFill" />
+              <image class="line-upload-image" :src="img" mode="aspectFill" @error="handleImageError" />
               <view class="line-upload-image-border"></view>
             </view>
             <view class="line-remove-btn" @click="removeImage(index)">
@@ -288,6 +288,10 @@ function chooseImage() {
   })
 }
 
+function handleImageError(e: any) {
+  console.warn('图片加载失败:', e)
+}
+
 function removeImage(index: number) {
   images.value.splice(index, 1)
 }
@@ -353,6 +357,47 @@ async function handleSubmit() {
   flex-direction: column;
 }
 
+.line-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 32rpx;
+  padding-top: calc(20rpx + env(safe-area-inset-top));
+  background-color: $line-bg-card;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.line-back-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $line-primary;
+}
+
+.line-header-title {
+  font-size: $line-font-lg;
+  font-weight: 600;
+  color: $line-primary;
+}
+
+.line-header-right {
+  width: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.line-header-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border: 2rpx solid $line-border;
+  border-radius: 50%;
+}
+
 .line-content-scroll {
   flex: 1;
   padding: 24rpx;
@@ -360,28 +405,13 @@ async function handleSubmit() {
 }
 
 .line-form-section {
-  background-color: #fff;
-  border: $line-normal solid $line-border;
-  border-radius: $line-radius;
+  background-color: $line-bg-card;
+  border: 2rpx solid $line-border-light;
+  border-radius: $line-radius-lg;
   padding: 32rpx;
   margin-bottom: 24rpx;
   position: relative;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -6rpx;
-    left: 24rpx;
-    right: 24rpx;
-    height: 6rpx;
-    background: repeating-linear-gradient(
-      90deg,
-      $line-border 0rpx,
-      $line-border 8rpx,
-      transparent 8rpx,
-      transparent 16rpx
-    );
-  }
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.03);
 }
 
 .line-section-title {
@@ -706,8 +736,7 @@ async function handleSubmit() {
   padding: 24rpx;
   padding-bottom: calc(24rpx + constant(safe-area-inset-bottom));
   padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
-  background-color: #fff;
-  border-top: $line-thin solid $line-border;
+  background-color: $line-bg-card;
   z-index: 100;
 }
 
@@ -716,22 +745,25 @@ async function handleSubmit() {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: $line-normal solid $line-primary;
-  border-radius: $line-radius;
-  background-color: $line-primary;
+  border: none;
+  border-radius: $line-radius-lg;
+  background: linear-gradient(135deg, $line-accent 0%, $line-accent-light 100%);
   color: #fff;
   font-size: $line-font-lg;
   font-weight: 600;
   letter-spacing: 2rpx;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
+  box-shadow: 0 6rpx 24rpx rgba(102, 126, 234, 0.35);
   
   &:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
+    box-shadow: 0 4rpx 16rpx rgba(102, 126, 234, 0.4);
   }
   
   &.disabled {
     opacity: 0.4;
     pointer-events: none;
+    box-shadow: none;
   }
 }
 </style>

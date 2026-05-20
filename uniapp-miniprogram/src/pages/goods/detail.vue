@@ -108,7 +108,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { onLoad } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { getGoodsDetail, type Goods } from '@/api/goods'
 import { createOrder } from '@/api/order'
 import { addFavorite, removeFavorite, getFavorites } from '@/api/favorite'
@@ -155,6 +155,7 @@ function getCategoryText(category?: string): string {
 }
 
 function getImageUrl(url?: string): string {
+  if (!url) return 'https://api.dicebear.com/9.x/initials/png?seed=Goods&backgroundColor=e2e8f0'
   return formatImageUrl(url)
 }
 
@@ -365,6 +366,12 @@ onLoad((options) => {
 
 onMounted(() => {
   userStore.initFromStorage()
+  if (goodsId.value) {
+    loadData()
+  }
+})
+
+onShow(() => {
   if (goodsId.value) {
     loadData()
   }

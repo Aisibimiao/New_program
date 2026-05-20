@@ -9,7 +9,7 @@
       
       <view class="line-banner-box">
         <view class="line-banner">
-          <swiper class="line-swiper" indicator-dots autoplay circular interval="3500" :indicator-color="$line-border" :indicator-active-color="$line-accent">
+          <swiper class="line-swiper" indicator-dots autoplay circular interval="3500" indicator-color="#e0e0e0" indicator-active-color="#3f37c9">
             <swiper-item>
               <view class="line-banner-item">
                 <view class="line-banner-content">
@@ -148,6 +148,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { getGoods, type Goods } from '@/api/goods'
 import { getFavorites, addFavorite, removeFavorite } from '@/api/favorite'
 import { useUserStore } from '@/stores/user'
@@ -231,6 +232,7 @@ const mockGoods: Goods[] = [
 ]
 
 function getImageUrl(url?: string) {
+  if (!url) return 'https://api.dicebear.com/9.x/initials/png?seed=Goods&backgroundColor=e2e8f0'
   return formatImageUrl(url)
 }
 
@@ -372,14 +374,12 @@ function onPullDownRefresh() {
   page.value = 1
   hasMore.value = true
   goodsList.value = []
-  setTimeout(() => {
-    loadGoods().then(() => {
-      isRefreshing.value = false
-      uni.showToast({ title: '刷新成功', icon: 'none' })
-    }).catch(() => {
-      isRefreshing.value = false
-    })
-  }, 500)
+  loadGoods().then(() => {
+    isRefreshing.value = false
+    uni.showToast({ title: '刷新成功', icon: 'none' })
+  }).catch(() => {
+    isRefreshing.value = false
+  })
 }
 
 function onReachBottom() {
@@ -439,6 +439,14 @@ onMounted(() => {
   loadGoods()
   loadFavorites()
 })
+
+onShow(() => {
+  page.value = 1
+  hasMore.value = true
+  goodsList.value = []
+  loadGoods()
+  loadFavorites()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -464,8 +472,8 @@ onMounted(() => {
 .line-dot {
   width: 12rpx;
   height: 12rpx;
-  border: 3rpx solid $line-primary;
   border-radius: 50%;
+  background: linear-gradient(135deg, $line-accent 0%, $line-accent-light 100%);
 }
 
 .line-title {
@@ -480,13 +488,14 @@ onMounted(() => {
 }
 
 .line-banner {
-  border: 3rpx solid $line-primary;
   border-radius: $line-radius-lg;
   overflow: hidden;
+  background: linear-gradient(135deg, $line-accent 0%, $line-accent-light 100%);
+  box-shadow: 0 8rpx 32rpx rgba(102, 126, 234, 0.25);
 }
 
 .line-swiper {
-  height: 220rpx;
+  height: 240rpx;
 }
 
 .line-banner-item {
@@ -495,7 +504,6 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
 }
 
 .line-banner-content {
@@ -503,25 +511,28 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12rpx;
+  gap: 16rpx;
+  padding: 32rpx;
 }
 
 .line-banner-text {
   font-size: $line-font-xl;
   font-weight: 600;
-  color: $line-primary;
+  color: white;
   letter-spacing: 8rpx;
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
 }
 
 .line-banner-line {
-  width: 100rpx;
+  width: 80rpx;
   height: 3rpx;
-  background: $line-accent;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 2rpx;
 }
 
 .line-banner-sub {
   font-size: $line-font-sm;
-  color: $line-light;
+  color: rgba(255, 255, 255, 0.85);
   letter-spacing: 4rpx;
 }
 
@@ -545,11 +556,12 @@ onMounted(() => {
 .line-search-box {
   display: flex;
   align-items: center;
-  background-color: white;
-  border: 3rpx solid $line-primary;
+  background-color: $line-bg-card;
+  border: 2rpx solid $line-border-light;
   border-radius: $line-radius-lg;
-  padding: 12rpx 16rpx;
+  padding: 16rpx 20rpx;
   position: relative;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.03);
 }
 
 .line-category-picker {
@@ -557,8 +569,12 @@ onMounted(() => {
   align-items: center;
   padding: 8rpx 16rpx;
   margin-right: 12rpx;
-  border-right: 2rpx solid $line-border;
+  border-right: 2rpx solid $line-border-light;
   transition: all 0.2s ease;
+  
+  &:active {
+    opacity: 0.7;
+  }
 }
 
 .line-category-text {
@@ -571,12 +587,14 @@ onMounted(() => {
   width: 28rpx;
   height: 28rpx;
   margin-left: 8rpx;
+  color: $line-light;
 }
 
 .line-search-icon {
   width: 36rpx;
   height: 36rpx;
   margin-right: 12rpx;
+  color: $line-light;
 }
 
 .line-search-input {
@@ -602,12 +620,13 @@ onMounted(() => {
 
 .line-category-container {
   background-color: white;
-  border: 3rpx solid $line-primary;
+  border: 2rpx solid $line-border;
   border-radius: $line-radius-lg;
   padding: 16rpx;
   width: 85%;
   max-height: 70vh;
   overflow-y: auto;
+  box-shadow: 0 12rpx 48rpx rgba(0, 0, 0, 0.12);
 }
 
 .line-category-item {
@@ -655,28 +674,28 @@ onMounted(() => {
 }
 
 .line-goods-card {
-  background-color: white;
-  border: 3rpx solid $line-primary;
+  background-color: $line-bg-card;
+  border: 2rpx solid $line-border-light;
   border-radius: $line-radius-lg;
   overflow: hidden;
   position: relative;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.04);
 
   &::before {
     content: '';
     position: absolute;
-    top: 8rpx;
-    left: 8rpx;
-    right: 8rpx;
-    bottom: 8rpx;
-    border: 1rpx dashed $line-border;
-    border-radius: 8rpx;
-    pointer-events: none;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4rpx;
+    background: linear-gradient(90deg, $line-accent 0%, $line-accent-light 100%);
+    border-radius: $line-radius-lg $line-radius-lg 0 0;
   }
 
   &:active {
-    transform: translateY(-4rpx);
-    border-color: $line-accent;
+    transform: translateY(-4rpx) scale(0.98);
+    box-shadow: 0 12rpx 40rpx rgba(102, 126, 234, 0.18);
   }
 }
 

@@ -1,29 +1,31 @@
-$primary-color: #4F46E5;
-$primary-light: #7C3AED;
-$primary-dark: #3730A3;
-$secondary-color: #06B6D4;
-$accent-color: #F43F5E;
-$accent-light: #F97316;
-$success-color: #10B981;
-$warning-color: #F59E0B;
-$info-color: #3B82F6;
+$primary-color: #667eea;
+$primary-light: #7c8aff;
+$primary-dark: #5a6fd6;
+$secondary-color: #4fd1c5;
+$accent-color: #f687b3;
+$accent-light: #f9a8d4;
+$success-color: #48bb78;
+$warning-color: #ed8936;
+$danger-color: #f56565;
+$info-color: #63b3ed;
 
-$bg-color: #F8FAFC;
-$bg-white: #FFFFFF;
-$bg-gradient-start: #F1F5F9;
-$bg-gradient-end: #E2E8F0;
+$bg-color: #f7fafc;
+$bg-white: #ffffff;
+$bg-card: #ffffff;
+$bg-gradient-start: #f7fafc;
+$bg-gradient-end: #edf2f7;
 
-$text-primary: #1E293B;
-$text-secondary: #64748B;
-$text-light: #94A3B8;
-$text-placeholder: #CBD5E1;
+$text-primary: #2d3748;
+$text-secondary: #718096;
+$text-light: #a0aec0;
+$text-placeholder: #cbd5e0;
 
-$border-color: #E2E8F0;
-$border-light: #F1F5F9;
-$shadow-color: rgba(79, 70, 229, 0.06);
-$shadow-color-hover: rgba(79, 70, 229, 0.12);
+$border-color: #e2e8f0;
+$border-light: #edf2f7;
+$shadow-color: rgba(102, 126, 234, 0.08);
+$shadow-color-hover: rgba(102, 126, 234, 0.18);
 $shadow-card: 0 4rpx 24rpx rgba(0, 0, 0, 0.04);
-$shadow-card-hover: 0 12rpx 40rpx rgba(0, 0, 0, 0.08);
+$shadow-card-hover: 0 12rpx 40rpx rgba(102, 126, 234, 0.15);
 
 $radius-sm: 12rpx;
 $radius-md: 16rpx;
