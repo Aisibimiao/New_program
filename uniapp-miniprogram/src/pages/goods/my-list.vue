@@ -36,15 +36,15 @@
         <view
           class="line-goods-item"
           v-for="goods in goodsList"
-          :key="goods.id"
+          :key="goods._id"
         >
-          <view class="line-goods-content" @click="goToDetail(goods.id)">
+          <view class="line-goods-content" @click="goToDetail(goods._id)">
             <view class="line-goods-image-box">
               <image class="line-goods-image" :src="getImageUrl(goods.images?.[0])" mode="aspectFill" @error="handleImageError($event)" />
               <view class="line-goods-image-border"></view>
             </view>
             <view class="line-goods-info">
-              <text class="line-goods-name">{{ goods.name }}</text>
+              <text class="line-goods-name">{{ goods.title }}</text>
               <text class="line-goods-desc">{{ goods.description }}</text>
               <view class="line-goods-footer">
                 <text class="line-goods-price">¥{{ goods.price }}</text>
@@ -54,19 +54,19 @@
           </view>
 
           <view class="line-goods-actions" v-if="goods.status === 1">
-            <view class="line-action-btn line-off-btn" @click="handleOffShelf(goods.id)">
+            <view class="line-action-btn line-off-btn" @click="handleOffShelf(goods._id)">
               <text>下架</text>
             </view>
-            <view class="line-action-btn line-edit-btn" @click="goToEdit(goods.id)">
+            <view class="line-action-btn line-edit-btn" @click="goToEdit(goods._id)">
               <text>编辑</text>
             </view>
-            <view class="line-action-btn line-delete-btn" @click="handleDelete(goods.id)">
+            <view class="line-action-btn line-delete-btn" @click="handleDelete(goods._id)">
               <text>删除</text>
             </view>
           </view>
 
           <view class="line-goods-actions" v-else>
-            <view class="line-action-btn line-delete-btn" @click="handleDelete(goods.id)">
+            <view class="line-action-btn line-delete-btn" @click="handleDelete(goods._id)">
               <text>删除</text>
             </view>
           </view>
@@ -94,12 +94,31 @@ import LineIcon from '@/components/LineIcon.vue'
 const activeTab = ref('selling')
 const goodsList = ref<Goods[]>([])
 const refreshing = ref(false)
+const imageUrls = ref<Record<string, string>>({})
 
-function getImageUrl(url?: string): string {
-  if (!url || url === '[]') return ''
-  if (url.startsWith('http')) return url
-  if (url.startsWith('/')) return `http://47.236.64.92${url}`
-  return url
+async function getImageUrl(fileID?: string): Promise<string> {
+  if (!fileID || fileID === '[]' || fileID === '') return ''
+  
+  if (fileID.startsWith('http')) {
+    return fileID
+  }
+  
+  if (imageUrls.value[fileID]) {
+    return imageUrls.value[fileID]
+  }
+  
+  try {
+    const result = await uni.cloud.getTempFileURL({
+      fileList: [fileID]
+    })
+    if (result.fileList[0].tempFileURL) {
+      imageUrls.value[fileID] = result.fileList[0].tempFileURL
+      return result.fileList[0].tempFileURL
+    }
+  } catch (err) {
+    console.error('获取图片URL失败', err)
+  }
+  return ''
 }
 
 function handleImageError(e: any) {
@@ -159,16 +178,23 @@ async function handleDelete(id: string) {
 
 async function loadGoods() {
   refreshing.value = true
+  imageUrls.value = {}
   try {
     const result = await getMyGoods()
-    if (activeTab.value === 'selling') {
-      goodsList.value = result.filter(g => g.status === 1)
+    if (result.success && result.data) {
+      const list = result.data.list || []
+      if (activeTab.value === 'selling') {
+        goodsList.value = list.filter(g => g.status === 1)
+      } else {
+        goodsList.value = list.filter(g => g.status === 0)
+      }
     } else {
-      goodsList.value = result.filter(g => g.status === 0)
+      goodsList.value = []
     }
   } catch (err) {
     console.error('加载失败', err)
     uni.showToast({ title: '加载失败', icon: 'none' })
+    goodsList.value = []
   } finally {
     refreshing.value = false
   }

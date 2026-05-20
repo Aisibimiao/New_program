@@ -11,11 +11,27 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     const activeTab = common_vendor.ref("selling");
     const goodsList = common_vendor.ref([]);
     const refreshing = common_vendor.ref(false);
-    function getImageUrl(url) {
-      if (!url || url === "[]") return "";
-      if (url.startsWith("http")) return url;
-      if (url.startsWith("/")) return `http://47.236.64.92${url}`;
-      return url;
+    const imageUrls = common_vendor.ref({});
+    async function getImageUrl(fileID) {
+      if (!fileID || fileID === "[]" || fileID === "") return "";
+      if (fileID.startsWith("http")) {
+        return fileID;
+      }
+      if (imageUrls.value[fileID]) {
+        return imageUrls.value[fileID];
+      }
+      try {
+        const result = await common_vendor.index.cloud.getTempFileURL({
+          fileList: [fileID]
+        });
+        if (result.fileList[0].tempFileURL) {
+          imageUrls.value[fileID] = result.fileList[0].tempFileURL;
+          return result.fileList[0].tempFileURL;
+        }
+      } catch (err) {
+        console.error("获取图片URL失败", err);
+      }
+      return "";
     }
     function handleImageError(e) {
       const image = e.target;
@@ -65,16 +81,23 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
     }
     async function loadGoods() {
       refreshing.value = true;
+      imageUrls.value = {};
       try {
         const result = await api_goods.getMyGoods();
-        if (activeTab.value === "selling") {
-          goodsList.value = result.filter((g) => g.status === 1);
+        if (result.success && result.data) {
+          const list = result.data.list || [];
+          if (activeTab.value === "selling") {
+            goodsList.value = list.filter((g) => g.status === 1);
+          } else {
+            goodsList.value = list.filter((g) => g.status === 0);
+          }
         } else {
-          goodsList.value = result.filter((g) => g.status === 0);
+          goodsList.value = [];
         }
       } catch (err) {
         console.error("加载失败", err);
         common_vendor.index.showToast({ title: "加载失败", icon: "none" });
+        goodsList.value = [];
       } finally {
         refreshing.value = false;
       }
@@ -105,21 +128,21 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           var _a;
           return common_vendor.e({
             a: getImageUrl((_a = goods.images) == null ? void 0 : _a[0]),
-            b: common_vendor.o(($event) => handleImageError($event), goods.id),
-            c: common_vendor.t(goods.name),
+            b: common_vendor.o(($event) => handleImageError($event), goods._id),
+            c: common_vendor.t(goods.title),
             d: common_vendor.t(goods.description),
             e: common_vendor.t(goods.price),
             f: common_vendor.t(goods.status === 1 ? "在售" : "已售出"),
-            g: common_vendor.o(($event) => goToDetail(goods.id), goods.id),
+            g: common_vendor.o(($event) => goToDetail(goods._id), goods._id),
             h: goods.status === 1
           }, goods.status === 1 ? {
-            i: common_vendor.o(($event) => handleOffShelf(goods.id), goods.id),
-            j: common_vendor.o(($event) => goToEdit(goods.id), goods.id),
-            k: common_vendor.o(($event) => handleDelete(goods.id), goods.id)
+            i: common_vendor.o(($event) => handleOffShelf(goods._id), goods._id),
+            j: common_vendor.o(($event) => goToEdit(goods._id), goods._id),
+            k: common_vendor.o(($event) => handleDelete(goods._id), goods._id)
           } : {
-            l: common_vendor.o(($event) => handleDelete(goods.id), goods.id)
+            l: common_vendor.o(($event) => handleDelete(goods._id), goods._id)
           }, {
-            m: goods.id
+            m: goods._id
           });
         }),
         h: goodsList.value.length === 0
