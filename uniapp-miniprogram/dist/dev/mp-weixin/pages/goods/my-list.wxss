@@ -1,0 +1,196 @@
+.line-container.data-v-bf6a0d3e {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+.line-header-bar.data-v-bf6a0d3e {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 30rpx;
+  padding-top: calc(20rpx + var(--status-bar-height, 0px));
+  background-color: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.line-back-btn.data-v-bf6a0d3e {
+  width: 70rpx;
+  height: 70rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+.line-header-title.data-v-bf6a0d3e {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+  letter-spacing: 1rpx;
+}
+.line-header-right.data-v-bf6a0d3e {
+  width: 70rpx;
+}
+.line-tab-bar-page.data-v-bf6a0d3e {
+  display: flex;
+  background-color: #fff;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #e0e0e0;
+}
+.line-tab-item-page.data-v-bf6a0d3e {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx;
+  font-size: 28rpx;
+  color: #4a4a6a;
+  position: relative;
+  transition: all 0.2s ease;
+}
+.line-tab-item-page.active.data-v-bf6a0d3e {
+  color: #3f37c9;
+  font-weight: 600;
+}
+.line-tab-indicator.data-v-bf6a0d3e {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 4rpx;
+  background: linear-gradient(90deg, #3f37c9 0%, #4a4a6a 100%);
+  border-radius: 2rpx;
+}
+.line-goods-scroll.data-v-bf6a0d3e {
+  height: calc(100vh - 200rpx - var(--status-bar-height, 0px));
+}
+.line-goods-list.data-v-bf6a0d3e {
+  padding: 30rpx;
+}
+.line-goods-item.data-v-bf6a0d3e {
+  background-color: #fff;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 20rpx;
+  margin-bottom: 24rpx;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+.line-goods-content.data-v-bf6a0d3e {
+  display: flex;
+  padding: 24rpx;
+}
+.line-goods-image-box.data-v-bf6a0d3e {
+  position: relative;
+  width: 180rpx;
+  height: 180rpx;
+  flex-shrink: 0;
+}
+.line-goods-image.data-v-bf6a0d3e {
+  width: 100%;
+  height: 100%;
+  border-radius: 16rpx;
+}
+.line-goods-image-border.data-v-bf6a0d3e {
+  position: absolute;
+  top: 8rpx;
+  left: 8rpx;
+  right: 8rpx;
+  bottom: 8rpx;
+  border: 2rpx solid rgba(26, 26, 46, 0.1);
+  border-radius: 12rpx;
+  pointer-events: none;
+}
+.line-goods-info.data-v-bf6a0d3e {
+  flex: 1;
+  padding: 0 24rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.line-goods-name.data-v-bf6a0d3e {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: 0.5rpx;
+}
+.line-goods-desc.data-v-bf6a0d3e {
+  display: block;
+  font-size: 24rpx;
+  color: #8a8a9e;
+  margin-bottom: 16rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.line-goods-footer.data-v-bf6a0d3e {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.line-goods-price.data-v-bf6a0d3e {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #ef476f;
+  letter-spacing: 1rpx;
+}
+.line-goods-status.data-v-bf6a0d3e {
+  font-size: 22rpx;
+  color: #4a4a6a;
+  padding: 6rpx 14rpx;
+  border: 2rpx solid #e0e0e0;
+  border-radius: 10rpx;
+  font-weight: 500;
+}
+.line-goods-actions.data-v-bf6a0d3e {
+  display: flex;
+  gap: 16rpx;
+  padding: 20rpx 24rpx;
+  border-top: 2rpx solid #e0e0e0;
+}
+.line-action-btn.data-v-bf6a0d3e {
+  flex: 1;
+  height: 70rpx;
+  line-height: 70rpx;
+  text-align: center;
+  border-radius: 14rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.line-off-btn.data-v-bf6a0d3e {
+  border: 2rpx solid #ffd166;
+  color: #8a6a00;
+}
+.line-edit-btn.data-v-bf6a0d3e {
+  border: 2rpx solid #3f37c9;
+  color: #3f37c9;
+}
+.line-delete-btn.data-v-bf6a0d3e {
+  border: 2rpx solid #ef476f;
+  color: #ef476f;
+}
+.line-empty.data-v-bf6a0d3e {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 0;
+}
+.line-empty-icon.data-v-bf6a0d3e {
+  width: 120rpx;
+  height: 120rpx;
+  margin-bottom: 30rpx;
+  opacity: 0.4;
+}
+.line-empty-text.data-v-bf6a0d3e {
+  font-size: 28rpx;
+  color: #8a8a9e;
+  letter-spacing: 1rpx;
+}
+.line-bottom-space.data-v-bf6a0d3e {
+  height: 40rpx;
+}

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "商品列表",
+  "usingComponents": {
+    "line-icon": "../../components/LineIcon",
+    "tab-bar": "../../components/TabBar"
+  }
+}

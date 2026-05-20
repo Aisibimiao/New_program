@@ -1,0 +1,172 @@
+.line-container.data-v-ebed24a8 {
+  min-height: 100vh;
+  background-color: #f7fafc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 40rpx;
+  padding-top: calc(80rpx + env(safe-area-inset-top));
+  padding-bottom: calc(80rpx + env(safe-area-inset-bottom));
+}
+.line-header-section.data-v-ebed24a8 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 80rpx;
+  margin-bottom: 120rpx;
+}
+.line-dot-group.data-v-ebed24a8 {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 40rpx;
+}
+.line-dot.data-v-ebed24a8 {
+  width: 16rpx;
+  height: 16rpx;
+  border: 3rpx solid #2d3748;
+  border-radius: 50%;
+}
+.line-logo-wrapper.data-v-ebed24a8 {
+  margin-bottom: 40rpx;
+}
+.line-logo-border.data-v-ebed24a8 {
+  width: 160rpx;
+  height: 160rpx;
+  border: 4rpx solid #2d3748;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.line-logo-border.data-v-ebed24a8::before {
+  content: "";
+  position: absolute;
+  top: 12rpx;
+  left: 12rpx;
+  right: 12rpx;
+  bottom: 12rpx;
+  border: 2rpx dashed #e2e8f0;
+  border-radius: 8rpx;
+  pointer-events: none;
+}
+.line-logo.data-v-ebed24a8 {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #2d3748;
+  letter-spacing: 8rpx;
+}
+.line-title.data-v-ebed24a8 {
+  font-size: 52rpx;
+  font-weight: 700;
+  color: #2d3748;
+  letter-spacing: 12rpx;
+  margin-bottom: 20rpx;
+}
+.line-title-divider.data-v-ebed24a8 {
+  width: 120rpx;
+  height: 4rpx;
+  background-color: #2d3748;
+  margin-bottom: 20rpx;
+}
+.line-subtitle.data-v-ebed24a8 {
+  font-size: 28rpx;
+  color: #a0aec0;
+  letter-spacing: 6rpx;
+}
+.line-login-section.data-v-ebed24a8 {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.line-login-card.data-v-ebed24a8 {
+  width: 100%;
+  max-width: 600rpx;
+  background-color: white;
+  border: 4rpx solid #2d3748;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  position: relative;
+}
+.line-login-card.data-v-ebed24a8::before {
+  content: "";
+  position: absolute;
+  top: 16rpx;
+  left: 16rpx;
+  right: 16rpx;
+  bottom: 16rpx;
+  border: 2rpx dashed #e2e8f0;
+  border-radius: 8rpx;
+  pointer-events: none;
+}
+.line-wechat-btn.data-v-ebed24a8 {
+  width: 100%;
+  height: 100rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20rpx;
+  border: 4rpx solid #2d3748;
+  border-radius: 24rpx;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+.line-wechat-btn.data-v-ebed24a8:active {
+  background-color: #2d3748;
+  transform: scale(0.98);
+}
+.line-wechat-btn:active .line-wechat-icon.data-v-ebed24a8,
+.line-wechat-btn:active .line-wechat-text.data-v-ebed24a8 {
+  color: white;
+}
+.line-wechat-icon.data-v-ebed24a8 {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2d3748;
+  transition: all 0.2s ease;
+}
+.line-wechat-text.data-v-ebed24a8 {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #2d3748;
+  letter-spacing: 4rpx;
+  transition: all 0.2s ease;
+}
+.line-tips-section.data-v-ebed24a8 {
+  margin-top: 40rpx;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8rpx;
+}
+.line-tip-text.data-v-ebed24a8 {
+  font-size: 24rpx;
+  color: #a0aec0;
+  letter-spacing: 2rpx;
+}
+.line-tip-link.data-v-ebed24a8 {
+  font-size: 24rpx;
+  color: #2d3748;
+  letter-spacing: 2rpx;
+  text-decoration: underline;
+}
+.line-footer-section.data-v-ebed24a8 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 60rpx;
+}
+.line-footer-divider.data-v-ebed24a8 {
+  width: 40rpx;
+  height: 2rpx;
+  background-color: #e2e8f0;
+  margin-bottom: 20rpx;
+}
