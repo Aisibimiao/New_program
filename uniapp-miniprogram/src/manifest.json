@@ -16,10 +16,11 @@
     }
   },
   "mp-weixin": {
-    "appid": "wx3d1487d7bde93a4f",
+    "appid": "wxb26d178fc389271d",
     "setting": {
       "urlCheck": false
     },
-    "usingComponents": true
+    "usingComponents": true,
+    "cloudfunctionRoot": "cloudfunctions/"
   }
 }

@@ -3,6 +3,15 @@ import { onLaunch, onShow, onHide } from '@dcloudio/uni-app'
 
 onLaunch(() => {
   console.log('App Launch')
+  // 初始化云开发
+  if (typeof uni.cloud !== 'undefined') {
+    uni.cloud.init({
+      env: 'cloudbase-d9dg3iiqp40c9067a'
+    })
+    console.log('云开发初始化成功')
+  } else {
+    console.log('当前环境不支持云开发')
+  }
 })
 
 onShow(() => {

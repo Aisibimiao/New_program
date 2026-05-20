@@ -26,6 +26,14 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
   setup(__props) {
     common_vendor.onLaunch(() => {
       console.log("App Launch");
+      if (typeof common_vendor.index.cloud !== "undefined") {
+        common_vendor.index.cloud.init({
+          env: "cloudbase-d9dg3iiqp40c9067a"
+        });
+        console.log("云开发初始化成功");
+      } else {
+        console.log("当前环境不支持云开发");
+      }
     });
     common_vendor.onShow(() => {
       console.log("App Show");

@@ -2,8 +2,7 @@ backend/node_modules/
 frontend/node_modules/
 uniapp-miniprogram/node_modules/
 
-# UniApp build outputs
-uniapp-miniprogram/dist/
+# UniApp build outputs (temporarily uncommented for deployment)
 
 # Environment files
 .env

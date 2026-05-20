@@ -18,21 +18,21 @@ const useUserStore = common_vendor.defineStore("user", () => {
     }
   }
   async function login(email, password) {
-    const result = await api_auth.login({ email, password });
+    const result = await api_auth.login();
     setToken(result.token);
     setUser(result.user);
     common_vendor.index.setStorageSync("user", JSON.stringify(result.user));
     return result;
   }
   async function register(email, password, nickname, code) {
-    const result = await api_auth.register({ email, password, nickname, code });
+    const result = await api_auth.register();
     setToken(result.token);
     setUser(result.user);
     common_vendor.index.setStorageSync("user", JSON.stringify(result.user));
     return result;
   }
   async function wechatLogin(code, nickName, avatarUrl) {
-    const result = await api_auth.wechatLogin({ code, nickName, avatarUrl });
+    const result = await api_auth.wechatLogin();
     setToken(result.token);
     setUser(result.user);
     common_vendor.index.setStorageSync("user", JSON.stringify(result.user));

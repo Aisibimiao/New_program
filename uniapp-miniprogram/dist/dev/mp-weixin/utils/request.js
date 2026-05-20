@@ -82,41 +82,6 @@ function request(options) {
     });
   });
 }
-function uploadFile(url, filePath, name) {
-  return new Promise((resolve, reject) => {
-    const token = common_vendor.index.getStorageSync("token");
-    common_vendor.index.uploadFile({
-      url: baseURL + url,
-      filePath,
-      name,
-      header: {
-        "Authorization": `Bearer ${token}`
-      },
-      success: (res) => {
-        var _a, _b;
-        try {
-          const data = JSON.parse(res.data);
-          if (res.statusCode >= 200 && res.statusCode < 300) {
-            if ((_a = data.data) == null ? void 0 : _a.url) {
-              resolve(data.data);
-            } else if ((_b = data.goods) == null ? void 0 : _b.images) {
-              resolve({ url: data.goods.images[0] || "" });
-            } else {
-              resolve({ url: "" });
-            }
-          } else {
-            reject(new Error(data.msg || "上传失败"));
-          }
-        } catch {
-          reject(new Error("解析响应失败"));
-        }
-      },
-      fail: (err) => {
-        reject(new Error(err.errMsg || "上传失败"));
-      }
-    });
-  });
-}
 const placeholderImage = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23667EEA" width="400" height="300"/%3E%3Ctext fill="white" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3E暂无图片%3C/text%3E%3C/svg%3E';
 function formatImageUrl(url) {
   if (!url || url === "[]" || url === "null" || url === "") {
@@ -138,4 +103,3 @@ function formatImageUrl(url) {
 }
 exports.formatImageUrl = formatImageUrl;
 exports.request = request;
-exports.uploadFile = uploadFile;

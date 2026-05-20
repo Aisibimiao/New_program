@@ -1,19 +1,56 @@
-import { request } from '@/utils/request'
-
 export interface User {
-  id: number
+  _id: string
   nickname: string
   avatar: string
-  role: string
   openid?: string
+  phone?: string
 }
 
-export function login(data: { email: string; password: string }) {
-  return request<{ token: string; user: User }>({
-    url: '/auth/login',
-    method: 'POST',
-    data: { account: data.email, password: data.password }
-  })
+export async function login() {
+  try {
+    const result = await uni.cloud.callFunction({
+      name: 'login'
+    })
+    return result.result
+  } catch (error) {
+    return { success: false, message: '云函数调用失败' }
+  }
+}
+
+export async function getProfile() {
+  try {
+    const result = await uni.cloud.callFunction({
+      name: 'login'
+    })
+    return result.result
+  } catch (error) {
+    return { success: false, message: '云函数调用失败' }
+  }
+}
+
+export async function updateProfile(data: {
+  nickname?: string
+  avatar?: string
+}) {
+  const userStore = uni.getStorageSync('user')
+  if (!userStore) {
+    return { success: false, message: '请先登录' }
+  }
+  
+  try {
+    const db = uni.cloud.database()
+    const result = await db.collection('users').doc(userStore._id).update({
+      data
+    })
+    return { success: result.stats.updated > 0 }
+  } catch (error) {
+    return { success: false, message: '更新失败' }
+  }
+}
+
+export function logout() {
+  uni.removeStorageSync('user')
+  return { success: true }
 }
 
 export function register(data: {
@@ -22,44 +59,11 @@ export function register(data: {
   nickname: string
   code: string
 }) {
-  return request<{ token: string; user: User }>({
-    url: '/auth/register',
-    method: 'POST',
-    data
-  })
-}
-
-export function getProfile() {
-  return request<User>({
-    url: '/auth/profile',
-    method: 'GET'
-  })
-}
-
-export function updateProfile(data: {
-  nickname?: string
-  avatar?: string
-}) {
-  return request<User>({
-    url: '/auth/profile',
-    method: 'PUT',
-    data
-  })
+  return login()
 }
 
 export function sendCode(email: string) {
-  return request({
-    url: '/auth/send-register-code',
-    method: 'POST',
-    data: { email }
-  })
-}
-
-export function logout() {
-  return request({
-    url: '/auth/logout',
-    method: 'POST'
-  })
+  return { success: true }
 }
 
 export function wechatLogin(data: { 
@@ -67,9 +71,5 @@ export function wechatLogin(data: {
   nickName?: string 
   avatarUrl?: string 
 }) {
-  return request<{ token: string; user: User }>({
-    url: '/auth/wechat-login',
-    method: 'POST',
-    data
-  })
+  return login()
 }

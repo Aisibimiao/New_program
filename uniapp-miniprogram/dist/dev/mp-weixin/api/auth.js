@@ -1,37 +1,34 @@
 "use strict";
-const utils_request = require("../utils/request.js");
-function login(data) {
-  return utils_request.request({
-    url: "/auth/login",
-    method: "POST",
-    data: { account: data.email, password: data.password }
-  });
+const common_vendor = require("../common/vendor.js");
+async function login() {
+  try {
+    const result = await common_vendor.index.cloud.callFunction({
+      name: "login"
+    });
+    return result.result;
+  } catch (error) {
+    return { success: false, message: "云函数调用失败" };
+  }
 }
-function register(data) {
-  return utils_request.request({
-    url: "/auth/register",
-    method: "POST",
-    data
-  });
-}
-function getProfile() {
-  return utils_request.request({
-    url: "/auth/profile",
-    method: "GET"
-  });
+async function getProfile() {
+  try {
+    const result = await common_vendor.index.cloud.callFunction({
+      name: "login"
+    });
+    return result.result;
+  } catch (error) {
+    return { success: false, message: "云函数调用失败" };
+  }
 }
 function logout() {
-  return utils_request.request({
-    url: "/auth/logout",
-    method: "POST"
-  });
+  common_vendor.index.removeStorageSync("user");
+  return { success: true };
+}
+function register(data) {
+  return login();
 }
 function wechatLogin(data) {
-  return utils_request.request({
-    url: "/auth/wechat-login",
-    method: "POST",
-    data
-  });
+  return login();
 }
 exports.getProfile = getProfile;
 exports.login = login;
