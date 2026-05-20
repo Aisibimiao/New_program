@@ -1,1 +1,0 @@
-"use strict";const e=require("../utils/request.js");exports.getMessages=function(s,t){return e.request({url:"/chat/messages",method:"GET",data:{goodsId:s,otherId:t}})},exports.sendMessage=function(s){return e.request({url:"/chat/send",method:"POST",data:s})};
