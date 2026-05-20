@@ -320,16 +320,11 @@ async function handleSubmit() {
     }
 
     await createGoods({
-      name: form.value.name,
+      title: form.value.name,
       description: form.value.description,
       price: form.value.price,
       images: uploadedImages,
-      category: form.value.category,
-      college: form.value.college || undefined,
-      major: form.value.major || undefined,
-      bookName: form.value.bookName || undefined,
-      grade: form.value.grade || undefined,
-      location: form.value.location || undefined
+      category: form.value.category
     })
 
     uni.hideLoading()

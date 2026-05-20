@@ -127,16 +127,11 @@ const _sfc_main = /* @__PURE__ */ common_vendor.defineComponent({
           }
         }
         await api_goods.createGoods({
-          name: form.value.name,
+          title: form.value.name,
           description: form.value.description,
           price: form.value.price,
           images: uploadedImages,
-          category: form.value.category,
-          college: form.value.college || void 0,
-          major: form.value.major || void 0,
-          bookName: form.value.bookName || void 0,
-          grade: form.value.grade || void 0,
-          location: form.value.location || void 0
+          category: form.value.category
         });
         common_vendor.index.hideLoading();
         common_vendor.index.showToast({ title: "发布成功", icon: "success" });
